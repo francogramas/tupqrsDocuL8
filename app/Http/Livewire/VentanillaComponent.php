@@ -1,0 +1,364 @@
+<?php
+
+namespace App\Http\Livewire;
+
+use Livewire\Component;
+use App\Models\Tipodocumento;
+use App\Models\Solicitante;
+use App\Models\SeccionUser;
+use App\Models\Estado;
+use App\Models\Ciudade;
+use App\Models\SeccionEmpresa;
+
+use App\Models\Serie;
+use App\Models\TipoSolicitud;
+use App\Models\TipoUsuario;
+use App\Models\MedioRecepcion;
+use App\Models\Solicitud;
+use App\Models\Subserie;
+use App\Models\TipologiaDocumento;
+use App\Models\solicitudCopia;
+
+use App\Models\SeguimientoOrden;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Livewire\WithPagination;
+use Illuminate\Support\Str;
+use Livewire\WithFileUploads;
+
+use App\Mail\solicitudMail;
+use Illuminate\Support\Facades\Mail;
+use phpDocumentor\Reflection\Types\This;
+
+class VentanillaComponent extends Component
+{
+    public $empresa, $tiposolicitud, $solicitante, $solicitante_id, $tipodocumento, $etapa, $documento, $nacimiento, $nombrecompleto,
+    $telefono, $email, $modalFormVisible, $mensaje, $tipo_documento, $seccion_id, $adjunto, 
+    $asunto, $anos, $ano, $meses, $mes, $dias, $dia, $estados, $estado_id, $ciudades, $ciudad_id, $direccion, $seccion_empresa, 
+    $tipo_usuarios, $tipo_usuario_id, $medio_recepcion, $medio_id, $fecha, $copia_radicado, $seccionCopia, $seccionCopia_id, 
+    $tipos_id, $confidencial, $respuesta_email, $diasTermino, $solicitudi, $descripcion, $series, $serie_id, $subserie, $subserie_id, $tipologia, 
+    $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1;
+
+    public function mount()
+    {        
+        $s = SeccionUser::where('user_id', Auth::user()->id)->first();
+        $this->empresa = $s->seccionempresa->empresa;
+        $this->tipodocumento = Tipodocumento::all();
+        $this->tipo_documento = Tipodocumento::first()->id;
+
+        
+        $this->anos = range(now()->year-100, now()->year);
+        $this->ano = now()->year-30;
+        $this->dias = range(1,31);
+        $this->dia = 1;
+        $this->mes = 1;
+        $this->tipoProceso = 1;
+
+        $this->estados=Estado::all()->sortBy('estado');        
+        $this->estado_id=1;
+        $this->ciudades = Ciudade::where('estado_id',$this->estado_id)->get();
+        $ciudad1 = Ciudade::where('estado_id',$this->estado_id)->first();
+        $this->ciudad_id = $ciudad1->id;
+
+        $this->seccion_empresa = Subserie::seccionE($this->empresa->id);    
+        $this->seccion_id = $this->seccion_empresa->first()->id;
+        $this->seccion_empresa = $this->seccion_empresa->pluck('nombre', 'id');
+
+        $this->seccionCopia = SeccionEmpresa::where('empresa_id', $this->empresa->id)->get();
+        $this->seccionCopia_id = SeccionEmpresa::where('empresa_id', $this->empresa->id)->first()->id;
+        $this->buscarSerie();
+        $this->buscarSubSerie();
+        
+        $this->tipo_usuarios = TipoUsuario::all();
+        $this->tipo_usuario_id = TipoUsuario::first()->id;
+        $this->medio_recepcion = MedioRecepcion::all();
+        $this->medio_id = MedioRecepcion::first()->id;
+        $this->fecha = now()->format('Y-m-d');
+        /*$this->consultarTipoSerie();        
+        $this->diasTermino = TipoSolicitud::first()->diasTermino;*/
+        $this->solicitudi = 0;  
+
+
+        $this->confidencial = false;
+        $this->respuesta_email = false;
+        $this->copia_radicado = false;
+        $this->folios = 1;     
+        $this->anexos = 0;   
+        $this->filtro = 0;
+        $this->etapa = 0;
+    }
+    public function render()
+    {     
+
+        if(Str::length($this->param)>2){
+            $this->filtro = 0;
+            $char = [' ',',','.',';','"','?','¿','!','¡','&','$','@','#','%',')','(','/','=','+','-','*','/','_',':','>','<','{','}','[',']',"'"];
+            $p = '%'.str_replace($char,'',$this->param).'%';  
+            $solicitudes = Solicitud::select('solicituds.*')->whereRaw("(replace(solicitantes.nombrecompleto,' ','') like ?) or (replace(concat_ws('', solicitantes.documento),' ','') like ?) or (replace(concat_ws('', solicituds.radicado),' ','') like ?) or (replace(concat_ws('', solicituds.asunto),' ','') like ?)", [$p, $p, $p, $p])->join('solicitantes','solicituds.solicitante_id','solicitantes.id')->paginate(20);
+        } 
+        else{
+            if ($this->filtro == 0) {
+                $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)                    
+                    ->orderby('created_at','desc')
+                    ->paginate(15);             
+            }
+            else {
+                $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)
+                    ->where('estado_id',$this->filtro)
+                    ->orderby('created_at','desc')
+                    ->paginate(15);             
+            }
+        }; 
+        
+        $activas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',1)->count();
+        $pendientes = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',2)->count();
+        $vencidas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',3)->count();
+        $finalizadas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',4)->count();
+        $total = Solicitud::where('empresa_id', $this->empresa->id)->count();
+        return view('livewire.ventanilla-component',['solicitudes' => $solicitudes, 'activas' => $activas, 'pendientes'=>$pendientes, 'vencidas'=>$vencidas, 'finalizadas'=>$finalizadas, 'total'=>$total] );
+    }
+
+    public function calcularDias()
+    {
+        $m31 = collect(["1","3","5","7","8","10","12"]);
+        
+        if($this->mes=="2"){            
+            $this->dias = range(1,28);            
+            if($this->ano%4==0){                
+                if($this->ano%100 != 0){
+                    $this->dias = range(1,29);
+                }
+                elseif($this->ano%400 == 0){
+                    $this->dias = range(1,29);
+                }               
+            }
+        }
+        elseif($m31->contains($this->mes)){
+            $this->dias = range(1,31);
+        }
+        else{
+            $this->dias = range(1,30);
+        }
+
+        $this->dia = 1;
+    }
+    
+    public function cargarciudades()
+    {
+        $this->ciudades = Ciudade::where('estado_id',$this->estado_id)->get();
+        $ciudades1 = Ciudade::where('estado_id',$this->estado_id)->first();
+        $this->ciudad_id = $ciudades1->id;
+    }
+
+    public function siguienteSolictud($t)
+    {
+        $this->etapa = $this->etapa+1;
+        $this->tipoProceso = $t; 
+        $this->consultarTipoSerie();    
+           
+    }
+
+    public function crearFecha()
+    {        
+        $this->calcularDias();        
+    }
+    public function guardarSolicitante()
+    {
+        $this->etapa = 2;
+        $this->validate([            
+            'tipo_documento' => 'required',
+            'documento' => 'required|min:5',
+            'nacimiento' => 'required|date',
+            'telefono' => 'required|numeric|min:10',
+            'email' => 'required|email',
+            'nombrecompleto' => 'required|min:10',
+            'direccion' => 'required'
+        ]);
+
+        $s = Solicitante::where('documento', $this->documento)->first();
+        if($s){
+            $s = Solicitante::where('documento', $this->documento)->where('nacimiento', $this->nacimiento)->first();
+            if($s){                
+                $s->telefono = $this->telefono;
+                $s->email = $this->email;
+                $s->save();                
+                $this->solicitante = $s;
+                $this->solicitante_id = $this->solicitante->id;
+                
+            }
+            else {
+                $this->mensaje = "El usuario ya se encuentra registrado en nuestro sistema, pero el número de documento no corresponde con la fecha de nacimiento, por favor verifique e intente nuevamente";
+                $this->modalFormVisible = true;
+                $this->etapa = 1;
+            }
+        }
+        else {
+            $this->solicitante = Solicitante::create([
+                'tipo_documento' => $this->tipo_documento,
+                'tipo_usuario_id' => $this->tipo_usuario_id,
+                'documento' => $this->documento,
+                'nacimiento' => $this->nacimiento,
+                'nombrecompleto' => $this->nombrecompleto,
+                'telefono' => $this->telefono,
+                'email' => $this->email,                
+                'ciudad_id' => $this->ciudad_id,
+                'direccion' => $this->direccion,
+            ]);
+    
+            $this->solicitante_id = $this->solicitante->id;                   
+        }
+    }    
+    public function buscarSolicitante()
+    {  
+        $this->nacimiento = $this->ano.'-'.$this->mes.'-'.$this->dia;      
+        $s = Solicitante::where('documento', $this->documento)
+        ->where('nacimiento', $this->nacimiento)->first();
+
+        if($s){
+            $this->nombrecompleto = $s->nombrecompleto;
+            $this->tipo_documento = $s->tipo_documento;
+            $this->tipo_usuario_id = $s->tipo_usuario_id;
+            $this->telefono = $s->telefono;
+            $this->email = $s->email;
+            $this->direccion = $s->direccion;
+            $this->estado_id = $s->ciudad->estado_id;
+            $this->ciudades = Ciudade::where('estado_id', $s->ciudad->estado_id)->get();
+            $this->ciudad_id = $s->ciudad_id;
+        }
+    }
+
+    public function buscarSerie()
+    {
+        $this->series = Subserie::serieSeccion($this->seccion_id);
+        $this->serie_id = $this->series->first()->id;
+        $this->series = $this->series->pluck('nombre', 'id');
+        $this->buscarSubSerie();
+    }
+
+    public function buscarSubSerie()
+    {
+        $this->subserie = Subserie::where('serie_id', $this->serie_id)->where('seccion_id', $this->seccion_id)->orderBy('nombre')->get();
+        $this->subserie_id = $this->subserie->first()->id;
+        $this->buscarTipologia();
+    }
+
+    public function buscarTipologia()
+    {
+        $this->tipologia = TipologiaDocumento::where('subserie_id', $this->subserie_id)->orderBy('nombre')->get();
+        $this->tipologia_id = $this->tipologia->first()->id;
+        $this->obtenerDiasTermino();
+    }
+
+    
+    public function obtenerDiasTermino()
+    {
+        $this->diasTermino = TipologiaDocumento::find($this->tipologia_id)->pqrs->diastermino;
+    }
+
+    public function radicar()
+    {
+        $this->validate([            
+            'fecha'=>'required|date',            
+            'asunto'=>'required|min:5',
+            'diasTermino'=>'required|numeric',
+            'adjunto' => 'max:4096', // Pdf máximo 4MB
+        ]);
+                
+        $solicitudBD = Solicitud::create([
+            'solicitante_id'=>$this->solicitante_id,            
+            'estado_id'=> 1,
+            'seccion_id'=>$this->seccion_id,
+            'empresa_id'=>$this->empresa->id,
+            'serie_id'=>$this->serie_id,
+            'subserie_id'=>$this->subserie_id,
+            'medio_id'=>$this->medio_id,
+            'user_id' => Auth::user()->id,
+            'radicado'=> $this->calcularRadicado(),
+            'consecutivo'=> $this->max_consecutivo,
+            'diasTermino'=> $this->diasTermino,   
+            'folios'=>$this->folios,
+            'anexos'=>$this->anexos,
+            'destinatario'=>$this->destinatario,
+            'asunto'=>$this->asunto,
+            'fecha'=>$this->fecha,
+            'confidencial'=>$this->confidencial,
+            'respuesta_email'=>$this->respuesta_email,
+            'tipologia_id'=>$this->tipologia_id,
+
+        ]);
+
+        try {
+            $dataValid['adjunto'] = $this->adjunto->store('pdf','public');        
+        } catch (\Throwable $th) {
+            $dataValid['adjunto']='';
+        }
+
+        SeguimientoOrden::create([
+            'solicitud_id' => $solicitudBD->id,
+            'estado_id' => 1,
+            'seccion_id' => $this->seccion_id,
+            'accion_id' => 1,
+            'mensaje' => $this->descripcion,            
+            'adjunto' => $dataValid['adjunto'],            
+        ]);
+
+        if($this->copia_radicado){
+            solicitudCopia::create([
+                'solicitud_id' => $solicitudBD->id,
+                'seccion_id' => $this->seccionCopia_id
+            ]);
+        }
+
+        Mail::to($this->solicitante->email)->send(new solicitudMail($solicitudBD));
+        $this->solicitudi = $solicitudBD->id;
+        $this->etapa = 3;
+    }
+
+    public function calcularRadicado()
+    {
+        $date = Carbon::createFromDate(now()->format('Y-m-d'));
+        $startOfYear = $date->copy()->startOfYear();
+        $endOfYear   = $date->copy()->endOfYear();
+
+        $this->max_consecutivo = Solicitud::where('empresa_id',$this->empresa->id)
+                            ->whereBetween('created_at',[$startOfYear, $endOfYear])
+                            ->max('consecutivo');
+        if($this->max_consecutivo>0){
+            $this->max_consecutivo +=1;
+        }                              
+        else{
+            $this->max_consecutivo =1;
+        }
+        $t = TipologiaDocumento::find($this->tipologia_id);
+        $c= $t->subserie->seccionempresa->codigo.'-'.$t->subserie->serie->codigo.'-'.$t->subserie->codigo;
+        $radicado = now()->format('y').'-'.$c.'-'.$this->max_consecutivo;
+        
+        return($radicado);
+    }
+
+    public function finalizarRadicado()
+    {
+        $this->nombrecompleto = null;
+        $this->telefono = null;
+        $this->email = null;
+        $this->direccion = null;
+        $this->documento = null;
+        $this->solicitante = null;
+        $this->solicitudi = 0;
+        $this->etapa = 0;
+        $this->asunto = null;
+        $this->destinatario = null;
+        $this->etapa = 0;
+    }
+    public function filtrar($id)
+    {
+        $this->filtro = $id;
+    }
+
+    public function consultarTipoSerie()
+    {
+        $this->etapa = 1;    
+        $this->buscarSubSerie();
+    }
+
+}
