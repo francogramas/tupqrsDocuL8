@@ -15,7 +15,7 @@ use Asantibanez\LivewireCharts\Facades\LivewireCharts;
 class InformeComponent extends Component
 {
     public $fechai, $fechaf, $solicitudes, $series, $secciones, $serie_id, $seccion_id, $empresa;
-    public $colors = ['#54478C', '#2C699A', '#048BA8', '#0DB39E', '#16DB93', '#83E377', '#B9E769', '#EFEA5A', '#F1C453', '#F29E4C','#EA8C55', '#C75146', '#AD2E24', '#81171B', '#540804', 
+    public $colors = ['#54478C', '#2C699A', '#048BA8', '#0DB39E', '#16DB93', '#83E377', '#B9E769', '#EFEA5A', '#F1C453', '#F29E4C','#EA8C55', '#C75146', '#AD2E24', '#81171B', '#540804',
     '#54478C', '#2C699A', '#048BA8', '#0DB39E', '#16DB93', '#83E377', '#B9E769', '#EFEA5A', '#F1C453', '#F29E4C','#EA8C55', '#C75146', '#AD2E24', '#81171B', '#540804',
     '#54478C', '#2C699A', '#048BA8', '#0DB39E', '#16DB93', '#83E377', '#B9E769', '#EFEA5A', '#F1C453', '#F29E4C','#EA8C55', '#C75146', '#AD2E24', '#81171B', '#540804',
     '#54478C', '#2C699A', '#048BA8', '#0DB39E', '#16DB93', '#83E377', '#B9E769', '#EFEA5A', '#F1C453', '#F29E4C','#EA8C55', '#C75146', '#AD2E24', '#81171B', '#540804',
@@ -25,7 +25,7 @@ class InformeComponent extends Component
     protected $listeners = [
         'onSliceClick' => 'handleOnSliceClick'
     ];
-    
+
     public function handleOnSliceClick($slice)
     {
         $this->seccion_id = $slice['extras'];
@@ -35,9 +35,9 @@ class InformeComponent extends Component
         ->where('solicituds.seccion_id', $this->seccion_id)
         ->groupBy('subseries.serie_id')
         ->get();
-        $this->series = Serie::whereIn('id',$serie)->get();        
+        $this->series = Serie::whereIn('id',$serie)->get();
         $this->series_id = $this->series->first()->id;
-        
+
     }
 
     public function selSeccion()
@@ -50,19 +50,19 @@ class InformeComponent extends Component
             ->groupBy('subseries.serie_id')
             ->get();
 
-            $this->series = Serie::whereIn('id',$serie)->get();        
+            $this->series = Serie::whereIn('id',$serie)->get();
             $this->series_id = $this->series->first()->id;
-        }        
+        }
 
     }
 
     public function mount()
     {
         $this->empresa=Auth::user()->empresa;
-        $this->fechaf = Carbon::now()->lastOfMonth()->format('Y-m-d');        
-        $this->fechai = Carbon::now()->firstOfMonth()->subMonths(5)->format('Y-m-d');  
+        $this->fechaf = Carbon::now()->lastOfMonth()->format('Y-m-d');
+        $this->fechai = Carbon::now()->firstOfMonth()->subMonths(5)->format('Y-m-d');
 
-        
+
         $seccion = Solicitud::select('seccion_id')
         ->whereBetween('solicituds.created_at', [$this->fechai, $this->fechaf])
         ->where('solicituds.empresa_id', $this->empresa->id)
@@ -72,8 +72,8 @@ class InformeComponent extends Component
         $this->secciones = SeccionEmpresa::whereIn('id',$seccion)->get();
 
         try {
-            $this->seccion_id = $this->secciones->first()->id;        
-            
+            $this->seccion_id = $this->secciones->first()->id;
+
             $serie = Solicitud::select('subseries.serie_id')
             ->join('subseries', 'solicituds.subserie_id', 'subseries.id')
             ->whereBetween('solicituds.created_at', [$this->fechai, $this->fechaf])
@@ -81,14 +81,14 @@ class InformeComponent extends Component
             ->groupBy('subseries.serie_id')
             ->get();
 
-            $this->series = Serie::whereIn('id',$serie)->get();        
+            $this->series = Serie::whereIn('id',$serie)->get();
             $this->series_id = $this->series->first()->id;
 
         } catch (\Throwable $th) {
-            $this->series = null;        
+            $this->series = null;
             $this->series_id = 0;
         }
-        
+
 
     }
 
@@ -99,7 +99,7 @@ class InformeComponent extends Component
             ->with('pieChartModel', [])
             ->with('pieChartModel1', [])
             ->with('columnChartModel', []);
-            
+
         }
         else{
             $solicitesMesTotales = Solicitud::select(DB::raw('count(solicituds.id) as `data`'),
@@ -109,12 +109,12 @@ class InformeComponent extends Component
             ->whereBetween('solicituds.created_at',[$this->fechai, $this->fechaf])
             ->groupBy('new_date')->orderBy('new_date')
             ->get();
-            $m = [];        
-            
+            $m = [];
+
             $this->seccion = SeccionEmpresa::find($this->seccion_id);
             $columnChartModel =  LivewireCharts::multiColumnChartModel()
-                ->setTitle('PQRS Mensual');            
-            
+                ->setTitle('PQRS Mensual');
+
             $this->total = 0;
 
             $pieChartModel = LivewireCharts::pieChartModel()
@@ -122,15 +122,15 @@ class InformeComponent extends Component
             ->setAnimated(true)
             ->withOnSliceClickEvent('onSliceClick')
             ->withLegend()
-            ->legendPositionRight()
+            ->legendPositionBottom()
             ->legendHorizontallyAlignedCenter()
             ->setDataLabelsEnabled(true);
 
             $i=0;
-            foreach ($this->secciones as $seccioni) {            
-                $t = Solicitud::whereBetween('created_at', [$this->fechai, $this->fechaf])            
+            foreach ($this->secciones as $seccioni) {
+                $t = Solicitud::whereBetween('created_at', [$this->fechai, $this->fechaf])
                 ->where('seccion_id', $seccioni->id)
-                ->count();            
+                ->count();
 
                 $this->total += $t;
                 $pieChartModel->addSlice($seccioni->nombre, $t, $this->colors[$i], $seccioni->id);
@@ -141,18 +141,18 @@ class InformeComponent extends Component
             $totalSerie = [];
             $pieChartModel1 = LivewireCharts::pieChartModel()
             ->setTitle('Total de solicitudes de '. SeccionEmpresa::find($this->seccion_id)->nombre .' por series')
-            ->setAnimated(true)        
+            ->setAnimated(true)
             ->withLegend()
-            ->legendPositionRight()
+            ->legendPositionBottom()
             ->legendHorizontallyAlignedCenter()
             ->setDataLabelsEnabled(true);
 
             foreach ($this->series as $serie) {
-                $t = Solicitud::whereBetween('created_at', [$this->fechai, $this->fechaf])            
+                $t = Solicitud::whereBetween('created_at', [$this->fechai, $this->fechaf])
                 ->where('seccion_id', $this->seccion_id)
                 ->where('serie_id', $serie->id)
-                ->count();            
-            
+                ->count();
+
                 $pieChartModel1->addSlice($serie->nombre, $t, $this->colors[$i], $seccioni->id);
                 $i +=1;
             }
@@ -162,21 +162,21 @@ class InformeComponent extends Component
                 $m[] = $fechas->new_date;
 
                 foreach ($this->series as $serie) {
-                    $t = Solicitud::where(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"),$fechas->new_date)            
+                    $t = Solicitud::where(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"),$fechas->new_date)
                     ->where('seccion_id', $this->seccion_id)
                     ->where('serie_id', $serie->id)
-                    ->count();                                
-                    $columnChartModel->addSeriesColumn($serie->nombre, $mes, $t);                    
-                }                      
+                    ->count();
+                    $columnChartModel->addSeriesColumn($serie->nombre, $mes, $t);
+                }
             }
 
             $columnChartModel->multiColumn()
-            ->withLegend()            
+            ->withLegend()
             ->setOpacity(.75)
             ->setColumnWidth(15)
             ->setHorizontal(false)
             ->setAnimated(true)
-            ->legendPositionRight()
+            ->legendPositionBottom()
             ->stacked()
             ->withGrid()
             ->setXAxisCategories($m);
@@ -186,6 +186,6 @@ class InformeComponent extends Component
             ->with('pieChartModel1', $pieChartModel1)
             ->with('columnChartModel', $columnChartModel);
         }
-        
+
     }
 }

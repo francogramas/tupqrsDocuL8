@@ -1,7 +1,7 @@
 @component('mail::message')
-# Hola {{$solicitud->solicitante->nombrecompleto}} 
+# Hola {{$solicitud->solicitante->nombrecompleto}}
 
-usted ha recibido una respuesta a la {{$solicitud->tipo->nombre}} realizada el {{$solicitud->created_at}} con las siguientes características:
+usted ha recibido una respuesta a la {{$solicitud->tipologia->nombre}} realizada el {{$solicitud->created_at}} con las siguientes características:
 
 ## Empresa:
 {{$solicitud->seccionempresa->empresa->razonsocial}}
@@ -18,7 +18,7 @@ No de Radicado: {{$solicitud->radicado}}
     {{$seguimiento->created_at->format('M d/Y').' -'.$seguimiento->accion->nombre}}
 @if ($seguimiento->mensaje)
     {{'Mensaje - '. $seguimiento->mensaje}}
-@endif   
+@endif
 @if ($seguimiento->observaciones)
     {{'Observaciones - '. $seguimiento->observaciones}}
 @endif

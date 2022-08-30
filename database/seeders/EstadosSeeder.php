@@ -18,7 +18,7 @@ class EstadosSeeder extends Seeder
 {
     /**
      * Corre un seeder para varias tablas generales, .
-     * tales como ciudades, estados, sexos, tipos de documentos, 
+     * tales como ciudades, estados, sexos, tipos de documentos,
      * cups, educación, entre otros...
      * @return void
      **/
@@ -1005,7 +1005,7 @@ class EstadosSeeder extends Seeder
             array( 'id'=>940,  'estado_id'=>22, 'codigo'=>124, 'ciudad'=>'CAIMITO'),
             array( 'id'=>941,  'estado_id'=>22, 'codigo'=>204, 'ciudad'=>'COLOSO RICAURTE'),
             array( 'id'=>942,  'estado_id'=>22, 'codigo'=>215, 'ciudad'=>'COROZAL'),
-            array( 'id'=>1127,  'estado_id'=>22, 'codigo'=>215, 'ciudad'=>'COVEÑAS'),            
+            array( 'id'=>1127,  'estado_id'=>22, 'codigo'=>215, 'ciudad'=>'COVEÑAS'),
             array( 'id'=>943,  'estado_id'=>22, 'codigo'=>230, 'ciudad'=>'CHALAN'),
             array( 'id'=>944,  'estado_id'=>22, 'codigo'=>235, 'ciudad'=>'GALERAS NUEVA GRANADA'),
             array( 'id'=>945,  'estado_id'=>22, 'codigo'=>265, 'ciudad'=>'GUARANDA'),
@@ -1191,7 +1191,7 @@ class EstadosSeeder extends Seeder
             array( 'id'=>1125,  'estado_id'=>33, 'codigo'=>760, 'ciudad'=>'SAN JOSE DE OCUNE'),
             array( 'id'=>1126,  'estado_id'=>33, 'codigo'=>773, 'ciudad'=>'CUMARIBO')
         );
-        
+
         DB::table('ciudades')->insert($ciudades);
 
         $tipodocumentos= array(
@@ -1216,31 +1216,31 @@ class EstadosSeeder extends Seeder
         $estado_empresas = array(
             array('id'=>1,'nombre'=>'ACTIVA'),
             array('id'=>2,'nombre'=>'VENCIDA'),
-            array('id'=>3,'nombre'=>'SUSPENDIDA'),                        
+            array('id'=>3,'nombre'=>'SUSPENDIDA'),
         );
         DB::table('estado_empresas')->insert($estado_empresas);
-        
+
         $estado_seccions = array(
             array('id'=>1,'nombre'=>'ACTIVA'),
-            array('id'=>2,'nombre'=>'INACTIVA'),            
+            array('id'=>2,'nombre'=>'INACTIVA'),
         );
         DB::table('estado_seccions')->insert($estado_seccions);
 
         $estado_pagos = array(
             array('id'=>1,'nombre'=>'FINALIZADO'),
             array('id'=>2,'nombre'=>'PENDIENTE POR CONFIRMAR'),
-            array('id'=>3,'nombre'=>'CANCELADO'),            
+            array('id'=>3,'nombre'=>'CANCELADO'),
         );
         DB::table('estado_pagos')->insert($estado_pagos);
-                
+
         $estado_solicituds = array(
             array('id'=>1,'nombre'=>'ACTIVA'),
             array('id'=>2,'nombre'=>'POR VENCER'),
-            array('id'=>3,'nombre'=>'VENCIDA'),            
-            array('id'=>4,'nombre'=>'RESUELTA'),            
+            array('id'=>3,'nombre'=>'VENCIDA'),
+            array('id'=>4,'nombre'=>'RESUELTA'),
         );
 
-        DB::table('estado_solicituds')->insert($estado_solicituds);        
+        DB::table('estado_solicituds')->insert($estado_solicituds);
         $medio_recepcions = array(
             array('id'=>1,'nombre'=>'Mensajeria'),
             array('id'=>3,'nombre'=>'Correo electrónico'),
@@ -1262,19 +1262,19 @@ class EstadosSeeder extends Seeder
 
         User::create(
             [   'id' => 1,
-                'name' => 'Anónimo', 
-                'email' => 'anonimo@pqrs.co', 
+                'name' => 'Anónimo',
+                'email' => 'anonimo@pqrs.co',
                 'email_verified_at' => now(),
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            ] 
+            ]
         );
 
         $user = User::create(
-            [   'name' => 'Administrador del Sistema', 
-                'email' => 'francogramas@gmail.com', 
+            [   'name' => 'Administrador del Sistema',
+                'email' => 'admin@tupqrs.co',
                 'email_verified_at' => now(),
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            ] 
+            ]
         );
         //Admin: Adimnistra y presta soporte de toda la plataforma
         $role = Role::create(['name' => 'Admin']);
@@ -1285,20 +1285,20 @@ class EstadosSeeder extends Seeder
         Role::create(['name' => 'Lider']);
         //Ventanilla: Administra la ventanilla única
         Role::create(['name' => 'Ventanilla']);
-        
+
         $empresa1 = User::create(
-            [   'name' => 'Catalina Macías Rosero', 
-                'email' => 'concejo@sangil.gov.co', 
+            [   'name' => 'Usuario de plataforma',
+                'email' => 'usuario@tupqrs.co',
                 'email_verified_at' => now(),
-                'password' => Hash::make('concejo2021'), // password
-            ] 
+                'password' => Hash::make('password'), // password
+            ]
         );
         $empresa1->assignRole('Gerente');
         $empresa1->assignRole('Lider');
         $empresa1->assignRole('Ventanilla');
 
         $empresa = empresa::create([
-            'nit'=> '804004425-1',     
+            'nit'=> '804004425-1',
             'razonsocial'=> 'Concejo Municpal de San Gil',
             'direccion'=> 'Carrera 21 # 32 G',
             'telefono'=> '323 654 7878',
@@ -1308,9 +1308,9 @@ class EstadosSeeder extends Seeder
             'user_id'=> $empresa1->id,
             'url'=> 'WCjlB42wXiFb',
             //'url'=> Str::random(12),
-            'estado_id'=> '1',     
+            'estado_id'=> '1',
         ]);
-        
+
     $pqrs = array(
         ['id'=>1, 'nombre'=>'Peticiones', 'diastermino'=>15, 'created_at'=>now() , 'updated_at'=>now()],
         ['id'=>2, 'nombre'=>'Quejas', 'diastermino'=>15, 'created_at'=>now() , 'updated_at'=>now()],
@@ -1318,6 +1318,6 @@ class EstadosSeeder extends Seeder
         ['id'=>4, 'nombre'=>'Sugerencias', 'diastermino'=>15, 'created_at'=>now() , 'updated_at'=>now()],
     );
     DB::table('pqrs')->insert($pqrs);
-    
+
     }
 }

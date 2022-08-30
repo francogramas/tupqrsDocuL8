@@ -36,7 +36,7 @@ module.exports = {
             transparent: 'transparent',
             current: 'currentColor',
             'titulo': '#392789ff',
-            'contenido': '#9ba1b0ff',
+            'contenido': '#9499a5',
             'morado': '#5d27b3ff',
             'white': '#ffffff',
             'purple': '#3f3cbb',

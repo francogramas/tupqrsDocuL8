@@ -9,21 +9,29 @@ use App\Models\mailEmpresa;
 use App\Mail\adminEmpresasMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use App\Models\Estado;
+use App\Models\Ciudade;
+
 use Illuminate\Support\Facades\DB;
 
 class AdminEmpresasComponent extends Component
 {
     use WithPagination;
 
-    public  $empresa_id, $empresa, $modalFormVisible1, $asunto, $mensaje, $estado_id, $param;
+    public  $empresa_id, $empresa, $modalFormVisible1, $asunto, $mensaje, $estado_id, $param, $estados, $estados_id, $ciudades, $ciudad_id,
+    $boolGuardar;
     public function mount()
-    {        
+    {
         $this->empresa = empresa::first();
         $this->estado_id = '_';
+        $this->estados=Estado::all()->sortBy('estado');
+        $this->estados_id=$this->estados->first()->id;
+        $this->cargarciudades();
+
     }
-    
+
     public function render()
-    {       
+    {
         $empresas = $this->buscarEmpresas();
         return view('livewire.admin-empresas-component',['empresas'=>$empresas]);
     }
@@ -32,7 +40,7 @@ class AdminEmpresasComponent extends Component
     {
         $e = empresa::find($id);
         if($e->estado_id==1){
-            $e->estado_id = 2;            
+            $e->estado_id = 2;
         }
         else{
             $e->estado_id = 1;
@@ -49,13 +57,13 @@ class AdminEmpresasComponent extends Component
 
     public function enviarMensaje()
     {
-        if ($this->empresa->id>0) { 
-            $this->enviarCorreos($this->empresa);            
+        if ($this->empresa->id>0) {
+            $this->enviarCorreos($this->empresa);
         }
         else {
             $empresas = $this->buscarEmpresas();
             foreach ($empresas as $empresai) {
-                $this->enviarCorreos($empresai);            
+                $this->enviarCorreos($empresai);
             }
         }
 
@@ -65,7 +73,7 @@ class AdminEmpresasComponent extends Component
     }
 
     public function mostrarMensajeMasivo()
-    {        
+    {
         $this->empresa = new empresa();
         $this->empresa->id = 0;
         $this->empresa->razonsocial = "Todas las empresas seleccionadas";
@@ -82,7 +90,7 @@ class AdminEmpresasComponent extends Component
         if(Str::length($this->param)>1){
             $char = [' ',',','.',';','"','?','¿','!','¡','&','$','@','#','%',')','(','/','=','+','-','*','/','_',':','>','<','{','}','[',']',"'"];
             $p = '%'.str_replace($char,'',$this->param).'%';
-            $empresas = empresa::whereRaw("(replace(concat_ws('', nit),' ','') like ?) or (replace(concat_ws('', razonsocial),' ','') like ?)", [$p, $p])->paginate(19);            
+            $empresas = empresa::whereRaw("(replace(concat_ws('', nit),' ','') like ?) or (replace(concat_ws('', razonsocial),' ','') like ?)", [$p, $p])->paginate(19);
         }
         else {
             $empresas = empresa::where('estado_id','like',$this->estado_id)->paginate(30);
@@ -101,5 +109,25 @@ class AdminEmpresasComponent extends Component
 
         Mail::to($e->email)
         ->send(new adminEmpresasMail($mailEmpresa));
+    }
+
+    public function cargarciudades()
+    {
+        $this->ciudades = Ciudade::where('estado_id',$this->estados_id)->get();
+        $this->ciudad_id = $this->ciudades->first()->id;
+    }
+
+    public function crearNueva()
+    {
+        $this->boolGuardar = true;
+    }
+
+    public function guardarNueva()
+    {
+
+    }
+    public function cancelarNueva()
+    {
+        $this->boolGuardar = false;
     }
 }

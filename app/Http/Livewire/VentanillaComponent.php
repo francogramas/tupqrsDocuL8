@@ -32,21 +32,22 @@ use phpDocumentor\Reflection\Types\This;
 
 class VentanillaComponent extends Component
 {
+    use WithFileUploads;
     public $empresa, $tiposolicitud, $solicitante, $solicitante_id, $tipodocumento, $etapa, $documento, $nacimiento, $nombrecompleto,
-    $telefono, $email, $modalFormVisible, $mensaje, $tipo_documento, $seccion_id, $adjunto, 
-    $asunto, $anos, $ano, $meses, $mes, $dias, $dia, $estados, $estado_id, $ciudades, $ciudad_id, $direccion, $seccion_empresa, 
-    $tipo_usuarios, $tipo_usuario_id, $medio_recepcion, $medio_id, $fecha, $copia_radicado, $seccionCopia, $seccionCopia_id, 
-    $tipos_id, $confidencial, $respuesta_email, $diasTermino, $solicitudi, $descripcion, $series, $serie_id, $subserie, $subserie_id, $tipologia, 
+    $telefono, $email, $modalFormVisible, $mensaje, $tipo_documento, $seccion_id, $adjunto,
+    $asunto, $anos, $ano, $meses, $mes, $dias, $dia, $estados, $estado_id, $ciudades, $ciudad_id, $direccion, $seccion_empresa,
+    $tipo_usuarios, $tipo_usuario_id, $medio_recepcion, $medio_id, $fecha, $copia_radicado, $seccionCopia, $seccionCopia_id,
+    $tipos_id, $confidencial, $respuesta_email, $diasTermino, $solicitudi, $descripcion, $series, $serie_id, $subserie, $subserie_id, $tipologia,
     $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1;
 
     public function mount()
-    {        
+    {
         $s = SeccionUser::where('user_id', Auth::user()->id)->first();
         $this->empresa = $s->seccionempresa->empresa;
         $this->tipodocumento = Tipodocumento::all();
         $this->tipo_documento = Tipodocumento::first()->id;
 
-        
+
         $this->anos = range(now()->year-100, now()->year);
         $this->ano = now()->year-30;
         $this->dias = range(1,31);
@@ -54,13 +55,13 @@ class VentanillaComponent extends Component
         $this->mes = 1;
         $this->tipoProceso = 1;
 
-        $this->estados=Estado::all()->sortBy('estado');        
+        $this->estados=Estado::all()->sortBy('estado');
         $this->estado_id=1;
         $this->ciudades = Ciudade::where('estado_id',$this->estado_id)->get();
         $ciudad1 = Ciudade::where('estado_id',$this->estado_id)->first();
         $this->ciudad_id = $ciudad1->id;
 
-        $this->seccion_empresa = Subserie::seccionE($this->empresa->id);    
+        $this->seccion_empresa = Subserie::seccionE($this->empresa->id);
         $this->seccion_id = $this->seccion_empresa->first()->id;
         $this->seccion_empresa = $this->seccion_empresa->pluck('nombre', 'id');
 
@@ -68,69 +69,69 @@ class VentanillaComponent extends Component
         $this->seccionCopia_id = SeccionEmpresa::where('empresa_id', $this->empresa->id)->first()->id;
         $this->buscarSerie();
         $this->buscarSubSerie();
-        
+
         $this->tipo_usuarios = TipoUsuario::all();
         $this->tipo_usuario_id = TipoUsuario::first()->id;
         $this->medio_recepcion = MedioRecepcion::all();
         $this->medio_id = MedioRecepcion::first()->id;
         $this->fecha = now()->format('Y-m-d');
-        /*$this->consultarTipoSerie();        
+        /*$this->consultarTipoSerie();
         $this->diasTermino = TipoSolicitud::first()->diasTermino;*/
-        $this->solicitudi = 0;  
+        $this->solicitudi = 0;
 
 
         $this->confidencial = false;
         $this->respuesta_email = false;
         $this->copia_radicado = false;
-        $this->folios = 1;     
-        $this->anexos = 0;   
+        $this->folios = 1;
+        $this->anexos = 0;
         $this->filtro = 0;
         $this->etapa = 0;
     }
     public function render()
-    {     
+    {
 
         if(Str::length($this->param)>2){
             $this->filtro = 0;
             $char = [' ',',','.',';','"','?','¿','!','¡','&','$','@','#','%',')','(','/','=','+','-','*','/','_',':','>','<','{','}','[',']',"'"];
-            $p = '%'.str_replace($char,'',$this->param).'%';  
+            $p = '%'.str_replace($char,'',$this->param).'%';
             $solicitudes = Solicitud::select('solicituds.*')->whereRaw("(replace(solicitantes.nombrecompleto,' ','') like ?) or (replace(concat_ws('', solicitantes.documento),' ','') like ?) or (replace(concat_ws('', solicituds.radicado),' ','') like ?) or (replace(concat_ws('', solicituds.asunto),' ','') like ?)", [$p, $p, $p, $p])->join('solicitantes','solicituds.solicitante_id','solicitantes.id')->paginate(20);
-        } 
+        }
         else{
             if ($this->filtro == 0) {
-                $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)                    
+                $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)
                     ->orderby('created_at','desc')
-                    ->paginate(15);             
+                    ->paginate(15);
             }
             else {
                 $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)
                     ->where('estado_id',$this->filtro)
                     ->orderby('created_at','desc')
-                    ->paginate(15);             
+                    ->paginate(15);
             }
-        }; 
-        
+        };
+
         $activas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',1)->count();
         $pendientes = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',2)->count();
         $vencidas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',3)->count();
         $finalizadas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',4)->count();
         $total = Solicitud::where('empresa_id', $this->empresa->id)->count();
-        return view('livewire.ventanilla-component',['solicitudes' => $solicitudes, 'activas' => $activas, 'pendientes'=>$pendientes, 'vencidas'=>$vencidas, 'finalizadas'=>$finalizadas, 'total'=>$total] );
+        return view('livewire.ventanilla-component',['solicitudes' => $solicitudes, 'activas' => $activas, 'pendientes'=>$pendientes, 'vencidas'=>$vencidas, 'finalizadas'=>$finalizadas, 'total'=>$total]);
     }
 
     public function calcularDias()
     {
         $m31 = collect(["1","3","5","7","8","10","12"]);
-        
-        if($this->mes=="2"){            
-            $this->dias = range(1,28);            
-            if($this->ano%4==0){                
+
+        if($this->mes=="2"){
+            $this->dias = range(1,28);
+            if($this->ano%4==0){
                 if($this->ano%100 != 0){
                     $this->dias = range(1,29);
                 }
                 elseif($this->ano%400 == 0){
                     $this->dias = range(1,29);
-                }               
+                }
             }
         }
         elseif($m31->contains($this->mes)){
@@ -142,7 +143,7 @@ class VentanillaComponent extends Component
 
         $this->dia = 1;
     }
-    
+
     public function cargarciudades()
     {
         $this->ciudades = Ciudade::where('estado_id',$this->estado_id)->get();
@@ -153,19 +154,19 @@ class VentanillaComponent extends Component
     public function siguienteSolictud($t)
     {
         $this->etapa = $this->etapa+1;
-        $this->tipoProceso = $t; 
-        $this->consultarTipoSerie();    
-           
+        $this->tipoProceso = $t;
+        $this->consultarTipoSerie();
+
     }
 
     public function crearFecha()
-    {        
-        $this->calcularDias();        
+    {
+        $this->calcularDias();
     }
     public function guardarSolicitante()
     {
         $this->etapa = 2;
-        $this->validate([            
+        $this->validate([
             'tipo_documento' => 'required',
             'documento' => 'required|min:5',
             'nacimiento' => 'required|date',
@@ -178,13 +179,13 @@ class VentanillaComponent extends Component
         $s = Solicitante::where('documento', $this->documento)->first();
         if($s){
             $s = Solicitante::where('documento', $this->documento)->where('nacimiento', $this->nacimiento)->first();
-            if($s){                
+            if($s){
                 $s->telefono = $this->telefono;
                 $s->email = $this->email;
-                $s->save();                
+                $s->save();
                 $this->solicitante = $s;
                 $this->solicitante_id = $this->solicitante->id;
-                
+
             }
             else {
                 $this->mensaje = "El usuario ya se encuentra registrado en nuestro sistema, pero el número de documento no corresponde con la fecha de nacimiento, por favor verifique e intente nuevamente";
@@ -200,17 +201,17 @@ class VentanillaComponent extends Component
                 'nacimiento' => $this->nacimiento,
                 'nombrecompleto' => $this->nombrecompleto,
                 'telefono' => $this->telefono,
-                'email' => $this->email,                
+                'email' => $this->email,
                 'ciudad_id' => $this->ciudad_id,
                 'direccion' => $this->direccion,
             ]);
-    
-            $this->solicitante_id = $this->solicitante->id;                   
+
+            $this->solicitante_id = $this->solicitante->id;
         }
-    }    
+    }
     public function buscarSolicitante()
-    {  
-        $this->nacimiento = $this->ano.'-'.$this->mes.'-'.$this->dia;      
+    {
+        $this->nacimiento = $this->ano.'-'.$this->mes.'-'.$this->dia;
         $s = Solicitante::where('documento', $this->documento)
         ->where('nacimiento', $this->nacimiento)->first();
 
@@ -249,7 +250,7 @@ class VentanillaComponent extends Component
         $this->obtenerDiasTermino();
     }
 
-    
+
     public function obtenerDiasTermino()
     {
         $this->diasTermino = TipologiaDocumento::find($this->tipologia_id)->pqrs->diastermino;
@@ -257,15 +258,15 @@ class VentanillaComponent extends Component
 
     public function radicar()
     {
-        $this->validate([            
-            'fecha'=>'required|date',            
+        $this->validate([
+            'fecha'=>'required|date',
             'asunto'=>'required|min:5',
             'diasTermino'=>'required|numeric',
             'adjunto' => 'max:4096', // Pdf máximo 4MB
         ]);
-                
+
         $solicitudBD = Solicitud::create([
-            'solicitante_id'=>$this->solicitante_id,            
+            'solicitante_id'=>$this->solicitante_id,
             'estado_id'=> 1,
             'seccion_id'=>$this->seccion_id,
             'empresa_id'=>$this->empresa->id,
@@ -275,7 +276,7 @@ class VentanillaComponent extends Component
             'user_id' => Auth::user()->id,
             'radicado'=> $this->calcularRadicado(),
             'consecutivo'=> $this->max_consecutivo,
-            'diasTermino'=> $this->diasTermino,   
+            'diasTermino'=> $this->diasTermino,
             'folios'=>$this->folios,
             'anexos'=>$this->anexos,
             'destinatario'=>$this->destinatario,
@@ -288,7 +289,7 @@ class VentanillaComponent extends Component
         ]);
 
         try {
-            $dataValid['adjunto'] = $this->adjunto->store('pdf','public');        
+            $dataValid['adjunto'] = $this->adjunto->store('pdf','public');
         } catch (\Throwable $th) {
             $dataValid['adjunto']='';
         }
@@ -298,8 +299,8 @@ class VentanillaComponent extends Component
             'estado_id' => 1,
             'seccion_id' => $this->seccion_id,
             'accion_id' => 1,
-            'mensaje' => $this->descripcion,            
-            'adjunto' => $dataValid['adjunto'],            
+            'mensaje' => $this->descripcion,
+            'adjunto' => $dataValid['adjunto'],
         ]);
 
         if($this->copia_radicado){
@@ -325,14 +326,14 @@ class VentanillaComponent extends Component
                             ->max('consecutivo');
         if($this->max_consecutivo>0){
             $this->max_consecutivo +=1;
-        }                              
+        }
         else{
             $this->max_consecutivo =1;
         }
         $t = TipologiaDocumento::find($this->tipologia_id);
         $c= $t->subserie->seccionempresa->codigo.'-'.$t->subserie->serie->codigo.'-'.$t->subserie->codigo;
         $radicado = now()->format('y').'-'.$c.'-'.$this->max_consecutivo;
-        
+
         return($radicado);
     }
 
@@ -357,7 +358,7 @@ class VentanillaComponent extends Component
 
     public function consultarTipoSerie()
     {
-        $this->etapa = 1;    
+        $this->etapa = 1;
         $this->buscarSubSerie();
     }
 

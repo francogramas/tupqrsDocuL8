@@ -1,61 +1,62 @@
 <div class="px-5 pt-5 text-sm">
-    @if (!is_null($seccion_empresa))        
-    <div class="grid grid-cols-1 md:grid-cols-6 gap-3">            
-        <div class="grid grid-cols-1">
+    @if (!is_null($seccion_empresa))
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+        <div class="grid grid-cols-1 border px-2 py-2">
             <div class="mb-2">
                 <label for="" class="block text-gray-700 text-sm font-bold">Dependencias</label>
-                <select wire:model="secciones_u_id" id="secciones_u_id" class="w-full mb-2" wire:change="consultarSeries();">            
+                <select wire:model="secciones_u_id" id="secciones_u_id" class="w-full mb-2" wire:change="consultarSeries();">
                     @foreach ($seccion_empresa as $seccion)
                         <option value="{{$seccion->id}}">{{$seccion->nombre}}</option>
                     @endforeach
-                </select>                
-            <div class="divide-y divide-gray-500 rounded-md shadow-lg">
+                </select>
+            <div class="divide-y divide-gray-500 rounded-md shadow-lg border px-2 py-2">
             @foreach ($series as $seriei)
                 <div class="w-full cursor-pointer flex text-xs gap-1 @if($seriei->id == $serie_id) bg-contenido @endif" wire:click="solicitudes({{$seriei->id}})">
                     <div class="hover:bg-contenido rounded-2xl w-full px-2 py-1">
                         {{$seriei->nombre}} <span class="badge badge-error text-xs text-white font-semibold"></span>
                     </div>
                 </div>
-            @endforeach            
+            @endforeach
             </div>
             </div>
         </div>
-        <div class="rounded-md shadow-lg">
+        <div class="rounded-md shadow-lg border px-2 py-2">
             <div class="">
+                <label for="" class="block text-gray-700 text-sm font-bold">Solicitudes</label>
                 @forelse($solicitud as $sol)
                     <button wire:click="verSolicitud({{$sol->id}})" class="w-full text-left py-1 px-1 cursor-pointer border shadow-md hover:bg-contenido  @if($sol->id == $solicitudi->id) bg-contenido @endif">
                         <a href="#respuesta">
                             <p class="text-gray-700 text-sm font-semibold">{{Str::limit($sol->solicitante->nombrecompleto,20)}}</p>
                             <p class="text-gray-700 text-xs">{{Str::limit($sol->asunto, 25, '...') }}</p>
                             <p class="text-gray-500 text-xs text-right flex">
-                                
-                                @if($sol->estado_id==1)                                     
+
+                                @if($sol->estado_id==1)
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                       </svg>
-                                @elseif($sol->estado_id==2) 
+                                @elseif($sol->estado_id==2)
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-warning" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                                     </svg>
-                                @elseif($sol->estado_id==3) 
+                                @elseif($sol->estado_id==3)
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
-                                @endif                                    
+                                @endif
                                 {{$sol->created_at->format('d/m/Y')}}
-                            
-                            </p>                            
+
+                            </p>
                         </a>
                     </button>
                 @empty
                     <p class="px-2 py-2">No tienes compromisos por responder</p>
-                @endforelse        
+                @endforelse
                 <div></div>
             </div>
         </div>
         @isset($solicitudi)
         <div class="col-span1 md:col-span-3" id="respuesta">
-            <div class="rounded-lg shadow-ld">
+            <div class="rounded-lg shadow-ld border px-2 py-2">
                 <h3 class="font-bold text-gray-700 text-lg">Descripción de la solicitud:</h3>
                 <div class="text-sm text-gray-500 grid grid-cols-1 md:grid-cols-3">
                     <div class="mr-2">
@@ -179,7 +180,7 @@
           </div>
 
         @endisset
-    </div>    
+    </div>
     @else
         <p class="px-2 py-2">No tienes compromisos por responder</p>
     @endif

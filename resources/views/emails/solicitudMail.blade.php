@@ -1,7 +1,7 @@
 @component('mail::message')
 # Hola {{$solicitud->solicitante->nombrecompleto}}
 
-Usted ha realizado una {{$solicitud->tipo->nombre}} con las siguientes características:
+Usted ha realizado una {{$solicitud->tipologia->nombre}} con las siguientes características:
 
 ## Empresa:
 {{$solicitud->seccionempresa->empresa->razonsocial}}

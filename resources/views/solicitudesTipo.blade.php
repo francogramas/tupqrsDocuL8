@@ -1,29 +1,26 @@
 @if ($s->count()>0)
-    <div class="py-2 text-lg font-bold text-gray-600 block v-screen" id="{{$t->nombre}}">
+<div class="text-sm border">
+    <div class="py-2 text-lg font-bold text-gray-600 block v-screen text-center border" id="{{$t->nombre}}">
         {{$t->nombre}}
     </div>
-    <div class="py-1 block w-full">
-        <table class="text-xs w-full table table-compact">
-            <caption class="border font-semibold"></caption>
-            <thead>
-                <tr class="py-1 px-2 font-bold text-center border border-gray-400 bg-blue-300">
-                    <th class="pl-2 text-center">Fecha/Solicitante</th>
-                    <th class="pl-2 text-center">Solicitud</th>                                       
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($s as $s1)
-                <tr class="py-1 border border-gray-500 @if($s1->estado_id==1) bg-green-100 @elseif($s1->estado_id==2) bg-yellow-100 @elseif($s1->estado_id==3) bg-red-100 @elseif($s1->estado_id==4) bg-gray-100 @endif">
-                    <td class="pl-2 text-left" title="{{$s1->estado->nombre}}">
-                       <span class="font-bold">{{$s1->radicado}}</span> / {{$s1->created_at->format('Y/m/d')}}<br>
-                        {{$s1->subserie->serie->nombre}} / {{$s1->subserie->nombre}} / {{$s1->tipologia->nombre}}<br>
-                        {{$s1->solicitante->nombrecompleto}}
-                    </td>
-                    <td class="pl-2 text-left">
-                        <span class="font-bold">Asunto:</span>
-                        {{$s1->asunto}}                        
+    <div class="block w-full">
+        <div class="grid grid-cols-2 gap-3 border">
+            <div class="font-bold text-lg text-center">Fecha/Solicitante</div>
+            <div class="font-bold text-lg text-center">Solicitud</div>
+        </div>
+
+        @forelse ($s as $s1)
+        <div class="grid grid-cols-2 gap-3 py-2 px-2 border">
+            <div title="{{$s1->estado->nombre}}">
+                <span class="font-bold">{{$s1->radicado}}</span> / {{$s1->created_at->format('Y/m/d')}}<br>
+                {{$s1->subserie->serie->nombre}} / {{$s1->subserie->nombre}} / {{$s1->tipologia->nombre}}<br>
+                {{$s1->solicitante->nombrecompleto}}
+            </div>
+            <div>
+                <span class="font-bold">Asunto:</span>
+                        {{$s1->asunto}}
                         <div class="block">
-                        @foreach ($s1->seguimiento as $seguimiento)                            
+                        @foreach ($s1->seguimiento as $seguimiento)
                                 <div class="font-bold">
                                     {{$seguimiento->created_at->format('M d/Y').' -> '. $seguimiento->accion->nombre}}
                                 </div>
@@ -31,25 +28,28 @@
                                 <div>
                                     {!!'<span class="font-semibold text-gray-800"> Mensaje</span> -> '. $seguimiento->mensaje!!}
                                 </div>
-                                @endif   
+                                @endif
                                 @if ($seguimiento->observaciones)
                                 <div>
                                     {!!'<span class="font-semibold text-gray-800"> Observaciones</span> -> '. $seguimiento->observaciones!!}
                                 </div>
-                                @endif      
+                                @endif
                                 @if ($seguimiento->adjunto)
-                                <div>
-                                    {!!'<span class="font-semibold text-gray-800"> Adjunto</span> -> '. $seguimiento->adjunto!!}
+                                <div class="flex align-middle">
+                                    <span class="font-semibold text-gray-800"> Adjunto</span> ->
+                                    <a target="_blank" href="{{route('impdocumento',Crypt::encryptString($seguimiento->id))}}">
+                                        <img src="src/img/pdf.svg" class="w-6" alt="">
+                                    </a>
+
                                 </div>
-                                @endif                                                  
+                                @endif
                         @endforeach
                         </div>
-                    </td>                    
-                </tr>
-                @empty
-                    
-                @endforelse        
-            </tbody>
-        </table> 
+            </div>
+        </div>
+        @empty
+
+        @endforelse
     </div>
+</div>
 @endif

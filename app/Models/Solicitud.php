@@ -26,20 +26,20 @@ class Solicitud extends Model
         'asunto',
         'fecha',
         'confidencial',
-        'respuesta_email',   
-        'tipologia_id'     
+        'respuesta_email',
+        'tipologia_id'
     ];
-    
+
     public function copia()
     {
         return $this->hasOne(solicitudCopia::class, 'solicitud_id', 'id');
     }
-    
+
     public function solicitante()
     {
         return $this->belongsTo(Solicitante::class, 'solicitante_id');
     }
-    
+
     public function seccionempresa()
     {
         return $this->belongsTo(SeccionEmpresa::class, 'seccion_id');
@@ -54,7 +54,7 @@ class Solicitud extends Model
     {
         return $this->belongsTo(EstadoSolicitud::class, 'estado_id');
     }
-        
+
     public function seguimiento()
     {
         return $this->hasMany(SeguimientoOrden::class);
@@ -62,7 +62,7 @@ class Solicitud extends Model
 
     public function user()
     {
-        return $this->belongsTo(user::class);
+        return $this->belongsTo(User::class);
     }
 
     public function medio()
@@ -73,7 +73,12 @@ class Solicitud extends Model
     {
         return $this->belongsTo(TipologiaDocumento::class, 'tipologia_id');
     }
-    
+
+    public function serie()
+    {
+        return $this->belongsTo(Serie::class, 'serie_id');
+    }
+
     public function subserie()
     {
         return $this->belongsTo(Subserie::class, 'subserie_id');

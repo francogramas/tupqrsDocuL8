@@ -20,6 +20,7 @@
         "tailwindcss": "^3.0.0"
     },
     "dependencies": {
-        "daisyui": "^2.15.3"
+        "daisyui": "^2.15.3",
+        "pdf.js": "^0.1.0"
     }
 }

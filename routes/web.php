@@ -22,9 +22,11 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/impradicado/{radicado}', [App\Http\Controllers\impRadicadoController::class, 'radicado'])->name('impradicado');
     Route::get('/impficha/{radicado}', [App\Http\Controllers\impRadicadoController::class, 'ficha'])->name('impficha');
     Route::get('/impdocumento/{documento}', [App\Http\Controllers\impDocumentoController::class, 'seguimiento'])->name('impdocumento');
+    Route::get('/imparchivo/{archivo}', [App\Http\Controllers\impDocumentoController::class, 'archivo'])->name('imparchivo');
 });
+
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    
+
     if(Auth::user()->hasRole('Gerente')){
         return redirect('empresauser');
     }
@@ -50,6 +52,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Gerente']], fun
     Route::get('informe', App\Http\Livewire\InformeComponent::class)->name('informe');
     Route::get('informedia', App\Http\Livewire\InformeDiaComponent::class)->name('informedia');
     Route::get('ventanilla', App\Http\Livewire\VentanillaComponent::class)->name('ventanilla');
+    Route::get('digitalizacion', App\Http\Livewire\DigitalzacionComponent::class)->name('digitalizacion');
 });
 
 /** --------------------------------- Roles de Lider ----------------------------------------------------- **/
@@ -68,6 +71,6 @@ Route::get('e', App\Http\Livewire\EncuestaComponent::class)->name('e');
 Route::get('actualizarEstado/{id}', [App\Http\Controllers\actualizarEstadoController::class, 'show'])->name('actualizarEstado');
 
 Route::get('qrcode/{url}',  function($url)
-{    
+{
     return view('qurcode')->with('url', $url);
 });
