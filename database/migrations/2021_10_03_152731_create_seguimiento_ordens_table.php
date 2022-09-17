@@ -14,8 +14,9 @@ class CreateSeguimientoOrdensTable extends Migration
     public function up()
     {
         Schema::create('seguimiento_ordens', function (Blueprint $table) {
-            $table->id();            
+            $table->id();
             $table->foreignId('solicitud_id')->constrained('solicituds');
+            $table->foreignId('user_id')->constrained('users');
             $table->foreignId('estado_id')->constrained('estado_solicituds');
             $table->foreignId('seccion_id')->constrained('seccion_empresas');
             $table->foreignId('accion_id')->constrained('accion_ordenes');

@@ -54,6 +54,7 @@ class EmpresaUsuarioCompoment extends Component
         $this->ciudad_id = $ciudad1->id;
         $this->boolguardar = true;
         $this->boolguardarDep = true;
+        $this->publica = true;
     }
 
     public function render()

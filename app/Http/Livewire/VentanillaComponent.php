@@ -10,8 +10,6 @@ use App\Models\Estado;
 use App\Models\Ciudade;
 use App\Models\SeccionEmpresa;
 
-use App\Models\Serie;
-use App\Models\TipoSolicitud;
 use App\Models\TipoUsuario;
 use App\Models\MedioRecepcion;
 use App\Models\Solicitud;
@@ -28,7 +26,10 @@ use Livewire\WithFileUploads;
 
 use App\Mail\solicitudMail;
 use Illuminate\Support\Facades\Mail;
-use phpDocumentor\Reflection\Types\This;
+
+use Illuminate\Support\Facades\Storage;
+use setasign\Fpdi\Fpdi;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class VentanillaComponent extends Component
 {
@@ -169,7 +170,7 @@ class VentanillaComponent extends Component
         $this->validate([
             'tipo_documento' => 'required',
             'documento' => 'required|min:5',
-            'nacimiento' => 'required|date',
+            //'nacimiento' => 'required|date',
             'telefono' => 'required|numeric|min:10',
             'email' => 'required|email',
             'nombrecompleto' => 'required|min:10',
@@ -178,27 +179,27 @@ class VentanillaComponent extends Component
 
         $s = Solicitante::where('documento', $this->documento)->first();
         if($s){
-            $s = Solicitante::where('documento', $this->documento)->where('nacimiento', $this->nacimiento)->first();
-            if($s){
+
+            //if($s){
                 $s->telefono = $this->telefono;
                 $s->email = $this->email;
                 $s->save();
                 $this->solicitante = $s;
                 $this->solicitante_id = $this->solicitante->id;
 
-            }
+            /*}
             else {
-                $this->mensaje = "El usuario ya se encuentra registrado en nuestro sistema, pero el número de documento no corresponde con la fecha de nacimiento, por favor verifique e intente nuevamente";
+                $this->mensaje = "El usuario ya se encuentra registrado en nuestro sistema";
                 $this->modalFormVisible = true;
                 $this->etapa = 1;
-            }
+            }*/
         }
         else {
             $this->solicitante = Solicitante::create([
                 'tipo_documento' => $this->tipo_documento,
                 'tipo_usuario_id' => $this->tipo_usuario_id,
                 'documento' => $this->documento,
-                'nacimiento' => $this->nacimiento,
+                //'nacimiento' => null,
                 'nombrecompleto' => $this->nombrecompleto,
                 'telefono' => $this->telefono,
                 'email' => $this->email,
@@ -211,9 +212,8 @@ class VentanillaComponent extends Component
     }
     public function buscarSolicitante()
     {
-        $this->nacimiento = $this->ano.'-'.$this->mes.'-'.$this->dia;
-        $s = Solicitante::where('documento', $this->documento)
-        ->where('nacimiento', $this->nacimiento)->first();
+        //$this->nacimiento = $this->ano.'-'.$this->mes.'-'.$this->dia;
+        $s = Solicitante::where('documento', $this->documento)->first();
 
         if($s){
             $this->nombrecompleto = $s->nombrecompleto;
@@ -288,14 +288,18 @@ class VentanillaComponent extends Component
 
         ]);
 
-        try {
+        //try {
             $dataValid['adjunto'] = $this->adjunto->store('pdf','public');
-        } catch (\Throwable $th) {
+            $outputFile = Storage::disk('public')->path($dataValid['adjunto']);
+            $this->fillPDF(Storage::disk('public')->path($dataValid['adjunto']), $outputFile, $solicitudBD->empresa->razonsocial ,$solicitudBD->radicado);
+
+        /*} catch (\Throwable $th) {
             $dataValid['adjunto']='';
-        }
+        }*/
 
         SeguimientoOrden::create([
             'solicitud_id' => $solicitudBD->id,
+            'user_id'=>Auth::user()->id,
             'estado_id' => 1,
             'seccion_id' => $this->seccion_id,
             'accion_id' => 1,
@@ -360,6 +364,43 @@ class VentanillaComponent extends Component
     {
         $this->etapa = 1;
         $this->buscarSubSerie();
+    }
+
+    public function fillPDF($file, $outputFile, $empresa,$radicado)
+    {
+        $fpdi = new FPDI;
+        $im = QrCode::size(50)->format('png')->generate($radicado);
+        $output_file = 'img/qr-code/img-' . time() . '.png';
+        Storage::disk('local')->put($output_file, $im);
+
+        // merger operations
+        $count = $fpdi->setSourceFile($file);
+        for ($i=1; $i<=$count; $i++) {
+            $template   = $fpdi->importPage($i);
+            $size       = $fpdi->getTemplateSize($template);
+            $fpdi->AddPage($size['orientation'], array($size['width'], $size['height']));
+            $fpdi->useTemplate($template);
+            $left = 30;
+            $top = 10;
+            if ($i==1) {
+                $text = " Radicado: ".$radicado." Fecha: ".now();
+                $text1 = $empresa;
+                $fpdi->Image(Storage::disk('local')->path($output_file),5,5);
+            }
+
+
+            $fpdi->SetFont("helvetica", "", 10);
+            $fpdi->SetTextColor(100,100,100);
+            $fpdi->Text($left,$top,$text1);
+            $fpdi->Text($left,$top+4,$text);
+            $fpdi->SetCompression(true);
+
+            $text = null;
+            $text1 = null;
+        }
+        Storage::disk('local')->delete($output_file, $im);
+
+        return $fpdi->Output($outputFile, 'F');
     }
 
 }

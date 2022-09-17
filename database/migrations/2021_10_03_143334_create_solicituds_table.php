@@ -19,10 +19,10 @@ class CreateSolicitudsTable extends Migration
             $table->foreignId('estado_id')->constrained('estado_solicituds');
             $table->foreignId('seccion_id')->constrained('seccion_empresas');
             $table->foreignId('empresa_id')->constrained('empresas');
-            $table->foreignId('serie_id')->constrained('series');            
-            $table->foreignId('subserie_id')->constrained('subseries');            
+            $table->foreignId('serie_id')->constrained('series');
+            $table->foreignId('subserie_id')->constrained('subseries');
             $table->foreignId('medio_id')->constrained('medio_recepcions');
-            $table->foreignId('user_id')->constrained('users')->default(0);
+            $table->foreignId('user_id')->constrained('users');
             $table->string('radicado',30)->nullable();
             $table->integer('consecutivo');
             $table->integer('diasTermino');

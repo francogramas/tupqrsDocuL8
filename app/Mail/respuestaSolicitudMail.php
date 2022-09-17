@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Solicitud;
-use Str;
+use Illuminate\Support\Str;
 
 class respuestaSolicitudMail extends Mailable implements ShouldQueue
 {
@@ -34,7 +34,7 @@ class respuestaSolicitudMail extends Mailable implements ShouldQueue
     {
         if(Str::length($this->solicitud->adjuntorespuesta)>0){
             return $this->markdown('emails.respuestaSolicitudMail')
-            ->attachFromStorage('public/'.$this->solicitud->adjuntorespuesta, 
+            ->attachFromStorage('public/'.$this->solicitud->adjuntorespuesta,
                                 'adjuntoRespuesta.pdf', [
                                 'mime' => 'application/pdf']);
         }

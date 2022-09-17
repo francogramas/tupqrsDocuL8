@@ -185,7 +185,7 @@
                 No
             </x-jet-secondary-button>
 
-            <x-jet-danger-button class="ml-2" wire:click="deleteDependencia()" wire:loading.attr="disabled">
+            <x-jet-danger-button class="ml-2 btn btn-error" wire:click="deleteDependencia()" wire:loading.attr="disabled">
                 Borrar Dependencia
             </x-jet-danger-button>
         </x-slot>

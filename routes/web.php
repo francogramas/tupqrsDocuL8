@@ -74,3 +74,6 @@ Route::get('qrcode/{url}',  function($url)
 {
     return view('qurcode')->with('url', $url);
 });
+
+Route::get('/pdftest', [\App\Http\Controllers\pdfTestController::class,'process']);
+Route::get('test', fn () => phpinfo());

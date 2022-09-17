@@ -13,7 +13,7 @@
             @foreach ($series as $seriei)
                 <div class="w-full cursor-pointer flex text-xs gap-1 @if($seriei->id == $serie_id) bg-contenido @endif" wire:click="solicitudes({{$seriei->id}})">
                     <div class="hover:bg-contenido rounded-2xl w-full px-2 py-1">
-                        {{$seriei->nombre}} <span class="badge badge-error text-xs text-white font-semibold"></span>
+                        {{$seriei->nombre}} <span class="badge badge-error text-xs text-white font-semibold">{{totalSolicitudes($seriei->id, $secciones_u_id)}}</span>
                     </div>
                 </div>
             @endforeach
@@ -170,6 +170,7 @@
                       <div class="flex flex-row">
                         <h3 class="mb-2 font-bold text-gray-800 text-sm">{{$seguimiento->accion->nombre}}</h3>
                       </div>
+                      <p class="leading-snug tracking-wide text-gray-900 text-opacity-100 text-xs">{{$seguimiento->user->name}}</p>
                       <p class="leading-snug tracking-wide text-gray-900 text-opacity-100 text-xs">{{$seguimiento->created_at->format('M d/Y')}}</p>
                     </div>
                   </div>

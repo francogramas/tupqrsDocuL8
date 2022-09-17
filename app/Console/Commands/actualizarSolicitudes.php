@@ -40,7 +40,7 @@ class actualizarSolicitudes extends Command
      */
     public function handle()
     {
-        
+
         $solicitudes = Solicitud::whereNotIn('estado_id', [3, 4])->get();
         $vectorVencida = array();
         $seguimientoVencida = array();
@@ -50,9 +50,9 @@ class actualizarSolicitudes extends Command
         $idPendientes = [];
 
         foreach ($solicitudes as $solicitud) {
-            
-            $fi = Carbon::parse( $solicitud->created_at)->format('Y-m-d'); 
-            $fi = Carbon::createFromFormat('Y-m-d', $fi); 
+
+            $fi = Carbon::parse( $solicitud->created_at)->format('Y-m-d');
+            $fi = Carbon::createFromFormat('Y-m-d', $fi);
             $fv = $fi->addDays($solicitud->diasTermino);
             $d = now()->diffInDays($fv, false);
 
@@ -60,6 +60,7 @@ class actualizarSolicitudes extends Command
                 $seguimientoPendiente = array(
                     'solicitud_id' => $solicitud->id,
                     'estado_id' => '2',
+                    'user_id' => 0,
                     'seccion_id' => $solicitud->seccion_id,
                     'accion_id' => 2,
                     'created_at' => now(),
@@ -70,6 +71,7 @@ class actualizarSolicitudes extends Command
             elseif ($d<0) {
                 $seguimientoVencida = array(
                     'solicitud_id' => $solicitud->id,
+                    'user_id' => 0,
                     'estado_id' => '3',
                     'seccion_id' => $solicitud->seccion_id,
                     'accion_id' => 2,
@@ -78,8 +80,8 @@ class actualizarSolicitudes extends Command
                 );
                 $idVencidas[]=$solicitud->id;
             }
-            if($seguimientoVencida){array_push($vectorVencida, $seguimientoVencida); $seguimientoVencida = array();}                        
-            if($seguimientoPendiente){array_push($vectorPendientes, $seguimientoPendiente);$seguimientoPendiente = array();}                                            
+            if($seguimientoVencida){array_push($vectorVencida, $seguimientoVencida); $seguimientoVencida = array();}
+            if($seguimientoPendiente){array_push($vectorPendientes, $seguimientoPendiente);$seguimientoPendiente = array();}
         }
 
         DB::table('seguimiento_ordens')->insert($vectorVencida);
@@ -87,6 +89,6 @@ class actualizarSolicitudes extends Command
         Solicitud::whereIn('id', $idVencidas)->update(['estado_id' => 3]);
         Solicitud::whereIn('id', $idPendientes)->update(['estado_id' => 2]);
         $this->info('Solicitudes actualizadas');
-        
+
     }
 }

@@ -124,7 +124,7 @@
             @error('documento') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
             <input id="documento" wire:model="documento" wire:change="buscarSolicitante()" type="number" class="w-full px-2 py-1 rounded-md shadow-lg">
         </div>
-        <div class="px-2">
+        <!--div class="px-2">
             <label for="nacimiento" class="block text-gray-700 text-sm font-bold">Fecha de nacimiento</label>
             <div class="bg-white rounded-lg shadow-xl w-full border border-black h-9">
                 <div class="flex">
@@ -156,7 +156,7 @@
                   </select>
                 </div>
               </div>
-        </div>
+        </div-->
         <div class="px-2">
             <label for="tipo_usuario_id" class="block text-gray-700 text-sm font-bold">Tipo de Solicitante/Remitente</label>
             @error('tipo_usuario_id') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror

@@ -10,6 +10,7 @@ class SeguimientoOrden extends Model
     use HasFactory;
     protected $fillable = [
         'solicitud_id',
+        'user_id',
         'estado_id',
         'seccion_id',
         'accion_id',
@@ -36,5 +37,10 @@ class SeguimientoOrden extends Model
     public function accion()
     {
         return $this->belongsTo(AccionOrdene::class, 'accion_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

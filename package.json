@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "daisyui": "^2.15.3",
-        "pdf.js": "^0.1.0"
+        "pdf.js": "^0.1.0",
+        "pspdfkit": "^2022.4.1"
     }
 }
