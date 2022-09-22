@@ -16,20 +16,24 @@ use App\Models\Solicitud;
 use App\Models\Subserie;
 use App\Models\TipologiaDocumento;
 use App\Models\solicitudCopia;
-
 use App\Models\SeguimientoOrden;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use Livewire\WithPagination;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
-
 use App\Mail\solicitudMail;
 use Illuminate\Support\Facades\Mail;
-
 use Illuminate\Support\Facades\Storage;
 use setasign\Fpdi\Fpdi;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+/**
+ *
+ * // TODO: EL PREFIJO DE LOS RADICADOS DEBEN SER INTERNOs(I)
+ * // TODO: CREAR UNA HERRAMIENTA DE RADICADO MASIVO PARA SOLICITUDES DE LA VENTANILLA VIRTUAL
+ * // TODO: GENERARE UNA PLANTILLA DE RESPUESTA INSTITUCIONAL(EMAILS)
+ * //
+**/
 
 class VentanillaComponent extends Component
 {
@@ -44,11 +48,10 @@ class VentanillaComponent extends Component
     public function mount()
     {
         $s = SeccionUser::where('user_id', Auth::user()->id)->first();
+
         $this->empresa = $s->seccionempresa->empresa;
         $this->tipodocumento = Tipodocumento::all();
         $this->tipo_documento = Tipodocumento::first()->id;
-
-
         $this->anos = range(now()->year-100, now()->year);
         $this->ano = now()->year-30;
         $this->dias = range(1,31);
@@ -117,6 +120,7 @@ class VentanillaComponent extends Component
         $vencidas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',3)->count();
         $finalizadas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',4)->count();
         $total = Solicitud::where('empresa_id', $this->empresa->id)->count();
+
         return view('livewire.ventanilla-component',['solicitudes' => $solicitudes, 'activas' => $activas, 'pendientes'=>$pendientes, 'vencidas'=>$vencidas, 'finalizadas'=>$finalizadas, 'total'=>$total]);
     }
 
@@ -258,11 +262,12 @@ class VentanillaComponent extends Component
 
     public function radicar()
     {
+
         $this->validate([
             'fecha'=>'required|date',
             'asunto'=>'required|min:5',
             'diasTermino'=>'required|numeric',
-            'adjunto' => 'max:4096', // Pdf máximo 4MB
+            'adjunto' => 'max:24576', // Pdf máximo 24MB
         ]);
 
         $solicitudBD = Solicitud::create([
@@ -285,17 +290,16 @@ class VentanillaComponent extends Component
             'confidencial'=>$this->confidencial,
             'respuesta_email'=>$this->respuesta_email,
             'tipologia_id'=>$this->tipologia_id,
-
         ]);
 
-        //try {
+        try {
             $dataValid['adjunto'] = $this->adjunto->store('pdf','public');
             $outputFile = Storage::disk('public')->path($dataValid['adjunto']);
             $this->fillPDF(Storage::disk('public')->path($dataValid['adjunto']), $outputFile, $solicitudBD->empresa->razonsocial ,$solicitudBD->radicado);
 
-        /*} catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             $dataValid['adjunto']='';
-        }*/
+        }
 
         SeguimientoOrden::create([
             'solicitud_id' => $solicitudBD->id,
@@ -319,11 +323,12 @@ class VentanillaComponent extends Component
         $this->etapa = 3;
     }
 
-    public function calcularRadicado()
+    public function calcularRadicado($trd=false)
     {
         $date = Carbon::createFromDate(now()->format('Y-m-d'));
         $startOfYear = $date->copy()->startOfYear();
         $endOfYear   = $date->copy()->endOfYear();
+        $c=null;
 
         $this->max_consecutivo = Solicitud::where('empresa_id',$this->empresa->id)
                             ->whereBetween('created_at',[$startOfYear, $endOfYear])
@@ -334,9 +339,12 @@ class VentanillaComponent extends Component
         else{
             $this->max_consecutivo =1;
         }
-        $t = TipologiaDocumento::find($this->tipologia_id);
-        $c= $t->subserie->seccionempresa->codigo.'-'.$t->subserie->serie->codigo.'-'.$t->subserie->codigo;
-        $radicado = now()->format('y').'-'.$c.'-'.$this->max_consecutivo;
+
+        if ($trd) {
+            $t = TipologiaDocumento::find($this->tipologia_id);
+            $c= $t->subserie->seccionempresa->codigo.'-'.$t->subserie->serie->codigo.'-'.$t->subserie->codigo.'-';
+        }
+        $radicado = 'E-'.now()->format('y').'-'.$c.$this->max_consecutivo;
 
         return($radicado);
     }
