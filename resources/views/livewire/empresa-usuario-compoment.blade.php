@@ -103,12 +103,17 @@
                     <label for="" class="font-bold block">Crear dependencia:</label>
                     @error('dependencia') <span class="text-red-600 block text-xs">{{ '*'.$message }}</span> @enderror
                     <div class="flex">
-                    <input type="text" wire:model="dependencia" class="w-7/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Nombre de Sección/Dependencia">
-                    <input type="text" wire:model="codigo" class="w-2/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Código">
+                    <input type="text" wire:model="dependencia" class="w-5/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Nombre de Sección/Dependencia">
+                    <input type="text" wire:model="codigo" class="w-1/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Código">
+                    <input type="text" wire:model="lider" class="w-3/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Lider de la oificia">
                     <select name="publica" wire:model="publica" class="w-1/4 mr-3 px-2 py-1 rounded-md">
                         <option value="1" selected>Pública</option>
                         <option value="0">Oculta</option>
                     </select>
+                    <div class="w-1/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md">
+                        <label for="">Firma</label>
+                        <input type="file" wire:model="firma" accept="image/*">
+                    </div>
                         @if ($boolguardarDep)
                             <button wire:click="crearDependencia()" class="px-2 py-2 shadow-md bg-blue-400 rounded-lg hover:bg-blue-700 text-gray-100 font-bold" title="Crear dependencia">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor">

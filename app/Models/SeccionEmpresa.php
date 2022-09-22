@@ -14,13 +14,15 @@ class SeccionEmpresa extends Model
         'publica',
         'empresa_id',
         'estado_id',
+        'lider',
+        'firma',
     ];
 
     public function userSeccion()
     {
         return $this->hasOne(SeccionUser::class, 'seccion_id');
     }
-        
+
     public function empresa()
     {
         return $this->belongsTo(empresa::class, 'empresa_id');
@@ -29,5 +31,5 @@ class SeccionEmpresa extends Model
     public function estado()
     {
         return $this->belongsTo(EstadoSeccion::class, 'estado_id');
-    }    
+    }
 }

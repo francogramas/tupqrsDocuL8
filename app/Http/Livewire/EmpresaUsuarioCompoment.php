@@ -16,15 +16,19 @@ use Illuminate\Support\Str;
 
 use App\Mail\bienvenidaMail;
 use Illuminate\Support\Facades\Mail;
-
+use Livewire\WithFileUploads;
+use App\Models\Serie;
+use App\Models\Subserie;
+use App\Models\TipologiaDocumento;
 
 class EmpresaUsuarioCompoment extends Component
 {
+    use WithFileUploads;
 
     public $empresa, $empresa_id, $countempresa, $dependencia, $dependencia_id, $secciones, $estados, $estado_id, $ciudades,
     $nit, $razonsocial, $telefono, $email, $ciudad_id, $direccion, $id_eps, $boolguardar, $boolguardarDep, $modalFormVisible,
     $modalFormVisible1, $modalFormVisible2, $userName, $userEmail, $password, $password_confirmation, $seccionUser, $boolUsuario,
-    $mensaje, $codigo, $publica;
+    $mensaje, $codigo, $publica, $lider, $firma;
 
     public function rules()
     {
@@ -152,15 +156,47 @@ class EmpresaUsuarioCompoment extends Component
         $this->validate([
             'dependencia' => 'required|min:3',
             'codigo' => 'required|min:3',
+            'lider' => 'required',
+            'firma' => 'max:1024', // Pdf máximo 1MB
         ]);
 
-        SeccionEmpresa::create([
+        //try {
+            $dataValid['firma'] = $this->firma->store('firmas','public');
+
+        /*} catch (\Throwable $th) {
+            $dataValid['firma']='';
+        }*/
+
+        $seccion = SeccionEmpresa::create([
             'nombre'=>$this->dependencia,
             'codigo'=>$this->codigo,
             'empresa_id'=>$this->empresa_id,
             'estado_id'=>1,
             'publica' => $this->publica,
+            'lider' => $this->lider,
+            'firma' => $this->firma,
         ]);
+
+        //------------------------------------------------------------------ SERIES
+        $SP = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'PETICIONES')->first();
+        $SQ = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'QUEJAS')->first();
+        $SR = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'RECLAMOS')->first();
+        $SS = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'SUGERENCIAS')->first();
+        $SD = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'DENUNCIAS')->first();
+
+        //------------------------------------------------------------------ SUBSERIES
+        $SSP = Subserie::create([ 'serie_id'=>$SP->id, 'seccion_id'=>$seccion->id, 'codigo'=>'0001', 'nombre'=>'PETICIONES', 'Re_AG'=>10, 'Re_AC'=>0, 'DF_CT'=>true, 'DF_E'=>false, 'DF_MD'=>false, 'DF_S'=>false, 'ACC_P'=>true, 'ACC_Pr'=>false, 'procedimiento'=>'',]);
+        $SSQ = Subserie::create([ 'serie_id'=>$SQ->id, 'seccion_id'=>$seccion->id, 'codigo'=>'0002', 'nombre'=>'QUEJAS', 'Re_AG'=>10, 'Re_AC'=>0, 'DF_CT'=>true, 'DF_E'=>false, 'DF_MD'=>false, 'DF_S'=>false, 'ACC_P'=>true, 'ACC_Pr'=>false, 'procedimiento'=>'',]);
+        $SSR = Subserie::create([ 'serie_id'=>$SR->id, 'seccion_id'=>$seccion->id, 'codigo'=>'0003', 'nombre'=>'RECLAMOS', 'Re_AG'=>10, 'Re_AC'=>0, 'DF_CT'=>true, 'DF_E'=>false, 'DF_MD'=>false, 'DF_S'=>false, 'ACC_P'=>true, 'ACC_Pr'=>false, 'procedimiento'=>'',]);
+        $SSS = Subserie::create([ 'serie_id'=>$SS->id, 'seccion_id'=>$seccion->id, 'codigo'=>'0004', 'nombre'=>'SUGERENCIAS', 'Re_AG'=>10, 'Re_AC'=>0, 'DF_CT'=>true, 'DF_E'=>false, 'DF_MD'=>false, 'DF_S'=>false, 'ACC_P'=>true, 'ACC_Pr'=>false, 'procedimiento'=>'',]);
+        $SSD = Subserie::create([ 'serie_id'=>$SD->id, 'seccion_id'=>$seccion->id, 'codigo'=>'0005', 'nombre'=>'DENUNCIAS', 'Re_AG'=>10, 'Re_AC'=>0, 'DF_CT'=>true, 'DF_E'=>false, 'DF_MD'=>false, 'DF_S'=>false, 'ACC_P'=>true, 'ACC_Pr'=>false, 'procedimiento'=>'',]);
+
+        //--------------------------------------------------------------------------tipología
+        TipologiaDocumento::create([ 'subserie_id'=>$SSP->id, 'nombre'=>'PETICIONES', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSQ->id, 'nombre'=>'QUEJAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSR->id, 'nombre'=>'RECLAMOS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSS->id, 'nombre'=>'SUGERENCIAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSD->id, 'nombre'=>'DENUNCIAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
 
         $this->dependencia = null;
         $this->codigo = null;
@@ -240,11 +276,12 @@ class EmpresaUsuarioCompoment extends Component
 
         $user->assignRole('Lider');
 
-        SeccionUser::create([
+        $seccion = SeccionUser::create([
             'user_id' => $user->id,
             'seccion_id' => $this->dependencia_id,
             'empresa_id'=>$this->empresa_id
         ]);
+
 
         Mail::to($user->email)->send(new bienvenidaMail($user));
         $this->modalFormVisible1 = false;
@@ -286,6 +323,7 @@ class EmpresaUsuarioCompoment extends Component
                 $this->mensaje = "No se puede asignar este usuario por que ya tiene rol de gerente";
             }
 */
+
         }
         else {
             $this->boolUsuario=false;

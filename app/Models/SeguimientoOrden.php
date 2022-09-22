@@ -9,6 +9,7 @@ class SeguimientoOrden extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'radicado',
         'solicitud_id',
         'user_id',
         'estado_id',

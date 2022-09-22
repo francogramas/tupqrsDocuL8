@@ -56,16 +56,13 @@
                                 </x-jet-dropdown-link>
                             </x-slot>
                         </x-jet-dropdown>
+                        <x-jet-nav-link href="{{ route('ventanilla') }}" :active="request()->routeIs('ventanilla')">
+                            {{ __('Ventanilla') }}
+                        </x-jet-nav-link>
                         @endrole
                         @role('Lider')
                         <x-jet-nav-link href="{{ route('lider') }}" :active="request()->routeIs('lider')">
                             {{ __('Solicitudes') }}
-                        </x-jet-nav-link>
-                        <x-jet-nav-link href="{{ route('ventanilla') }}" :active="request()->routeIs('ventanilla')">
-                            {{ __('Ventanilla') }}
-                        </x-jet-nav-link>
-                        <x-jet-nav-link href="{{ route('digitalizacion') }}" :active="request()->routeIs('digitalizacion')">
-                            {{ __('Digitalizacion') }}
                         </x-jet-nav-link>
                         @endrole
                         @role('Admin')
@@ -109,12 +106,6 @@
                                         @role('Lider')
                                             <x-jet-dropdown-link href="{{ route('lider') }}">
                                                 {{ __('Solicitudes') }}
-                                            </x-jet-dropdown-link>
-                                            <x-jet-dropdown-link href="{{ route('ventanilla') }}">
-                                                {{ __('Ventanilla') }}
-                                            </x-jet-dropdown-link>
-                                            <x-jet-dropdown-link href="{{ route('digitalizacion') }}">
-                                                {{ __('Digitalizacion') }}
                                             </x-jet-dropdown-link>
                                         @endrole
                                         @role('Admin')
@@ -249,12 +240,6 @@
                 @role('Lider')
                     <x-jet-responsive-nav-link href="{{ route('lider') }}" :active="request()->routeIs('lider')">
                         {{ __('Solicitudes') }}
-                    </x-jet-responsive-nav-link>
-                    <x-jet-responsive-nav-link href="{{ route('ventanilla') }}" :active="request()->routeIs('ventanilla')">
-                        {{ __('Ventanilla') }}
-                    </x-jet-responsive-nav-link>
-                    <x-jet-responsive-nav-link href="{{ route('digitalizacion') }}" :active="request()->routeIs('digitalizacion')">
-                        {{ __('Digitalización') }}
                     </x-jet-responsive-nav-link>
                 @endrole
 

@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,20 +47,29 @@ Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
+
+
 /** --------------------------------- Roles de gerente ----------------------------------------------------- **/
 Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Gerente']], function () {
     Route::get('empresauser', App\Http\Livewire\EmpresaUsuarioCompoment::class)->name('empresauser');
     Route::get('gerente', App\Http\Livewire\GerenteComponent::class)->name('gerente');
     Route::get('informe', App\Http\Livewire\InformeComponent::class)->name('informe');
     Route::get('informedia', App\Http\Livewire\InformeDiaComponent::class)->name('informedia');
-    Route::get('ventanilla', App\Http\Livewire\VentanillaComponent::class)->name('ventanilla');
     Route::get('digitalizacion', App\Http\Livewire\DigitalzacionComponent::class)->name('digitalizacion');
+    Route::get('ventanilla', App\Http\Livewire\VentanillaComponent::class)->name('ventanilla');
+
 });
 
 /** --------------------------------- Roles de Lider ----------------------------------------------------- **/
 Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Lider']], function () {
     Route::get('lider', App\Http\Livewire\LiderComponent::class)->name('lider');
 });
+
+/** --------------------------------- Roles de Ventanilla/Gerente ----------------------------------------------------- **/
+Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Ventanilla']], function () {
+    Route::get('ventanilla', App\Http\Livewire\VentanillaComponent::class)->name('ventanilla');
+});
+
 
 /** --------------------------------- Roles de Admin ----------------------------------------------------- **/
 Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Admin']], function () {
@@ -77,3 +88,23 @@ Route::get('qrcode/{url}',  function($url)
 
 Route::get('/pdftest', [\App\Http\Controllers\pdfTestController::class,'process']);
 Route::get('test', fn () => phpinfo());
+
+/*--------------------------------------------------------------------------*/
+// Gestión de verificación de correos y recuperación de contraseñas
+
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/dashboard');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+/*--------------------------------------------------------------------------*/

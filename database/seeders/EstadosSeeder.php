@@ -7,10 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 use App\Models\empresa;
-use App\Models\SeccionEmpresa;
-use App\Models\SeccionUser;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 
 
@@ -1283,6 +1280,8 @@ class EstadosSeeder extends Seeder
         Role::create(['name' => 'Gerente']);
         //Lider: Lidera un departamento, gestiona y da respuesta a las PQRS
         Role::create(['name' => 'Lider']);
+        Role::create(['name' => 'Auxiliar']);
+
         //Ventanilla: Administra la ventanilla única
         Role::create(['name' => 'Ventanilla']);
 

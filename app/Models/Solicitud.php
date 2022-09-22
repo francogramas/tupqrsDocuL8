@@ -27,7 +27,8 @@ class Solicitud extends Model
         'fecha',
         'confidencial',
         'respuesta_email',
-        'tipologia_id'
+        'tipologia_id',
+        'entrada',
     ];
 
     public function copia()

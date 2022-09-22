@@ -9,23 +9,25 @@ class empresa extends Model
 {
     use HasFactory;
     public $table = 'empresas';
-    protected $fillable = ['nit',     
-     'razonsocial',
-     'direccion',
-     'telefono',
-     'email',
-     'logo',
-     'ciudad_id',
-     'user_id',
-     'url',
-     'estado_id',     
+    protected $fillable = [
+        'nit',
+        'razonsocial',
+        'direccion',
+        'telefono',
+        'email',
+        'logo',
+        'ciudad_id',
+        'user_id',
+        'url',
+        'estado_id',
+        'dominio',
     ];
-    
+
     public function user()
     {
         return $this->belongsTo(user::class);
     }
-    
+
     public function secciones()
     {
         return $this->hasMany(SeccionEmpresa::class, 'empresa_id');

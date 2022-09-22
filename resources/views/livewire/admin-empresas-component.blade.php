@@ -29,14 +29,15 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-5" >
             <div class="form-control">
                 <label for="" class="input-group input-group-vertical">
-                    <span>Nit</span>
-                    <input type="text" class="input input-bordered" placeholder="Nit">
+                    <span>Nit @error('nit') <span class="text-error font-bold text-sm">*{{ $message }}</span> @enderror</span>
+
+                    <input type="text" class="input input-bordered" placeholder="Nit" wire:model='nit'>
                 </label>
             </div>
             <div class="form-control">
                 <label for="" class="input-group input-group-vertical">
-                    <span>Razón Social</span>
-                    <input type="text" class="input input-bordered" placeholder="Razón Social">
+                    <span>Razón Social @error('razonsocial') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
+                    <input type="text" class="input input-bordered" placeholder="Razón Social" wire:model='razonsocial'>
                 </label>
             </div>
             <div class="form-control">
@@ -51,8 +52,8 @@
             </div>
             <div class="form-control">
                 <label for="" class="input-group input-group-vertical">
-                    <span>Ciudad</span>
-                    <select name="" wire:model="ciudad_id" id="" class="w-full px-2 py-1 rounded-md select select-bordered">
+                    <span>Ciudad @error('ciudad_id') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
+                    <select name="" wire:model="ciudad_id" id="" class="w-full px-2 py-1 rounded-md select select-bordered" wire:model='ciudad_id'>
                         @foreach ($ciudades as $ciudad)
                             <option value="{{$ciudad->id}}">{{$ciudad->ciudad}}</option>
                         @endforeach
@@ -61,32 +62,32 @@
             </div>
             <div class="form-control col-span-2">
                 <label for="" class="input-group input-group-vertical">
-                    <span>Dirección</span>
-                    <input type="text" class="input input-bordered" placeholder="Dirección">
+                    <span>Dirección @error('direccion') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
+                    <input type="text" class="input input-bordered" placeholder="Dirección" wire:model='direccion'>
                 </label>
             </div>
             <div class="form-control">
                 <label for="" class="input-group input-group-vertical">
-                    <span>Teléfono</span>
-                    <input type="text" class="input input-bordered" placeholder="Teléfono">
+                    <span>Teléfono @error('telefono') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
+                    <input type="text" class="input input-bordered" placeholder="Teléfono" wire:model='telefono'>
                 </label>
             </div>
             <div class="form-control">
                 <label for="" class="input-group input-group-vertical">
-                    <span>Email</span>
-                    <input type="text" class="input input-bordered" placeholder="Email">
+                    <span>Email @error('email') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
+                    <input type="text" class="input input-bordered" placeholder="Email" wire:model='email'>
                 </label>
             </div>
             <div class="form-control">
                 <label for="" class="input-group input-group-vertical">
-                    <span>Logo</span>
-                    <input type="text" class="input input-bordered" placeholder="Logo">
+                    <span>Dominio @error('dominio') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
+                    <input type="text" class="input input-bordered" placeholder="Dominio" wire:model='dominio'>
                 </label>
             </div>
             <div class="form-control">
                 <label for="" class="input-group input-group-vertical">
-                    <span>Url</span>
-                    <input type="text" class="input input-bordered" placeholder="Url">
+                    <span>Logo @error('logo') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
+                    <input type="file" class="input input-bordered" placeholder="Logo" wire:model='logo' accept="image/*">
                 </label>
             </div>
             <div class="form-control">
@@ -109,6 +110,7 @@
             </div>
         </div>
     @endif
+
     <div class="border-b border-gray-400 block mx-3 mt-2">
         <div class="hidden lg:grid grid-cols-1 md:grid-cols-7 gap-3 border-t border-r border-l border-gray-400 font-bold">
             <div class="px-2">

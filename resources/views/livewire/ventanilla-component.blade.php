@@ -43,8 +43,11 @@
                     <thead>
                         <tr class="border border-t-1 border-black font-bold">
                             <td class="px-2"></td>
+                            <td class="px-2">Radicado</td>
                             <td class="px-2">Fecha</td>
                             <td class="px-2">Vence</td>
+                            <td class="px-2">Recepción</td>
+                            <td class="px-2">Clase</td>
                             <td class="px-2">Dependencia</td>
                             <td class="px-2">Remitente</td>
                             <td class="px-2">Destinatario</td>
@@ -73,8 +76,11 @@
                             <td class="px-2">
                                 <div class="w-4 h-4 rounded-full {{$clase}}"></div>
                             </td>
+                            <td class="px-2">{{$solicitud->radicado}}</td>
                             <td class="px-2">{{$solicitud->fecha}}</td>
                             <td class="px-2">{{Carbon\Carbon::createFromFormat('Y-m-d', $solicitud->fecha)->addDays($solicitud->diasTermino)->format('Y-m-d')}}</td>
+                            <td class="px-2">{{$solicitud->medio->nombre}}</td>
+                            <td class="px-2">{{$solicitud->tipologia->nombre}}</td>
                             <td class="px-2">{{$solicitud->seccionempresa->nombre}}</td>
                             <td class="px-2">{{$solicitud->solicitante->nombrecompleto}}</td>
                             <td class="px-2">{{$solicitud->destinatario}}</td>
@@ -124,39 +130,6 @@
             @error('documento') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
             <input id="documento" wire:model="documento" wire:change="buscarSolicitante()" type="number" class="w-full px-2 py-1 rounded-md shadow-lg">
         </div>
-        <!--div class="px-2">
-            <label for="nacimiento" class="block text-gray-700 text-sm font-bold">Fecha de nacimiento</label>
-            <div class="bg-white rounded-lg shadow-xl w-full border border-black h-9">
-                <div class="flex">
-                  <select wire:model="ano" wire:change="crearFecha()" class="bg-transparent border-transparent" style="background-image: none">
-                    @foreach ($anos as $anoi)
-                        <option value="{{$anoi}}">{{$anoi}}</option>
-                    @endforeach
-                  </select>
-                  <span class="mr-2 mt-2">/</span>
-                  <select wire:model="mes" wire:change="crearFecha()" class="bg-transparent border-transparent" style="background-image: none">
-                    <option value="1">ENE</option>
-                    <option value="2">FEB</option>
-                    <option value="3">MAR</option>
-                    <option value="4">ABR</option>
-                    <option value="5">MAY</option>
-                    <option value="6">JUN</option>
-                    <option value="7">JUL</option>
-                    <option value="8">AGO</option>
-                    <option value="9">SEP</option>
-                    <option value="10">OCT</option>
-                    <option value="11">NOV</option>
-                    <option value="12">DIC</option>
-                  </select>
-                  <span class="mr-2 mt-2">/</span>
-                    <select select wire:model="dia" wire:change="buscarSolicitante()" class="bg-transparent border-transparent" style="background-image: none">
-                        @foreach ($dias as $diai)
-                        <option value="{{$diai}}">{{$diai}}</option>
-                        @endforeach
-                  </select>
-                </div>
-              </div>
-        </div-->
         <div class="px-2">
             <label for="tipo_usuario_id" class="block text-gray-700 text-sm font-bold">Tipo de Solicitante/Remitente</label>
             @error('tipo_usuario_id') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
@@ -212,7 +185,7 @@
     <div class="grid grid-cols-1 md:grid-cols-5 gap-3 px-3 py-2">
 
         <div>
-            <label for="seccion_id" class="block text-gray-700 text-sm font-bold">Secciones</label>
+            <label for="seccion_id" class="block text-gray-700 text-sm font-bold">Oficinas</label>
             <select name="" wire:model="seccion_id" wire:change="buscarSerie();" class="w-full px-2 py-1 rounded-md shadow-lg">
                 @foreach ($seccion_empresa as $seccioni=>$nombre )
                     <option value="{{$seccioni}}">{{$nombre}}</option>
@@ -220,14 +193,14 @@
             </select>
         </div>
         <div>
-            <label for="tipos_id" class="block text-gray-700 text-sm font-bold">Serie</label>
+            <label for="tipos_id" class="block text-gray-700 text-sm font-bold">Tipo de solictud</label>
             <select id="tipos_id" name="" wire:model="serie_id" wire:change = "buscarSubSerie()" class="w-full px-2 py-1 rounded-md shadow-lg">
                 @foreach ($series as $serie=>$nombre )
                     <option value="{{$serie}}">{{$nombre}}</option>
                 @endforeach
             </select>
         </div>
-        <div>
+        <div class="hidden">
             <label for="subserie_id" class="block text-gray-700 text-sm font-bold">Subserie</label>
             <select id="subserie_id" name="" wire:model="subserie_id" wire:change = "buscarTipologia()" class="w-full px-2 py-1 rounded-md shadow-lg">
                 @foreach ($subserie as $subseri)
@@ -235,7 +208,7 @@
                 @endforeach
             </select>
         </div>
-        <div>
+        <div class="hidden">
             <label for="tipologia_id" class="block text-gray-700 text-sm font-bold">Tipología</label>
             <select id="tipologia_id" name="" wire:model="tipologia_id" class="w-full px-2 py-1 rounded-md shadow-lg" wire:change="obtenerDiasTermino();">
                 @foreach ($tipologia as $tipologi)

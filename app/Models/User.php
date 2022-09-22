@@ -10,7 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-
+use Illuminate\Auth\Notifications\VerifyEmail;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -20,7 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles;
-    
+
 
     /**
      * The attributes that are mass assignable.
@@ -63,7 +63,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
-    
+
     public function seccion()
     {
         return $this->hasMany(SeccionUser::class);
@@ -73,5 +73,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(empresa::class);
     }
-    
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmail);
+    }
+
+
 }

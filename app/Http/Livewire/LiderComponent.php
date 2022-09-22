@@ -13,6 +13,8 @@ use App\Models\SeccionUser;
 use App\Mail\respuestaSolicitudMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Storage;
@@ -23,22 +25,21 @@ class LiderComponent extends Component
     use WithFileUploads;
     public $tiposolicitud, $solicitud, $solicitudi, $respuesta, $adjunto, $acciones, $accion_id, $empresa_id,
     $observaciones, $seccion_empresa, $seccion_id, $secciones_u, $secciones_u_id, $series, $serie_id, $subseries, $subserie_id,
-    $tipologias, $tipologia_id;
+    $tipologias, $tipologia_id, $max_consecutivo;
 
     public function mount()
     {
         $this->empresa_id = Auth::user()->seccion->first()->seccionempresa->empresa_id;
-
         $this->acciones=AccionOrdene::where('id','>',2)->orderBy('id','desc')->get();
         $this->accion_id = $this->acciones->first()->id;
-        $secciones_id = SeccionUser::select('id')->where('user_id', Auth::user()->id)->get();
+
+        $secciones_id = SeccionUser::select('seccion_id')->where('user_id', Auth::user()->id)->get();
         $seccion_id = Solicitud::select('seccion_id')->where('estado_id','<>',4)->whereIn('seccion_id', $secciones_id)->groupBy('seccion_id')->get();
 
         //Verificación de que existe solicitudes en las secciones, de lo contrario se muestra un mensaje diciendo que no hay solicitudes por responder
         if($seccion_id->count()>0){
             $this->seccion_empresa = SeccionEmpresa::whereIn('id', $seccion_id)->get();
             $this->secciones_u_id = $this->seccion_empresa->first()->id;
-
             try {
                 $this->seccion_id = $this->seccion_empresa->first()->id;
             } catch (\Throwable $th) {
@@ -139,7 +140,7 @@ class LiderComponent extends Component
     {
         $datavalid = $this->validate([
             'respuesta' => 'required|min:10',
-            'adjunto' => 'max:4096', // Pdf máximo 4MB
+            'adjunto' => 'max:24576', // Pdf máximo 24MB
         ]);
 
         try {
@@ -150,15 +151,41 @@ class LiderComponent extends Component
 
         if ($this->accion_id >= 6 and $this->accion_id <=8) {
             $this->solicitudi->estado_id = 4;
+
+            // Se debe definir la forma de radiciaciones internas
+            $solicitudBD = Solicitud::create([
+                'solicitante_id'=>$this->solicitudi->solicitante_id,
+                'estado_id'=> $this->solicitudi->estado_id,
+                'seccion_id'=>$this->solicitudi->seccion_id,
+                'empresa_id'=>$this->solicitudi->empresa_id,
+                'serie_id'=>$this->solicitudi->serie_id,
+                'subserie_id'=>$this->solicitudi->subserie_id,
+                'medio_id'=>$this->medio_id,
+                'user_id' => Auth::user()->id,
+                'radicado'=> $this->calcularRadicado(),
+                'consecutivo'=> $this->max_consecutivo,
+                'diasTermino'=> $this->solicitudi->diasTermino,
+                'folios'=>$this->solicitudi->folios,
+                'anexos'=>$this->solicitudi->anexos,
+                'destinatario'=>$this->solicitudi->solicitante->nombrecompleto,
+                'asunto'=>'Rta: '.$this->solicitudi->asunto,
+                'fecha'=>$this->fecha,
+                'confidencial'=>$this->solicitudi->confidencial,
+                'respuesta_email'=>$this->solicitudi->respuesta_email,
+                'tipologia_id'=>$this->solicitudi->tipologia_id,
+                'entrada'=>false
+            ]);
+
             $this->solicitudi->save();
         }
-
         elseif($this->accion_id == 3) {
             $this->solicitudi->seccion_id = $this->seccion_id;
             $this->solicitudi->save();
         }
 
+
         SeguimientoOrden::create([
+            'radicado' => null, // El seguimiento se hace por cada solicitud, debido a esto no es necesrio que tenga radicado
             'solicitud_id' => $this->solicitudi->id,
             'user_id'=>Auth::user()->id,
             'estado_id' => $this->solicitudi->estado_id,
@@ -178,5 +205,32 @@ class LiderComponent extends Component
     {
         $sol = SeguimientoOrden::find($id);
         dd(Storage::url('public/'.$sol->adjunto));
+    }
+
+    public function calcularRadicado($trd=false)
+    {
+        $date = Carbon::createFromDate(now()->format('Y-m-d'));
+        $startOfYear = $date->copy()->startOfYear();
+        $endOfYear   = $date->copy()->endOfYear();
+        $c=null;
+        $pref = 'S';
+
+        $this->max_consecutivo = Solicitud::where('empresa_id',$this->empresa_id)
+                            ->whereBetween('created_at',[$startOfYear, $endOfYear])
+                            ->max('consecutivo');
+        if($this->max_consecutivo>0){
+            $this->max_consecutivo +=1;
+        }
+        else{
+            $this->max_consecutivo =1;
+        }
+
+        if ($trd) {
+            $t = TipologiaDocumento::find($this->tipologia_id);
+            $c= $t->subserie->seccionempresa->codigo.'-'.$t->subserie->serie->codigo.'-'.$t->subserie->codigo.'-';
+        }
+        if($this->accion_id==3){$pref='I';}
+        $radicado = $pref.'-'.now()->format('y').'-'.$c.$this->max_consecutivo;
+        return($radicado);
     }
 }
