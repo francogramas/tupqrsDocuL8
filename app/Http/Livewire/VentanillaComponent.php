@@ -292,14 +292,14 @@ class VentanillaComponent extends Component
             'tipologia_id'=>$this->tipologia_id,
         ]);
 
-        //try {
+        try {
             $dataValid['adjunto'] = $this->adjunto->store('pdf','public');
             $outputFile = Storage::disk('public')->path($dataValid['adjunto']);
             $this->fillPDF(Storage::disk('public')->path($dataValid['adjunto']), $outputFile, $solicitudBD->empresa->razonsocial ,$solicitudBD->radicado);
 
-        /*} catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             $dataValid['adjunto']='';
-        }*/
+        }
 
 
 
