@@ -301,6 +301,9 @@ class VentanillaComponent extends Component
             $dataValid['adjunto']='';
         }*/
 
+
+
+
         SeguimientoOrden::create([
             'solicitud_id' => $solicitudBD->id,
             'user_id'=>Auth::user()->id,
