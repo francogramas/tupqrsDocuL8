@@ -160,7 +160,7 @@ class LiderComponent extends Component
                 'empresa_id'=>$this->solicitudi->empresa_id,
                 'serie_id'=>$this->solicitudi->serie_id,
                 'subserie_id'=>$this->solicitudi->subserie_id,
-                'medio_id'=>$this->medio_id,
+                'medio_id'=>2,
                 'user_id' => Auth::user()->id,
                 'radicado'=> $this->calcularRadicado(),
                 'consecutivo'=> $this->max_consecutivo,
