@@ -409,7 +409,7 @@ class VentanillaComponent extends Component
             $text = null;
             $text1 = null;
         }
-        Storage::disk('local')->delete($output_file, $im);
+        Storage::disk('local')->delete($output_file);
 
         return $fpdi->Output($outputFile, 'F');
     }
