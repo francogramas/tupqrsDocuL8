@@ -16,6 +16,7 @@ class SeccionEmpresa extends Model
         'estado_id',
         'lider',
         'firma',
+        'emailjefe',
     ];
 
     public function userSeccion()

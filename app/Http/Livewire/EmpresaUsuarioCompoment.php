@@ -20,6 +20,8 @@ use Livewire\WithFileUploads;
 use App\Models\Serie;
 use App\Models\Subserie;
 use App\Models\TipologiaDocumento;
+use Illuminate\Support\Facades\Storage;
+
 
 class EmpresaUsuarioCompoment extends Component
 {
@@ -28,7 +30,7 @@ class EmpresaUsuarioCompoment extends Component
     public $empresa, $empresa_id, $countempresa, $dependencia, $dependencia_id, $secciones, $estados, $estado_id, $ciudades,
     $nit, $razonsocial, $telefono, $email, $ciudad_id, $direccion, $id_eps, $boolguardar, $boolguardarDep, $modalFormVisible,
     $modalFormVisible1, $modalFormVisible2, $userName, $userEmail, $password, $password_confirmation, $seccionUser, $boolUsuario,
-    $mensaje, $codigo, $publica, $lider, $firma;
+    $mensaje, $codigo, $publica, $lider, $firma, $emailjefe;
 
     public function rules()
     {
@@ -160,12 +162,12 @@ class EmpresaUsuarioCompoment extends Component
             'firma' => 'max:1024', // Pdf máximo 1MB
         ]);
 
-        //try {
+        try {
             $dataValid['firma'] = $this->firma->store('firmas','public');
 
-        /*} catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             $dataValid['firma']='';
-        }*/
+        }
 
         $seccion = SeccionEmpresa::create([
             'nombre'=>$this->dependencia,
@@ -174,7 +176,8 @@ class EmpresaUsuarioCompoment extends Component
             'estado_id'=>1,
             'publica' => $this->publica,
             'lider' => $this->lider,
-            'firma' => $this->firma,
+            'firma' => $dataValid['firma'],
+            'emailjefe' => $this->emailjefe,
         ]);
 
         //------------------------------------------------------------------ SERIES
@@ -208,18 +211,40 @@ class EmpresaUsuarioCompoment extends Component
         $this->dependencia = $dependencia->nombre;
         $this->dependencia_id = $dependencia->id;
         $this->codigo = $dependencia->codigo;
+        $this->lider = $dependencia->lider;
+        $this->firma = $dependencia->firma;
         $this->boolguardarDep=false;
         $this->publica = $dependencia->publica;
-
+        $this->emailjefe = $dependencia->emailjefe;
 
     }
     public function updateDependencia()
     {
         $dependencia = SeccionEmpresa::find($this->dependencia_id);
+
+
+        $this->validate([
+            'dependencia' => 'required|min:3',
+            'codigo' => 'required|min:3',
+            'lider' => 'required',
+            'firma' => 'max:1024', // Pdf máximo 1MB
+        ]);
+
+        try {
+            $dataValid['firma'] = $this->firma->store('firmas','public');
+            Storage::disk('local')->delete('public/'.$dependencia->firma);
+
+        } catch (\Throwable $th) {
+            $dataValid['firma'] = $dependencia->firma;
+        }
+
         $dependencia->update([
             'nombre' => $this->dependencia,
             'codigo' => $this->codigo,
             'publica' => $this->publica,
+            'lider' => $this->lider,
+            'firma' => $dataValid['firma'],
+            'emailjefe' => $this->emailjefe,
         ]);
 
 
@@ -227,6 +252,9 @@ class EmpresaUsuarioCompoment extends Component
         $this->dependencia_id = null;
         $this->boolguardarDep = true;
         $this->codigo = null;
+        $this->lider = null;
+        $this->firma = null;
+        $this->emailjefe = null;
     }
 
     public function deleteDependencia()

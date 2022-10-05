@@ -25,6 +25,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/impficha/{radicado}', [App\Http\Controllers\impRadicadoController::class, 'ficha'])->name('impficha');
     Route::get('/impdocumento/{documento}', [App\Http\Controllers\impDocumentoController::class, 'seguimiento'])->name('impdocumento');
     Route::get('/imparchivo/{archivo}', [App\Http\Controllers\impDocumentoController::class, 'archivo'])->name('imparchivo');
+    Route::get('/impoficio/{seguimiento_id}', [App\Http\Controllers\impDocumentoController::class, 'oficio'])->name('impoficio');
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {

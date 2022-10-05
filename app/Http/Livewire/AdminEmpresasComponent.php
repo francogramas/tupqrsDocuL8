@@ -21,7 +21,7 @@ use App\Models\Subserie;
 use App\Models\SeccionEmpresa;
 use App\Models\TipologiaDocumento;
 
-// TODO: Crear empresas con TRD de inicio: PQRSD
+
 class AdminEmpresasComponent extends Component
 {
     use WithPagination;

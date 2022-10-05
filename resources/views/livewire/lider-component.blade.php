@@ -113,17 +113,17 @@
                 @endforelse
 
                 <div class="mt-2">
-                    @error('respuesta') <span class="error text-red-600">{{ '*'.$message }}</span> @enderror
+                    @error('respuesta') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
                     <textarea wire:model="respuesta" class="mt-2 rounded-md resize-none w-full h-full border shadow-lg px-2 py-2" rows="4" placeholder="Diligencie la respuesta a la solicitud"></textarea>
                 </div>
                 <div class="mt-2">
-                    @error('observaciones') <span class="error text-red-600">{{ '*'.$message }}</span> @enderror
+                    @error('observaciones') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
                     <textarea wire:model="observaciones" class="mt-2 rounded-md resize-none w-full h-full border shadow-lg px-2 py-2" rows="2" placeholder="Observaciones"></textarea>
                 </div>
                 <div>
                     <label for="" class="block text-gray-700 text-sm font-bold">Adjuntar archivo</label>
                     <input class="bg-green-200" type="file" accept="application/pdf" wire:model="adjunto">
-                    @error('adjunto') <span class="error text-red-600">{{ '*'.$message }}</span> @enderror
+                    @error('adjunto') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
                 </div>
                 <div class="mt-2">
                     <label for="" class="block text-gray-700 text-sm font-bold">Acciones</label>
@@ -157,7 +157,7 @@
               @forelse ($solicitudi->seguimiento as $seguimiento)
                    <!-- First timeline -->
                 <button class="w-full text-right">
-                  <div class="mb-5 flex justify-between items-center w-full">
+                  <div class="mb-1 flex justify-between items-center w-full">
                     <div class="order-2"></div>
                     <div class="z-20">
                       <div class="my-4 rounded-full h-8 w-8 flex items-center bg-indigo-300 ring-4 ring-indigo-400 ring-opacity-30">
@@ -166,17 +166,23 @@
                         </svg>
                       </div>
                     </div>
-                    <div class="order-1 @if ($seguimiento->estado_id==1) bg-green-300 @elseif($seguimiento->estado_id==2) bg-yellow-300 @elseif ($seguimiento->estado_id==3) bg-red-300 @endif opacity-70 rounded-lg shadow-xl w-full px-3 py-3">
+                    <div class="order-1 @if ($seguimiento->estado_id==1) bg-green-300 @elseif($seguimiento->estado_id==2) bg-yellow-300 @elseif ($seguimiento->estado_id==3) bg-red-300 @endif opacity-70 rounded-lg shadow-xl w-full px-3 py-1">
                       <div class="flex flex-row">
-                        <h3 class="mb-2 font-bold text-gray-800 text-sm">{{$seguimiento->accion->nombre}}</h3>
+                        <h3 class="mb-1 font-bold text-gray-800 text-sm">{{$seguimiento->accion->nombre}}</h3>
                       </div>
-                      <p class="leading-snug tracking-wide text-gray-900 text-opacity-100 text-xs">{{$seguimiento->user->name}}</p>
-                      <p class="leading-snug tracking-wide text-gray-900 text-opacity-100 text-xs">{{$seguimiento->created_at->format('M d/Y')}}</p>
+                      <p class="leading-snug tracking-wide text-gray-900 text-opacity-100 text-xs">{{$seguimiento->created_at->format('M d/Y')}} - {{$seguimiento->user->name}}</p>
                     </div>
                   </div>
                 </button>
               @empty
+
               @endforelse
+              <div>
+                <h3 class="mb-2 font-bold text-gray-800 text-base">Solicitudes Pendientes</h3>
+              </div>
+              <div>
+                <h3 class="mb-2 font-bold text-gray-800 text-base">Solicitudes Resueltas</h3>
+              </div>
             </div>
           </div>
 

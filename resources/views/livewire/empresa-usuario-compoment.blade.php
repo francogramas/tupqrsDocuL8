@@ -5,22 +5,22 @@
         <div class="grid grid-cols-1 md:grid-cols-2 md:gap-1 text-sm border-morado border-2 px-3 py-3 shadow-md rounded-xl bg-white">
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Nit</label>
-                @error('nit') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                @error('nit') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 <input type="text" wire:model="nit" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Razón Social</label>
-                @error('razonsocial') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                @error('razonsocial') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 <input type="text" wire:model="razonsocial" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Teléfono</label>
-                @error('telefono') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                @error('telefono') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 <input type="text" wire:model="telefono" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Email</label>
-                @error('email') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                @error('email') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 <input type="email" wire:model="email" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2">
@@ -33,7 +33,7 @@
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Ciudad</label>
-                @error('ciudad_id') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                @error('ciudad_id') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 <select name="" wire:model="ciudad_id" id="" class="w-full px-2 py-1 rounded-md">
                     @foreach ($ciudades as $ciudad)
                         <option value="{{$ciudad->id}}">{{$ciudad->ciudad}}</option>
@@ -42,7 +42,7 @@
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Dirección</label>
-                @error('direccion') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                @error('direccion') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 <input wire:model="direccion" type="text" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2 md:py-6">
@@ -101,11 +101,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 md:gap-1">
                 <div class="py-2 px-2 col-span-2">
                     <label for="" class="font-bold block">Crear dependencia:</label>
-                    @error('dependencia') <span class="text-red-600 block text-xs">{{ '*'.$message }}</span> @enderror
+                    @error('dependencia') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
                     <div class="flex">
                     <input type="text" wire:model="dependencia" class="w-5/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Nombre de Sección/Dependencia">
                     <input type="text" wire:model="codigo" class="w-1/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Código">
-                    <input type="text" wire:model="lider" class="w-3/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Lider de la oificia">
+                    <input type="text" wire:model="lider" class="w-3/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Jefe de la oificia">
+                    <input type="email" wire:model="emailjefe" class="w-3/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Email de Jefe">
                     <select name="publica" wire:model="publica" class="w-1/4 mr-3 px-2 py-1 rounded-md">
                         <option value="1" selected>Pública</option>
                         <option value="0">Oculta</option>
@@ -159,7 +160,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-                                        <button wire:click="confirmarBorrarDependencia({{$seccion->id}})" class="rounded-md text-red-600 font-bold" title="Eliminar">
+                                        <button wire:click="confirmarBorrarDependencia({{$seccion->id}})" class="rounded-md text-error  font-bold" title="Eliminar">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -199,24 +200,24 @@
     <!-- ------------------------------ Modal 2: Asignar lider de dependencia ---------------------------------------- -->
     <x-jet-dialog-modal wire:model="modalFormVisible1" >
         <x-slot name="title">
-            ASIGNAR LÍDER
+            ASIGNAR AUXILIAR
         </x-slot>
 
         <x-slot name="content">
             @if (is_null($seccionUser))
                 <div class="pt-2">
                     <x-jet-label for="" value="Email" autocomplete="off" />
-                    @error('userEmail') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                    @error('userEmail') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                     <x-jet-input wire:model="userEmail"  wire:change="revisarEmail()" class="block mt-1 w-full" type="text" />
                 </div>
                 <div class="pt-2">
                     <x-jet-label for=""  value="Nombre completo" autocomplete="off"/>
-                    @error('userName') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                    @error('userName') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                     <x-jet-input wire:model="userName" class="block mt-1 w-full" type="text" />
                 </div>
                 <div class="pt-2">
                     <x-jet-label for="" value="Contraseña" />
-                    @error('password') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                    @error('password') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                     <x-jet-input wire:model="password" class="block mt-1 w-full" type="password" />
                 </div>
                 <div class="pt-2">
@@ -226,7 +227,7 @@
             @else
                 <div class="flex">
                     <div class="mr-2">
-                        <button wire:click="confirmarBorrarUsuario({{$seccionUser->id}})" class="rounded-md text-red-600 font-bold" title="Eliminar">
+                        <button wire:click="confirmarBorrarUsuario({{$seccionUser->id}})" class="rounded-md text-error  font-bold" title="Eliminar">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>

@@ -96,6 +96,7 @@ class LiderComponent extends Component
 
     public function consultarSeries()
     {
+
         $sub = Solicitud::select('subseries.serie_id')
             ->join('subseries','solicituds.subserie_id','subseries.id')
             ->where('solicituds.seccion_id', $this->secciones_u_id)
@@ -197,8 +198,13 @@ class LiderComponent extends Component
         ]);
 
         Mail::to($this->solicitudi->solicitante->email)->send(new respuestaSolicitudMail($this->solicitudi));
-        $this->consultarSeries();
-        $this->solicitudes($this->serie_id);
+        try {
+            $this->consultarSeries();
+            $this->solicitudes($this->serie_id);
+        } catch (\Throwable $th) {
+            $this->seccion_empresa = null;
+        }
+
     }
 
     public function descargar($id)
@@ -232,5 +238,10 @@ class LiderComponent extends Component
         if($this->accion_id==3){$pref='I';}
         $radicado = $pref.'-'.now()->format('y').'-'.$c.$this->max_consecutivo;
         return($radicado);
+    }
+
+    public function finalizadas()
+    {
+
     }
 }

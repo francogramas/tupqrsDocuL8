@@ -11,6 +11,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\VerifyEmailQueued;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -31,6 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'theme',
     ];
 
     /**
@@ -76,8 +78,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new VerifyEmail);
+        $this->notify(new VerifyEmailQueued);
     }
-
 
 }

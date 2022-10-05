@@ -6,13 +6,6 @@ use App\Models\InventarioDigital;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
 
-use App\Models\Solicitud;
-use App\Models\Serie;
-use App\Models\Subserie;
-use App\Models\SeccionEmpresa;
-use App\Models\TipologiaDocumento;
-use App\Models\Pqr;
-
 use App\Models\empresa;
 use App\Models\SeguimientoOrden;
 use Illuminate\Support\Facades\Storage;
@@ -67,6 +60,16 @@ class impDocumentoController extends Controller
         } catch (DecryptException $e) {
             return('No existen tablas para la empresa');
         }
+    }
+
+    public function oficio($seguimiento)
+    {
+        $id = Crypt::decryptString($seguimiento);
+        $s = SeguimientoOrden::find($id);
+        $urlFirma = Storage::url('public/'.$s->seccionempresa->firma);
+        $urlLogo = Storage::url('public/'.$s->solicitud->empresa->logo);
+
+        return view('oficio_respuesta', ['s'=>$s, 'urlFirma'=>$urlFirma, 'urlLogo'=>$urlLogo]);
     }
 
 }

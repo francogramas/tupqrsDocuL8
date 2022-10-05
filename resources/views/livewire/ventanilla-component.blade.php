@@ -1,4 +1,5 @@
 <div>
+
     @if ($etapa==0)
         <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
             <button class="w-full mx-2 my-2 btn btn-primary rounded-lg shadow-lg hover:bg-blue-700" wire:click="siguienteSolictud(1)">Radicar solicitud</button>
@@ -11,31 +12,23 @@
             </div>
 
             <div class="py-2 gap-4 flex flex-row">
-                <div class="flex flex-row cursor-pointer" :active="$filtro==1">
-                    <x-jet-nav-link href="#" :active="$filtro==1" wire:click="filtrar(1)">
-                        <div class="w-4 h-4 rounded-full bg-success mt-1 mx-1"></div>Activas({{$activas}})
-                    </x-jet-nav-link>
-                </div>
-                <div class="flex flex-row cursor-pointer">
-                    <x-jet-nav-link href="#" :active="$filtro==2" wire:click="filtrar(2)">
-                        <div class="w-4 h-4 rounded-full bg-warning mt-1 mx-1"></div>Por Vencer({{$pendientes}})
-                    </x-jet-nav-link>
-                </div>
-                <div class="flex flex-row cursor-pointer">
-                    <x-jet-nav-link href="#" :active="$filtro==3" wire:click="filtrar(3)">
-                        <div class="w-4 h-4 rounded-full bg-error mt-1 mx-1"></div>Vencidas({{$vencidas}})
-                    </x-jet-nav-link>
-                </div>
-                <div class="flex flex-row cursor-pointer">
-                    <x-jet-nav-link href="#" :active="$filtro==4" wire:click="filtrar(4)">
-                        <div class="w-4 h-4 rounded-full bg-primary mt-1 mx-1"></div>Finalizadas({{$finalizadas}})
-                    </x-jet-nav-link>
-                </div>
                 <div class="flex flex-row cursor-pointer">
                     <x-jet-nav-link href="#" :active="$filtro==0" wire:click="filtrar(0)">
-                        <div class="w-4 h-4 rounded-full mt-1 mx-1" ></div> Total({{$total}})
+                        <div class="w-4 h-4 rounded-full mt-1 mx-1 bg-success "></div>{{'Todos: '.$total}}
                     </x-jet-nav-link>
                 </div>
+                @foreach ($totales as $totali)
+                <div class="flex flex-row cursor-pointer">
+                    <x-jet-nav-link href="#" :active="$filtro==$totali->estado_id" wire:click="filtrar({{$totali->estado_id}})">
+                        <div class="w-4 h-4 rounded-full mt-1 mx-1 @if ($totali->estado_id==1)bg-success
+                            @elseif($totali->estado_id==2)bg-warning
+                            @elseif($totali->estado_id==3)bg-error
+                            @elseif($totali->estado_id==4)bg-primary
+                            @endif "></div>{{$totali->estado. ': '.$totali->total}}
+                    </x-jet-nav-link>
+                </div>
+                @endforeach
+
             </div>
 
             <div class="py-2">
@@ -86,12 +79,12 @@
                             <td class="px-2">{{$solicitud->destinatario}}</td>
                             <td class="px-2">{{Str::limit($solicitud->asunto, 50, '...') }}</td>
                             <td class="flex flex-row">
-                                <a href="#" class="text-gray-500" onclick="window.open('{{route('impficha',Crypt::encryptString($solicitud->id))}}','Imprimir Radicado','width=700,height=600')" title="Imprimir Ficha">
+                                <a href="#" class="text-gray-500" onclick="window.open('{{route('impdocumento',Crypt::encryptString(seguimientoRadicado($solicitud->id)))}}','Imprimir Radicado','width=700,height=600')" title="Imprimir Ficha">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
                                     </svg>
                                 </a>
-                                <a href="#" class="text-gray-500" onclick="window.open('{{route('impradicado',Crypt::encryptString($solicitud->id))}}','Imprimir Radicado','width=600,height=400')" title="Imprimir Radicado">
+                                <a href="#" class="text-gray-500" onclick="window.open('{{route('impdocumento',Crypt::encryptString(seguimientoRadicado($solicitud->id)))}}','Imprimir Radicado','width=600,height=400')" title="Imprimir Radicado">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
                                     </svg>
@@ -118,7 +111,7 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 px-3 py-2">
         <div class="px-2">
             <label for="tipo_documento" class="block text-gray-700 text-sm font-bold">Tipo de documento</label>
-            @error('tipo_documento') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('tipo_documento') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <select wire:model.defer="tipo_documento" id="tipo_documento" class="w-full px-2 py-1 rounded-md shadow-lg">
                 @foreach ($tipodocumento as $tipo)
                     <option value="{{$tipo->id}}">{{$tipo->descripcion}}</option>
@@ -127,12 +120,12 @@
         </div>
         <div class="px-2">
             <label for="documento" class="block text-gray-700 text-sm font-bold"># de documento</label>
-            @error('documento') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('documento') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <input id="documento" wire:model="documento" wire:change="buscarSolicitante()" type="number" class="w-full px-2 py-1 rounded-md shadow-lg">
         </div>
         <div class="px-2">
             <label for="tipo_usuario_id" class="block text-gray-700 text-sm font-bold">Tipo de Solicitante/Remitente</label>
-            @error('tipo_usuario_id') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('tipo_usuario_id') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <select wire:model="tipo_usuario_id" id="tipo_usuario_id" class="w-full px-2 py-1 rounded-md shadow-lg">
                 @foreach ($tipo_usuarios as $tipo_usuario)
                     <option value="{{$tipo_usuario->id}}">{{$tipo_usuario->nombre}}</option>
@@ -141,17 +134,17 @@
         </div>
         <div class="px-2">
             <label for="nombrecompleto" class="block text-gray-700 text-sm font-bold">Nombre completo</label>
-            @error('nombrecompleto') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('nombrecompleto') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <input id="nombrecompleto" wire:model.defer="nombrecompleto" type="text" class="w-full px-2 py-1 rounded-md shadow-lg">
         </div>
         <div class="px-2">
             <label for="telefono" class="block text-gray-700 text-sm font-bold">Celular</label>
-            @error('telefono') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('telefono') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <input id="telefono" wire:model.defer="telefono" type="tel" class="w-full px-2 py-1 rounded-md shadow-lg" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
         </div>
         <div class="px-2">
             <label for="email" class="block text-gray-700 text-sm font-bold">Correo electrónico</label>
-            @error('email') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('email') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <input id="email" wire:model.defer="email" type="email" class="w-full px-2 py-1 rounded-md shadow-lg">
         </div>
         <div class="py-1 px-2">
@@ -164,7 +157,7 @@
         </div>
         <div class="py-1 px-2">
             <label class="block text-gray-700 text-sm font-bold" for="">Ciudad</label>
-            @error('ciudad_id') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('ciudad_id') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <select name="" wire:model="ciudad_id" id="" class="w-full px-2 py-1 rounded-md shadow-lg">
                 @foreach ($ciudades as $ciudad)
                     <option value="{{$ciudad->id}}">{{$ciudad->ciudad}}</option>
@@ -173,11 +166,12 @@
         </div>
         <div class="py-1 px-2">
             <label for="direccion" class="block text-gray-700 text-sm font-bold">Dirección Completa</label>
-            @error('direccion') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('direccion') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <input id="direccion" wire:model.defer="direccion" type="text" class="w-full px-2 py-1 rounded-md shadow-lg">
         </div>
-        <div class="px-2">
-            <button id="btnguardar" wire:click="guardarSolicitante()"  class="w-full btn btn-sm mt-5 btn-primary">Continuar</button>
+        <div class="px-2 flex gap-2">
+            <button id="btnguardar" wire:click="guardarSolicitante()"  class="w-1/2 btn btn-sm mt-5 btn-primary">Continuar</button>
+            <button id="btnguardar" wire:click="finalizarRadicado()"  class="w-1/2 btn btn-sm mt-5 btn-warning">Cancelar</button>
         </div>
     </div>
     @elseif ($etapa==2)
@@ -246,7 +240,7 @@
         </div>
         <div class="md:col-span-5">
             <label for="asunto" class="block text-gray-700 text-sm font-bold">Asunto</label>
-            @error('asunto') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+            @error('asunto') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <textarea id="asunto" wire:model.defer="asunto" rows="2" class="w-full px-2 py-1 rounded-md shadow-lg"></textarea>
         </div>
         <div class="md:col-span-5">
@@ -269,8 +263,9 @@
             <label for="" class="block text-gray-700 text-sm font-bold">Adjuntar archivo</label>
             <input class="bg-green-200" type="file" wire:model="adjunto" accept="application/pdf">
         </div>
-        <div>
+        <div class="flex gap-2">
             <button class="w-full btn btn-primary" wire:click="radicar()">Radicar solicitud</button>
+            <button class="w-full btn btn-warning" wire:click="finalizarRadicado()">Canclear</button>
         </div>
 
     </div>

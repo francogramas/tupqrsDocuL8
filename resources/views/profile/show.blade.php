@@ -40,6 +40,13 @@
                     @livewire('profile.delete-user-form')
                 </div>
             @endif
+            <x-jet-section-border />
+            <div class="mt-4">
+                @livewire('profile.theme')
+            </div>
+
+
+
         </div>
     </div>
 </x-app-layout>

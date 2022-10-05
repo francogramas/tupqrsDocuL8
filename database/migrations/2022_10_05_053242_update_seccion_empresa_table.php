@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateSeccionEmpresasTable extends Migration
+class UpdateSeccionEmpresaTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,8 +14,7 @@ class UpdateSeccionEmpresasTable extends Migration
     public function up()
     {
         Schema::table('seccion_empresas', function (Blueprint $table) {
-            $table->string('lider',50)->nullable()->after('publica');
-            $table->string('firma')->nullable()->after('publica');
+            $table->string('emailjefe')->nullable()->after('publica');
         });
     }
 
@@ -27,8 +26,7 @@ class UpdateSeccionEmpresasTable extends Migration
     public function down()
     {
         Schema::table('seccion_empresas', function (Blueprint $table) {
-            $table->dropColumn('lider');
-            $table->dropColumn('firma');
+            $table->dropColumn('emailjefe');
         });
     }
 }

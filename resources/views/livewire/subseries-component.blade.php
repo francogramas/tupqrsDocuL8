@@ -58,13 +58,13 @@
                     <label for="" class="font-bold">Código</label>
                     <input type="text" class="input input-sm input-primary w-full" wire:model="codigo">
 
-                    @error('codigo') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                    @error('codigo') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
 
                 </div>
                 <div class="col-span-5">
                     <label for="" class="font-bold">Nombre</label>
                     <input type="text" class="input input-sm input-primary w-full" wire:model.defer="nombre">
-                    @error('nombre') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                    @error('nombre') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 </div>
                 <div class="col-span-2">
                     <label class="w-full block font-bold" for="">Retención en años</label>
@@ -76,16 +76,16 @@
 
                 <div class="col-span-2">
                     <label class="w-full block font-bold" for="">Disposición final</label>
-                    <label for=""><input type="radio" class="radio radio-sm radio-primary" name="disposicion" wire:click="disposicionFinalEvent(1)" checked> C</label>
-                    <label for=""><input type="radio" class="radio radio-sm radio-primary" name="disposicion" wire:click="disposicionFinalEvent(2)">E </label>
-                    <label for=""><input type="radio" class="radio radio-sm radio-primary" name="disposicion" wire:click="disposicionFinalEvent(3)">D </label>
-                    <label for=""><input type="radio" class="radio radio-sm radio-primary" name="disposicion" wire:click="disposicionFinalEvent(4)">CP </label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Conservación total"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:click="disposicionFinalEvent(1)" checked> C</label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Eliminación"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:click="disposicionFinalEvent(2)">E </label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Selección"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:click="disposicionFinalEvent(3)">D </label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Digitalización"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:click="disposicionFinalEvent(4)">S </label>
                 </div>
 
                 <div class="col-span-1">
                     <label class="w-full block font-bold" for="">Acceso</label>
-                    <label for=""><input type="radio" class="radio radio-sm radio-primary" name="acceso" wire:click="accesoEvent(1)" checked>P </label>
-                    <label for=""><input type="radio" class="radio radio-sm radio-primary" name="acceso" wire:click="accesoEvent(2)">Pr </label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Público"><input type="radio" class="radio radio-sm radio-primary" name="acceso" wire:click="accesoEvent(1)" checked>P </label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Privado"><input type="radio" class="radio radio-sm radio-primary" name="acceso" wire:click="accesoEvent(2)">Pr </label>
                 </div>
                 <div class="col-span-2">
                     <button class="btn btn-xs btn-primary mt-4 text-xs w-full" @if ($boolEditSubserie)  wire:click="updateSubserie()" @else wire:click="guardar()" @endif>@if ($boolEditSubserie) Actualizar @else Crear Subserie  @endif </button>
@@ -118,9 +118,9 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
                 <div class="">
                     <label class="w-full block font-bold" for="">Soporte</label>
-                    <label for=""><input type="checkbox" class="checkbox checkbox-primary" id="Pa" wire:model="So_Pa" checked>P </label>
-                    <label for=""><input type="checkbox" class="checkbox checkbox-primary" id="Di" wire:model="So_El">Di </label>
-                    <label for=""><input type="checkbox" class="checkbox checkbox-primary" id="El" wire:model="So_Di">El </label>
+                    <label for=""><input type="checkbox" class="tooltip tooltip-primary checkbox checkbox-primary" data-tip="Papel"  id="Pa" wire:model="So_Pa" checked>P </label>
+                    <label for=""><input type="checkbox" class="tooltip tooltip-primary checkbox checkbox-primary" data-tip="Digital"  id="Di" wire:model="So_El">Di </label>
+                    <label for=""><input type="checkbox" class="tooltip tooltip-primary checkbox checkbox-primary" data-tip="Electrónico" id="El" wire:model="So_Di">El </label>
                 </div>
                 <div class="">
                     <label class="w-full block font-bold" for="">Radicado</label>
@@ -147,7 +147,7 @@
             <div class="">
                 <label for="" class="font-bold">Nombre</label>
                 <input type="text" class="input input-sm input-primary w-full" wire:model.defer="nombreTipologia" id="nombreTipologia">
-                @error('nombre') <span class="text-red-600 block text-xs">{{ $message }}</span> @enderror
+                @error('nombre') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             </div>
             <div class="">
                 <button class="btn btn-xs btn-primary mt-4 text-xs w-full" @if($boolEditTipologia) wire:click="updateTipologia()" @else wire:click="CrearTipologia()" @endif onclick='document.getElementById("nombreTipologia").focus();'>@if($boolEditTipologia) Actualizar @else Crear tipología @endif </button>

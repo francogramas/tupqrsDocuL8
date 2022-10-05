@@ -56,9 +56,6 @@
                                 </x-jet-dropdown-link>
                             </x-slot>
                         </x-jet-dropdown>
-                        <x-jet-nav-link href="{{ route('ventanilla') }}" :active="request()->routeIs('ventanilla')">
-                            {{ __('Ventanilla') }}
-                        </x-jet-nav-link>
                         @endrole
                         @role('Lider')
                         <x-jet-nav-link href="{{ route('lider') }}" :active="request()->routeIs('lider')">
@@ -71,6 +68,11 @@
                         </x-jet-nav-link>
                         <x-jet-nav-link href="{{ route('subseries') }}" :active="request()->routeIs('subseries')">
                             {{ __('TRD') }}
+                        </x-jet-nav-link>
+                        @endrole
+                        @hasanyrole('Gerente|Ventanilla')
+                        <x-jet-nav-link href="{{ route('ventanilla') }}" :active="request()->routeIs('ventanilla')">
+                            {{ __('Ventanilla') }}
                         </x-jet-nav-link>
                         @endrole
                     </div>
@@ -194,9 +196,11 @@
                                     <x-jet-dropdown-link href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
                                                     this.closest('form').submit();">
-                                        {{ __('Log Out') }}
+                                        {{ __('Salir') }}
                                     </x-jet-dropdown-link>
                                 </form>
+                                <!-- Theme -->
+
                             </x-slot>
                         </x-jet-dropdown>
                     </div>
@@ -240,6 +244,11 @@
                 @role('Lider')
                     <x-jet-responsive-nav-link href="{{ route('lider') }}" :active="request()->routeIs('lider')">
                         {{ __('Solicitudes') }}
+                    </x-jet-responsive-nav-link>
+                @endrole
+                @hasanyrole('Gerente|Ventanilla')
+                    <x-jet-responsive-nav-link href="{{ route('ventanilla') }}" :active="request()->routeIs('ventanilla')">
+                        {{ __('Ventanilla') }}
                     </x-jet-responsive-nav-link>
                 @endrole
 

@@ -26,18 +26,21 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use setasign\Fpdi\Fpdi;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
+use Livewire\WithPagination;
 
 /**
  *
  * // TODO: EL PREFIJO DE LOS RADICADOS DEBEN SER INTERNOs(I)
  * // TODO: CREAR UNA HERRAMIENTA DE RADICADO MASIVO PARA SOLICITUDES DE LA VENTANILLA VIRTUAL
- * // TODO: GENERARE UNA PLANTILLA DE RESPUESTA INSTITUCIONAL(EMAILS)
+ * // TODO: GENERAR UNA PLANTILLA DE RESPUESTA INSTITUCIONAL(EMAILS)
  * //
 **/
 
 class VentanillaComponent extends Component
 {
     use WithFileUploads;
+    use WithPagination;
     public $empresa, $tiposolicitud, $solicitante, $solicitante_id, $tipodocumento, $etapa, $documento, $nacimiento, $nombrecompleto,
     $telefono, $email, $modalFormVisible, $mensaje, $tipo_documento, $seccion_id, $adjunto,
     $asunto, $anos, $ano, $meses, $mes, $dias, $dia, $estados, $estado_id, $ciudades, $ciudad_id, $direccion, $seccion_empresa,
@@ -99,29 +102,32 @@ class VentanillaComponent extends Component
             $this->filtro = 0;
             $char = [' ',',','.',';','"','?','¿','!','¡','&','$','@','#','%',')','(','/','=','+','-','*','/','_',':','>','<','{','}','[',']',"'"];
             $p = '%'.str_replace($char,'',$this->param).'%';
-            $solicitudes = Solicitud::select('solicituds.*')->whereRaw("(replace(solicitantes.nombrecompleto,' ','') like ?) or (replace(concat_ws('', solicitantes.documento),' ','') like ?) or (replace(concat_ws('', solicituds.radicado),' ','') like ?) or (replace(concat_ws('', solicituds.asunto),' ','') like ?)", [$p, $p, $p, $p])->join('solicitantes','solicituds.solicitante_id','solicitantes.id')->paginate(20);
+            $solicitudes = Solicitud::select('solicituds.*')->whereRaw("(replace(solicitantes.nombrecompleto,' ','') like ?) or (replace(concat_ws('', solicitantes.documento),' ','') like ?) or (replace(concat_ws('', solicituds.radicado),' ','') like ?) or (replace(concat_ws('', solicituds.asunto),' ','') like ?)", [$p, $p, $p, $p])->join('solicitantes','solicituds.solicitante_id','solicitantes.id')->paginate(10);
         }
         else{
             if ($this->filtro == 0) {
                 $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)
                     ->orderby('created_at','desc')
-                    ->paginate(15);
+                    ->paginate(10);
             }
             else {
                 $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)
                     ->where('estado_id',$this->filtro)
                     ->orderby('created_at','desc')
-                    ->paginate(15);
+                    ->paginate(10);
             }
         };
 
-        $activas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',1)->count();
-        $pendientes = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',2)->count();
-        $vencidas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',3)->count();
-        $finalizadas = Solicitud::where('empresa_id', $this->empresa->id)->where('estado_id',4)->count();
-        $total = Solicitud::where('empresa_id', $this->empresa->id)->count();
+        $totales = DB::table('solicituds')
+            ->select('estado_id','estado_solicituds.nombre as estado', DB::raw('count(*) as total'))
+            ->join('estado_solicituds','estado_solicituds.id','solicituds.estado_id')
+            ->where('empresa_id', $this->empresa->id)
+            ->groupBy('estado_id')
+            ->orderBy('estado_id')
+            ->get();
 
-        return view('livewire.ventanilla-component',['solicitudes' => $solicitudes, 'activas' => $activas, 'pendientes'=>$pendientes, 'vencidas'=>$vencidas, 'finalizadas'=>$finalizadas, 'total'=>$total]);
+        $total = $totales->sum('total');
+        return view('livewire.ventanilla-component',['solicitudes' => $solicitudes, 'total'=>$total, 'totales'=>$totales]);
     }
 
     public function calcularDias()
@@ -170,10 +176,10 @@ class VentanillaComponent extends Component
     }
     public function guardarSolicitante()
     {
-        $this->etapa = 2;
+
         $this->validate([
             'tipo_documento' => 'required',
-            'documento' => 'required|min:5',
+            'documento' => 'required',
             //'nacimiento' => 'required|date',
             'telefono' => 'required|numeric|min:10',
             'email' => 'required|email',
@@ -213,6 +219,8 @@ class VentanillaComponent extends Component
 
             $this->solicitante_id = $this->solicitante->id;
         }
+
+        $this->etapa = 2;
     }
     public function buscarSolicitante()
     {
@@ -237,6 +245,8 @@ class VentanillaComponent extends Component
         $this->series = Subserie::serieSeccion($this->seccion_id);
         $this->serie_id = $this->series->first()->id;
         $this->series = $this->series->pluck('nombre', 'id');
+        $seccion_empresa = SeccionEmpresa::find($this->seccion_id);
+        $this->destinatario = $seccion_empresa->lider;
         $this->buscarSubSerie();
     }
 
@@ -301,9 +311,6 @@ class VentanillaComponent extends Component
             $dataValid['adjunto']='';
         }
 
-
-
-
         SeguimientoOrden::create([
             'solicitud_id' => $solicitudBD->id,
             'user_id'=>Auth::user()->id,
@@ -365,10 +372,12 @@ class VentanillaComponent extends Component
         $this->asunto = null;
         $this->destinatario = null;
         $this->etapa = 0;
+        $this->filtrar(0);
     }
     public function filtrar($id)
     {
         $this->filtro = $id;
+        $this->resetPage();
     }
 
     public function consultarTipoSerie()
@@ -391,21 +400,18 @@ class VentanillaComponent extends Component
             $size       = $fpdi->getTemplateSize($template);
             $fpdi->AddPage($size['orientation'], array($size['width'], $size['height']));
             $fpdi->useTemplate($template);
-            $left = 30;
+            $left = 140;
             $top = 10;
             if ($i==1) {
                 $text = " Radicado: ".$radicado." Fecha: ".now();
                 $text1 = $empresa;
-                $fpdi->Image(Storage::disk('local')->path($output_file),5,5);
+                $fpdi->Image(Storage::disk('local')->path($output_file),125,5);
+                $fpdi->SetFont("helvetica", "", 8);
+                $fpdi->SetTextColor(100,100,100);
+                $fpdi->Text($left,$top,$text1);
+                $fpdi->Text($left,$top+4,$text);
+                $fpdi->SetCompression(true);
             }
-
-
-            $fpdi->SetFont("helvetica", "", 10);
-            $fpdi->SetTextColor(100,100,100);
-            $fpdi->Text($left,$top,$text1);
-            $fpdi->Text($left,$top+4,$text);
-            $fpdi->SetCompression(true);
-
             $text = null;
             $text1 = null;
         }
@@ -413,5 +419,6 @@ class VentanillaComponent extends Component
 
         return $fpdi->Output($outputFile, 'F');
     }
+
 
 }
