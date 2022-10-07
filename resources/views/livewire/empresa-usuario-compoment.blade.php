@@ -100,12 +100,27 @@
         <section class="">
             <div class="py-2 px-2">
                 <label for="" class="font-bold block">Crear dependencia:</label>
-                @error('dependencia') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
                 <div class="flex">
-                    <input type="text" wire:model="dependencia" class="w-5/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Nombre de Sección/Dependencia">
-                    <input type="text" wire:model="codigo" class="w-1/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Código">
-                    <input type="text" wire:model="lider" class="w-3/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Jefe de la oificia">
-                    <input type="email" wire:model="emailjefe" class="w-3/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Email de Jefe">
+                    <div class="w-5/12 mr-3 py-1">
+                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model="dependencia" required placeholder="Nombre de Sección/Dependencia">
+                        @error('dependencia') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
+                    </div>
+                    <div class="w-1/12 mr-3 py-1">
+                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model="codigo" required placeholder="Código">
+                        @error('codigo') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
+                    </div>
+                    <div class="w-3/12 mr-3 py-1">
+                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model="lider" required placeholder="Jefe de la oificia">
+                        @error('lider') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
+                    </div>
+                    <div class="w-3/12 mr-3 py-1">
+                        <input class=" rounded-md border-morado shadow-md w-full" type="email" wire:model="emailjefe" required placeholder="Email de Jefe">
+                        @error('emailjefe') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
+                    </div>
+
+
+
+
                 </div>
             <div class="py-2 flex">
                 <select name="publica" wire:model="publica" class="w-1/4 mr-3 px-2 py-1 rounded-md  select select-bordered max-w-xs">
