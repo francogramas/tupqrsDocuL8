@@ -30,7 +30,7 @@ class EmpresaUsuarioCompoment extends Component
     public $empresa, $empresa_id, $countempresa, $dependencia, $dependencia_id, $secciones, $estados, $estado_id, $ciudades,
     $nit, $razonsocial, $telefono, $email, $ciudad_id, $direccion, $id_eps, $boolguardar, $boolguardarDep, $modalFormVisible,
     $modalFormVisible1, $modalFormVisible2, $userName, $userEmail, $password, $password_confirmation, $seccionUser, $boolUsuario,
-    $mensaje, $codigo, $publica, $lider, $firma, $emailjefe;
+    $mensaje, $codigo, $publica, $lider, $firma, $emailjefe, $urlFirma;
 
     public function rules()
     {
@@ -147,6 +147,7 @@ class EmpresaUsuarioCompoment extends Component
         $this->direccion="";
         $this->dependencia = null;
         $this->codigo = null;
+        $this->urlFirma = null;
     }
 
     public function crearDependencia()
@@ -216,6 +217,7 @@ class EmpresaUsuarioCompoment extends Component
         $this->boolguardarDep=false;
         $this->publica = $dependencia->publica;
         $this->emailjefe = $dependencia->emailjefe;
+        $this->urlFirma = Storage::url('public/'.$dependencia->firma);
 
     }
     public function updateDependencia()
@@ -255,6 +257,7 @@ class EmpresaUsuarioCompoment extends Component
         $this->lider = null;
         $this->firma = null;
         $this->emailjefe = null;
+        $this->urlFirma = null;
     }
 
     public function deleteDependencia()

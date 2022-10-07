@@ -15,7 +15,7 @@ class UpdateSeccionEmpresasTable extends Migration
     {
         Schema::table('seccion_empresas', function (Blueprint $table) {
             $table->string('lider',50)->nullable()->after('publica');
-            $table->string('firma')->nullable()->after('publica');
+            $table->string('firma',255)->nullable()->after('publica');
         });
     }
 

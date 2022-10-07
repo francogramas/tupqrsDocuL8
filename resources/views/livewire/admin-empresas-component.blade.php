@@ -88,6 +88,7 @@
                 <label for="" class="input-group input-group-vertical">
                     <span>Logo @error('logo') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
                     <input type="file" class="input input-bordered" placeholder="Logo" wire:model='logo' accept="image/*">
+                    <img src="{{$urlLogo}}" alt="" width="150">
                 </label>
             </div>
             <div class="form-control">
@@ -96,7 +97,11 @@
                 </label>
                 <label for="" class="">
                     <span></span>
-                    <input type="submit" class="btn btn-primary" value="Crear nueva" wire:click="guardarNueva()">
+                    @if ($boolUpdate)
+                        <input type="submit" class="btn btn-primary" value="Actualizar" wire:click="update()">
+                    @else
+                        <input type="submit" class="btn btn-primary" value="Crear nueva" wire:click="guardarNueva()">
+                    @endif
                 </label>
             </div>
             <div class="form-control">
@@ -169,7 +174,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
                 </button>
-                <button class="ml-2 px-1 py-1 rounded-lg font-bold tooltip tooltip-primary"  data-tip="Editar" wire:click="cambiarEstado({{$empresai->id}})">
+                <button class="ml-2 px-1 py-1 rounded-lg font-bold tooltip tooltip-primary"  data-tip="Editar" wire:click="edit({{$empresai->id}})">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                       </svg>
@@ -184,6 +189,9 @@
         </div>
     </div>
     <!-- ------------------------------ Modal 2: Asignar lider de dependencia ---------------------------------------- -->
+    @if ($empresa)
+
+
     <x-jet-dialog-modal wire:model="modalFormVisible1" >
         <x-slot name="title">
             Enviar Mensaje a {{$empresa->razonsocial}}
@@ -200,13 +208,14 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-jet-secondary-button wire:click="$toggle('modalFormVisible1')" wire:loading.attr="disabled">
+            <button wire:click="$toggle('modalFormVisible1')" wire:loading.attr="disabled" class="btn btn-warning">
                 Cancelar
-            </x-jet-secondary-button>
+            </button>
 
-            <x-jet-button class="ml-2" wire:click="enviarMensaje()" wire:loading.attr="disabled">
+            <button class="ml-2 btn btn-primary" wire:click="enviarMensaje()" wire:loading.attr="disabled" >
                 Enviar Mensaje
-            </x-jet-button>
+            </button>
         </x-slot>
     </x-jet-dialog-modal>
+    @endif
 </div>

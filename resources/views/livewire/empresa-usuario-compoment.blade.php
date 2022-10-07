@@ -97,82 +97,84 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-1 md:gap-2">
-            <div class="grid grid-cols-1 md:grid-cols-2 md:gap-1">
-                <div class="py-2 px-2 col-span-2">
-                    <label for="" class="font-bold block">Crear dependencia:</label>
-                    @error('dependencia') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
-                    <div class="flex">
+        <section class="">
+            <div class="py-2 px-2">
+                <label for="" class="font-bold block">Crear dependencia:</label>
+                @error('dependencia') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
+                <div class="flex">
                     <input type="text" wire:model="dependencia" class="w-5/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Nombre de Sección/Dependencia">
                     <input type="text" wire:model="codigo" class="w-1/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Código">
                     <input type="text" wire:model="lider" class="w-3/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Jefe de la oificia">
                     <input type="email" wire:model="emailjefe" class="w-3/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md" required placeholder="Email de Jefe">
-                    <select name="publica" wire:model="publica" class="w-1/4 mr-3 px-2 py-1 rounded-md">
-                        <option value="1" selected>Pública</option>
-                        <option value="0">Oculta</option>
-                    </select>
-                    <div class="w-1/12 mr-3 px-2 py-1 rounded-md border-morado shadow-md">
-                        <label for="">Firma</label>
-                        <input type="file" wire:model="firma" accept="image/*">
-                    </div>
-                        @if ($boolguardarDep)
-                            <button wire:click="crearDependencia()" class="px-2 py-2 shadow-md bg-blue-400 rounded-lg hover:bg-blue-700 text-gray-100 font-bold" title="Crear dependencia">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                  </svg>
-                            </button>
-                        @else
-                            <button wire:click="updateDependencia({{$dependencia_id}})" class="px-2 py-2 bg-green-500 rounded-lg hover:bg-green-800 text-gray-100 font-bold" title="Actualizar">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                  </svg>
-                            </button>
-                        @endif
-                    </div>
                 </div>
-                <div class="col-span-2 px-2">
-                    <div class="shadow overflow-hidden border border-morado rounded-lg">
-                    <table class="text-xs w-full">
-                        <thead class="font-bold bg-contenido uppercase">
-                            <tr class="my-2 text-left border h-8">
-                                <th class="pl-2">Dependencia</th>
-                                <th class="pl-2">Líder</th>
-                                <th></th>
+            <div class="py-2 flex">
+                <select name="publica" wire:model="publica" class="w-1/4 mr-3 px-2 py-1 rounded-md  select select-bordered max-w-xs">
+                    <option value="1" selected>Pública</option>
+                    <option value="0">Oculta</option>
+                </select>
+                <div class="w-3/12 mr-3 px-2 py-1 rounded-md shadow-md">
+                    <label for="">Firma</label>
+                    <input type="file" wire:model="firma" accept="image/*">
+                    <img src="{{$urlFirma}}" alt="" width="100">
+                </div>
+                    @if ($boolguardarDep)
+                        <button wire:click="crearDependencia()" class=" shadow-md rounded-lg btn btn-primary" title="Crear dependencia">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                        </button>
+                    @else
+                        <button wire:click="updateDependencia({{$dependencia_id}})" class="shadow-md rounded-lg btn btn-primary" title="Actualizar">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                        </button>
+                    @endif
+
+            </div>
+            <div class="px-2">
+                <div class="shadow overflow-hidden border border-morado rounded-lg">
+                <table class="text-xs w-full">
+                    <thead class="font-bold bg-contenido uppercase">
+                        <tr class="my-2 text-left border h-8">
+                            <th class="pl-2">Dependencia</th>
+                            <th class="pl-2">Líder</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($empresa->secciones as $seccion)
+                            <tr class="border h-8">
+                                <td class="py-1 pl-2">{{$seccion->nombre}}</td>
+                                <td>
+                                    @if ($seccion->userSeccion)
+                                        {{$seccion->userSeccion->user->name}}
+                                    @endif
+                                </td>
+                                <td class="text-right py-1 pl-2">
+                                    <button wire:click="adminUsuario({{$seccion->id}})" class="rounded-md text-purple-500 font-bold" title="Agregar lider" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                            </svg>
+                                    </button>
+                                    <button wire:click="editDependencia({{$seccion->id}})" class="rounded-md text-green-500 font-bold" title="Editar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button wire:click="confirmarBorrarDependencia({{$seccion->id}})" class="rounded-md text-error  font-bold" title="Eliminar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($empresa->secciones as $seccion)
-                                <tr class="border h-8">
-                                    <td class="py-1 pl-2">{{$seccion->nombre}}</td>
-                                    <td>
-                                        @if ($seccion->userSeccion)
-                                            {{$seccion->userSeccion->user->name}}
-                                        @endif
-                                    </td>
-                                    <td class="text-right py-1 pl-2">
-                                        <button wire:click="adminUsuario({{$seccion->id}})" class="rounded-md text-purple-500 font-bold" title="Agregar lider" >
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                              </svg>
-                                        </button>
-                                        <button wire:click="editDependencia({{$seccion->id}})" class="rounded-md text-green-500 font-bold" title="Editar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </button>
-                                        <button wire:click="confirmarBorrarDependencia({{$seccion->id}})" class="rounded-md text-error  font-bold" title="Eliminar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    </div>
+                        @endforeach
+                    </tbody>
+                </table>
                 </div>
             </div>
+
         </section>
     </section>
     @endif

@@ -29,7 +29,7 @@ class AdminEmpresasComponent extends Component
 
 
     public  $empresa_id, $empresa, $modalFormVisible1, $asunto, $mensaje, $estado_id, $param, $estados, $estados_id, $ciudades, $ciudad_id,
-    $boolGuardar, $nit, $razonsocial, $direccion, $telefono, $email, $logo, $user_id, $url, $dominio;
+    $boolGuardar, $boolUpdate, $nit, $razonsocial, $direccion, $telefono, $email, $logo, $user_id, $url, $dominio, $urlLogo;
 
      public function mount()
     {
@@ -131,6 +131,8 @@ class AdminEmpresasComponent extends Component
     public function crearNueva()
     {
         $this->boolGuardar = true;
+        $this->boolUpdate = false;
+        $this->limpiar();
     }
 
     public function guardarNueva()
@@ -212,11 +214,13 @@ class AdminEmpresasComponent extends Component
 
         $this->limpiar();
         $this->boolGuardar = false;
+        $this->boolUpdate = false;
 
     }
     public function cancelarNueva()
     {
         $this->boolGuardar = false;
+        $this->boolUpdate = false;
     }
 
     public function limpiar()
@@ -228,5 +232,71 @@ class AdminEmpresasComponent extends Component
         $this->email=null;
         $this->logo=null;
         $this->dominio=null;
+        $this->urlLogo = null;
+        $this->empresa = null;
+        $this->empresa_id = null;
+    }
+
+    public function edit($id)
+    {
+        $this->empresa_id = $id;
+        $this->empresa = empresa::find($this->empresa_id);
+        $this->nit = $this->empresa->nit;
+        $this->razonsocial = $this->empresa->razonsocial;
+        $this->direccion = $this->empresa->direccion;
+        $this->telefono = $this->empresa->telefono;
+        $this->email = $this->empresa->email;
+        $this->logo = $this->empresa->logo;
+        $this->ciudad_id = $this->empresa->ciudad_id;
+        $this->user_id = $this->empresa->user_id;
+        $this->url = $this->empresa->url;
+        $this->estado_id = $this->empresa->estado_id;
+        $this->dominio = $this->empresa->dominio;
+
+        $this->ciudades = Ciudade::where('estado_id', $this->empresa->ciudad->estado->id)->get();
+        $this->urlLogo = Storage::url('public/'.$this->empresa->logo);
+
+        $this->boolGuardar=true;
+        $this->boolUpdate = true;
+    }
+
+    public function update()
+    {
+        $this->validate(
+            [
+                'nit' => 'required|min:10|unique:empresas,nit,'.$this->empresa_id,
+                'razonsocial' => 'required|min:5',
+                'direccion' => 'required',
+                'telefono' => 'required',
+                'ciudad_id' => 'required',
+                'email' => 'required|email',
+                'logo' => 'max:1024', // Pdf máximo 1MB
+            ]
+        );
+
+        try {
+            $dataValid['logo'] = $this->logo->store('logos','public');
+            Storage::disk('local')->delete('public/'.$this->empresa->logo);
+
+        } catch (\Throwable $th) {
+            $dataValid['logo']=$this->empresa->logo;
+        }
+
+        $this->empresa->nit = $this->nit;
+        $this->empresa->razonsocial = $this->razonsocial;
+        $this->empresa->direccion = $this->direccion;
+        $this->empresa->telefono = $this->telefono;
+        $this->empresa->email = $this->email;
+        $this->empresa->logo = $this->logo;
+        $this->empresa->ciudad_id = $this->ciudad_id;
+        $this->empresa->user_id = $this->user_id;
+        $this->empresa->url = $this->url;
+        $this->empresa->estado_id = $this->estado_id;
+        $this->empresa->dominio = $this->dominio;
+
+        $this->empresa->save();
+        $this->cancelarNueva();
+        $this->limpiar();
+
     }
 }

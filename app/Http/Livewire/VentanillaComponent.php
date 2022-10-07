@@ -101,8 +101,14 @@ class VentanillaComponent extends Component
         if(Str::length($this->param)>2){
             $this->filtro = 0;
             $char = [' ',',','.',';','"','?','¿','!','¡','&','$','@','#','%',')','(','/','=','+','-','*','/','_',':','>','<','{','}','[',']',"'"];
-            $p = '%'.str_replace($char,'',$this->param).'%';
-            $solicitudes = Solicitud::select('solicituds.*')->whereRaw("(replace(solicitantes.nombrecompleto,' ','') like ?) or (replace(concat_ws('', solicitantes.documento),' ','') like ?) or (replace(concat_ws('', solicituds.radicado),' ','') like ?) or (replace(concat_ws('', solicituds.asunto),' ','') like ?)", [$p, $p, $p, $p])->join('solicitantes','solicituds.solicitante_id','solicitantes.id')->paginate(10);
+            $s = implode(" ",$char);
+            $p = str_replace($char,'',$this->param);
+            $solicitudes = Solicitud::select('solicituds.*')
+            ->whereRaw("(replace(solicitantes.nombrecompleto,' ','') REGEXP ?)
+            or (replace(concat_ws('', solicitantes.documento),' ','') REGEXP ?)
+            or (replace(concat_ws('', solicituds.radicado),' ','') REGEXP ?)
+            or (replace(concat_ws('', solicituds.asunto),' ','') REGEXP ?)",
+            [$p, $p, $this->param, $p])->join('solicitantes','solicituds.solicitante_id','solicitantes.id')->paginate(10);
         }
         else{
             if ($this->filtro == 0) {
@@ -259,9 +265,15 @@ class VentanillaComponent extends Component
 
     public function buscarTipologia()
     {
-        $this->tipologia = TipologiaDocumento::where('subserie_id', $this->subserie_id)->orderBy('nombre')->get();
-        $this->tipologia_id = $this->tipologia->first()->id;
-        $this->obtenerDiasTermino();
+        try {
+            $this->tipologia = TipologiaDocumento::where('subserie_id', $this->subserie_id)->orderBy('nombre')->get();
+            $this->tipologia_id = $this->tipologia->first()->id;
+            $this->obtenerDiasTermino();
+        } catch (\Throwable $th) {
+            $this->tipologia = null;
+            $this->tipologia_id = null;
+            $this->diasTermino = 0;
+        }
     }
 
 
