@@ -128,7 +128,7 @@ class VentanillaComponent extends Component
             ->select('estado_id','estado_solicituds.nombre as estado', DB::raw('count(*) as total'))
             ->join('estado_solicituds','estado_solicituds.id','solicituds.estado_id')
             ->where('empresa_id', $this->empresa->id)
-            ->groupBy('estado_id', 'estado')
+            ->groupBy('estado_id')
             ->orderBy('estado_id')
             ->get();
 
