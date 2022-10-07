@@ -130,7 +130,7 @@
                 <div class="w-3/12 mr-3 px-2 py-1 rounded-md shadow-md">
                     <label for="">Firma</label>
                     <input type="file" wire:model="firma" accept="image/*">
-                    <img src="{{$urlFirma}}" alt="" width="100">
+                    <img src="{{asset('/storage/'.$urlFirma)}}" alt="" width="100">
                 </div>
                     @if ($boolguardarDep)
                         <button wire:click="crearDependencia()" class=" shadow-md rounded-lg btn btn-primary" title="Crear dependencia">

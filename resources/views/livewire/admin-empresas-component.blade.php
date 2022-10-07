@@ -88,7 +88,7 @@
                 <label for="" class="input-group input-group-vertical">
                     <span>Logo @error('logo') <span class="text-error font-bold text-sm">* {{ $message }}</span> @enderror</span>
                     <input type="file" class="input input-bordered" placeholder="Logo" wire:model='logo' accept="image/*">
-                    <img src="{{$urlLogo}}" alt="" width="150">
+                    <img src="{{asset('/storage/'.$urlLogo)}}" alt="" width="150">
                 </label>
             </div>
             <div class="form-control">

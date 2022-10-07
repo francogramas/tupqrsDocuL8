@@ -217,7 +217,7 @@ class EmpresaUsuarioCompoment extends Component
         $this->boolguardarDep=false;
         $this->publica = $dependencia->publica;
         $this->emailjefe = $dependencia->emailjefe;
-        $this->urlFirma = Storage::url('public/'.$dependencia->firma);
+        $this->urlFirma = $dependencia->firma;
 
     }
     public function updateDependencia()

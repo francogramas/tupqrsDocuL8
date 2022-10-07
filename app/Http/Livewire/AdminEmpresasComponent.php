@@ -254,7 +254,7 @@ class AdminEmpresasComponent extends Component
         $this->dominio = $this->empresa->dominio;
 
         $this->ciudades = Ciudade::where('estado_id', $this->empresa->ciudad->estado->id)->get();
-        $this->urlLogo = Storage::url('public/'.$this->empresa->logo);
+        $this->urlLogo = $this->empresa->logo;
 
         $this->boolGuardar=true;
         $this->boolUpdate = true;
