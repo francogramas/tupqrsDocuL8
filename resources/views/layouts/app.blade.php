@@ -18,7 +18,9 @@
         <!-- Scripts -->
         <script src="{{ mix('js/app.js') }}" defer></script>
     </head>
-    <body class="font-sans antialiased text-titulo" >
+
+
+    <body class="font-sans antialiased @if (Auth::user()->theme=="tupqrs") text-titulo @endif" >
         <x-jet-banner />
 
         <div class="min-h-screen bg-gray-100">
@@ -26,7 +28,7 @@
 
             <!-- Page Heading -->
             @if (isset($header))
-                <header class="bg-white shadow">
+                <header class=" shadow">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>

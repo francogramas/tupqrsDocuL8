@@ -21,6 +21,7 @@ use App\Models\Serie;
 use App\Models\Subserie;
 use App\Models\TipologiaDocumento;
 use Illuminate\Support\Facades\Storage;
+use App\Models\EmpresaUser;
 
 
 class EmpresaUsuarioCompoment extends Component
@@ -293,27 +294,25 @@ class EmpresaUsuarioCompoment extends Component
 
     public function saveUser()
     {
-
         $this->validate([
             'userName' => 'required|min:5',
             'userEmail' => 'required|email',
             'password' => ['required','confirmed', Password::min(8)]
         ]);
-
         $user = User::firstOrCreate(
             ['email'=>$this->userEmail],
             ['name'=>$this->userName, 'password'=>Hash::make($this->password),]
         );
-
         $user->assignRole('Lider');
-
-        $seccion = SeccionUser::create([
+        EmpresaUser::firstOrCreate([
+            'user_id'=>$user->id,
+            'empresa_id'=>$this->empresa_id
+        ]);
+        SeccionUser::firstOrCreate([
             'user_id' => $user->id,
             'seccion_id' => $this->dependencia_id,
             'empresa_id'=>$this->empresa_id
         ]);
-
-
         Mail::to($user->email)->send(new bienvenidaMail($user));
         $this->modalFormVisible1 = false;
     }

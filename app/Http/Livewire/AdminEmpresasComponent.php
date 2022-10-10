@@ -20,6 +20,7 @@ use App\Models\Serie;
 use App\Models\Subserie;
 use App\Models\SeccionEmpresa;
 use App\Models\TipologiaDocumento;
+use App\Models\EmpresaUser;
 
 
 class AdminEmpresasComponent extends Component
@@ -175,16 +176,38 @@ class AdminEmpresasComponent extends Component
         $admin->assignRole('Gerente');
         $admin->assignRole('Ventanilla');
 
+        EmpresaUser::firstOrCreate(
+            [
+                'user_id' => $admin->id,
+                'empresa_id' => $this->empresa_id
+            ]
+        );
+
 // Lider de vetanilla unica central
         $usuario = User::create(['name' => 'Ventanilla Unica', 'email' => 'ventanilla@'.$this->dominio, 'email_verified_at' => now(), 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',]);
         $usuario->assignRole('Ventanilla');
+
+        EmpresaUser::firstOrCreate(
+            [
+                'user_id' => $usuario->id,
+                'empresa_id' => $this->empresa_id
+            ]
+        );
 
 // Auxiliar de dependencia
         $auxiliar = User::create(['name' => 'Auxiliar 1', 'email' => 'auxiliar@'.$this->dominio, 'email_verified_at' => now(), 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',]); // password
         $auxiliar->assignRole('Lider');
 
+        EmpresaUser::firstOrCreate(
+            [
+                'user_id' => $auxiliar->id,
+                'empresa_id' => $this->empresa_id
+            ]
+        );
+
         $empresa = empresa::create( [ 'nit'=> $this->nit, 'razonsocial'=> $this->razonsocial, 'direccion'=> $this->direccion, 'telefono'=> $this->telefono, 'email'=> $this->email, 'logo'=> $dataValid['logo'], 'ciudad_id'=> $this->ciudad_id, 'user_id'=> $admin->id, 'url'=> $url, 'estado_id'=> 1, 'dominio'=> $this->dominio,] );
         $seccion = SeccionEmpresa::create(['nombre'=>'Oficina General', 'codigo'=>'000', 'empresa_id'=>$empresa->id, 'estado_id'=>1, 'publica' => true, ]);
+
         SeccionUser::create(['user_id' => $auxiliar->id, 'seccion_id' => $seccion->id, 'empresa_id'=>$empresa->id,]);
         SeccionUser::create(['user_id' => $admin->id, 'seccion_id' => $seccion->id, 'empresa_id'=>$empresa->id,]);
         SeccionUser::create(['user_id' => $usuario->id, 'seccion_id' => $seccion->id, 'empresa_id'=>$empresa->id,]);
@@ -205,11 +228,11 @@ class AdminEmpresasComponent extends Component
         $SSD = Subserie::create([ 'serie_id'=>$SD->id, 'seccion_id'=>$seccion->id, 'codigo'=>'0005', 'nombre'=>'DENUNCIAS', 'Re_AG'=>10, 'Re_AC'=>0, 'DF_CT'=>true, 'DF_E'=>false, 'DF_MD'=>false, 'DF_S'=>false, 'ACC_P'=>true, 'ACC_Pr'=>false, 'procedimiento'=>'',]);
 
         //--------------------------------------------------------------------------tipología
-        $TP=TipologiaDocumento::create([ 'subserie_id'=>$SSP->id, 'nombre'=>'PETICIONES', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
-        $TQ=TipologiaDocumento::create([ 'subserie_id'=>$SSQ->id, 'nombre'=>'QUEJAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
-        $TR=TipologiaDocumento::create([ 'subserie_id'=>$SSR->id, 'nombre'=>'RECLAMOS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
-        $TS=TipologiaDocumento::create([ 'subserie_id'=>$SSS->id, 'nombre'=>'SUGERENCIAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
-        $TD=TipologiaDocumento::create([ 'subserie_id'=>$SSD->id, 'nombre'=>'DENUNCIAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSP->id, 'nombre'=>'PETICIONES', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSQ->id, 'nombre'=>'QUEJAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSR->id, 'nombre'=>'RECLAMOS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSS->id, 'nombre'=>'SUGERENCIAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
+        TipologiaDocumento::create([ 'subserie_id'=>$SSD->id, 'nombre'=>'DENUNCIAS', 'So_Pa'=>true, 'So_El'=>true, 'So_Di'=>true, 'diasTermino'=>15, 'radicadoSalida'=>true, 'radicadoEntrada'=>false, 'pqrs_id'=>true, ]);
 
 
         $this->limpiar();

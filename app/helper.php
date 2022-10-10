@@ -1,6 +1,8 @@
 <?php
 use App\Models\Solicitud;
 use App\Models\Serie;
+use App\Models\Subserie;
+use App\Models\TipologiaDocumento;
 
 
 function totalSolicitudes($serie, $seccion)
@@ -120,4 +122,23 @@ function enviarMailResumen()
 function actualizarEstadoSolicitudes()
 {
     //TODO: Cambiar los estados de las solicitudes de activas->pendientes->vencidas
+}
+
+function consultarSeries($seccion_id)
+{
+    $sub = Subserie::select('series.id', 'series.codigo' ,'series.nombre')
+    ->join('series','series.id', 'subseries.serie_id')
+    ->where('seccion_id', $seccion_id)->groupBy('serie_id')->get();
+    return $sub;
+}
+function consultarSubseries($serie_id, $seccion_id)
+{
+    $sub = Subserie::where('serie_id', $serie_id)->where('seccion_id', $seccion_id)->get();
+    return $sub;
+}
+
+function consultarTipologia($subserie_id)
+{
+    $tipo = TipologiaDocumento::where('subserie_id', $subserie_id)->get();
+    return $tipo;
 }

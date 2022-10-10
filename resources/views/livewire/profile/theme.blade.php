@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="description">
-        {{ __('Use el tema con que guste, con el que se sienta màs cómodo') }}
+        {{ __('Use el tema con que guste, para cambiar la apariencia de la plataforma, y escoja la paleta de colores de su preferencia') }}
     </x-slot>
 
     <x-slot name="form">

@@ -22,6 +22,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
 use App\Mail\solicitudMail;
+use App\Models\empresa;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use setasign\Fpdi\Fpdi;
@@ -41,7 +42,7 @@ class VentanillaComponent extends Component
 {
     use WithFileUploads;
     use WithPagination;
-    public $empresa, $tiposolicitud, $solicitante, $solicitante_id, $tipodocumento, $etapa, $documento, $nacimiento, $nombrecompleto,
+    public $empresa, $empresa_id, $tiposolicitud, $solicitante, $solicitante_id, $tipodocumento, $etapa, $documento, $nacimiento, $nombrecompleto,
     $telefono, $email, $modalFormVisible, $mensaje, $tipo_documento, $seccion_id, $adjunto,
     $asunto, $anos, $ano, $meses, $mes, $dias, $dia, $estados, $estado_id, $ciudades, $ciudad_id, $direccion, $seccion_empresa,
     $tipo_usuarios, $tipo_usuario_id, $medio_recepcion, $medio_id, $fecha, $copia_radicado, $seccionCopia, $seccionCopia_id,
@@ -50,9 +51,9 @@ class VentanillaComponent extends Component
 
     public function mount()
     {
-        $s = SeccionUser::where('user_id', Auth::user()->id)->first();
+        $this->empresa_id = Auth::user()->empresaUser->empresa_id;
+        $this->empresa = empresa::find($this->empresa_id);
 
-        $this->empresa = $s->seccionempresa->empresa;
         $this->tipodocumento = Tipodocumento::all();
         $this->tipo_documento = Tipodocumento::first()->id;
         $this->anos = range(now()->year-100, now()->year);
@@ -68,12 +69,12 @@ class VentanillaComponent extends Component
         $ciudad1 = Ciudade::where('estado_id',$this->estado_id)->first();
         $this->ciudad_id = $ciudad1->id;
 
-        $this->seccion_empresa = Subserie::seccionE($this->empresa->id);
+        $this->seccion_empresa = Subserie::seccionE($this->empresa_id);
         $this->seccion_id = $this->seccion_empresa->first()->id;
         $this->seccion_empresa = $this->seccion_empresa->pluck('nombre', 'id');
 
-        $this->seccionCopia = SeccionEmpresa::where('empresa_id', $this->empresa->id)->get();
-        $this->seccionCopia_id = SeccionEmpresa::where('empresa_id', $this->empresa->id)->first()->id;
+        $this->seccionCopia = SeccionEmpresa::where('empresa_id', $this->empresa_id)->get();
+        $this->seccionCopia_id = SeccionEmpresa::where('empresa_id', $this->empresa_id)->first()->id;
         $this->buscarSerie();
         $this->buscarSubSerie();
 
@@ -112,12 +113,12 @@ class VentanillaComponent extends Component
         }
         else{
             if ($this->filtro == 0) {
-                $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)
+                $solicitudes = Solicitud::where('empresa_id', $this->empresa_id)
                     ->orderby('created_at','desc')
                     ->paginate(10);
             }
             else {
-                $solicitudes = Solicitud::where('empresa_id', $this->empresa->id)
+                $solicitudes = Solicitud::where('empresa_id', $this->empresa_id)
                     ->where('estado_id',$this->filtro)
                     ->orderby('created_at','desc')
                     ->paginate(10);
@@ -127,7 +128,7 @@ class VentanillaComponent extends Component
         $totales = DB::table('solicituds')
             ->select('estado_id','estado_solicituds.nombre as estado', DB::raw('count(*) as total'))
             ->join('estado_solicituds','estado_solicituds.id','solicituds.estado_id')
-            ->where('empresa_id', $this->empresa->id)
+            ->where('empresa_id', $this->empresa_id)
             ->groupBy('estado_id')
             ->orderBy('estado_id')
             ->get();
@@ -296,7 +297,7 @@ class VentanillaComponent extends Component
             'solicitante_id'=>$this->solicitante_id,
             'estado_id'=> 1,
             'seccion_id'=>$this->seccion_id,
-            'empresa_id'=>$this->empresa->id,
+            'empresa_id'=>$this->empresa_id,
             'serie_id'=>$this->serie_id,
             'subserie_id'=>$this->subserie_id,
             'medio_id'=>$this->medio_id,
@@ -352,7 +353,7 @@ class VentanillaComponent extends Component
         $endOfYear   = $date->copy()->endOfYear();
         $c=null;
 
-        $this->max_consecutivo = Solicitud::where('empresa_id',$this->empresa->id)
+        $this->max_consecutivo = Solicitud::where('empresa_id',$this->empresa_id)
                             ->whereBetween('created_at',[$startOfYear, $endOfYear])
                             ->max('consecutivo');
         if($this->max_consecutivo>0){

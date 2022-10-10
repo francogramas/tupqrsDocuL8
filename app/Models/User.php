@@ -76,6 +76,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(empresa::class);
     }
 
+    public function empresaUser()
+    {
+        return $this->hasOne(EmpresaUser::class);
+    }
+
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmailQueued);

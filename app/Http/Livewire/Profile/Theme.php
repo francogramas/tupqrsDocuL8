@@ -25,7 +25,7 @@ class Theme extends Component
         $U = User::find(Auth::user()->id);
         $U->theme=$this->theme_id;
         $U->save();
-        $this->saved = true;
+        return redirect(request()->header('Referer'));
     }
 
 }

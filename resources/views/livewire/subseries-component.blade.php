@@ -1,9 +1,9 @@
 <div class="py-2 px-2 text-sm">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 px-2">
         <div class="">
-            <div class="grid grid-cols-6 gap-3">
+            <div class="grid grid-cols-6 gap-3 px-2 py-2 mt-2 border-2 rounded-md">
                 <div class="col-span-3  ">
-                    <h1>Empresa</h1>
+                    <h1 class="font-bold">Empresa</h1>
                     <select name="" id="" wire:model="empresa_id" wire:change="cambiarEmpresa()" class="select select-sm py-1 text-sm select-primary w-full max-w-xs">
                             @foreach ($empresas as $empresa)
                                 <option value="{{$empresa->id}}">{{$empresa->razonsocial}}</option>
@@ -18,9 +18,9 @@
                     </a>
                 </div>
             </div>
-            <div class="grid grid-cols-6 gap-3">
+            <div class="grid grid-cols-6 gap-3 px-2 py-2 mt-2 border-2 rounded-md">
                 <div class="col-span-3">
-                    <h1>Secciones de la empresa</h1>
+                    <h1 class="font-bold">Secciones de la empresa</h1>
                     <div class="flow">
                         <label for="modal-secciones" class="btn btn-sm modal-button" wire:click="administrar(1)">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="col-span-3">
-                    <h1>Series</h1>
+                    <h1 class="font-bold">Series</h1>
                     <label for="modal-secciones" class="btn btn-sm modal-button" wire:click="administrar(2)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -51,8 +51,11 @@
                     </select>
 
                 </div>
+            </div>
+
+            <div class="grid grid-cols-6 gap-3 px-2 py-2 mt-2 border-2 rounded-md">
                 <div class="col-span-6">
-                    <h1>Subseries</h1>
+                    <h1 class="font-bold">Crear Subseries</h1>
                 </div>
                 <div>
                     <label for="" class="font-bold">Código</label>
@@ -63,9 +66,10 @@
                 </div>
                 <div class="col-span-5">
                     <label for="" class="font-bold">Nombre</label>
-                    <input type="text" class="input input-sm input-primary w-full" wire:model.defer="nombre">
+                    <input type="text" class="input input-sm input-primary w-full" wire:model="nombre">
                     @error('nombre') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 </div>
+                @if (strlen($nombre)>0)
                 <div class="col-span-2">
                     <label class="w-full block font-bold" for="">Retención en años</label>
                     <div class="flex gap-2">
@@ -76,10 +80,10 @@
 
                 <div class="col-span-2">
                     <label class="w-full block font-bold" for="">Disposición final</label>
-                    <label for="" class="tooltip tooltip-primary" data-tip="Conservación total"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:click="disposicionFinalEvent(1)" checked> C</label>
-                    <label for="" class="tooltip tooltip-primary" data-tip="Eliminación"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:click="disposicionFinalEvent(2)">E </label>
-                    <label for="" class="tooltip tooltip-primary" data-tip="Selección"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:click="disposicionFinalEvent(3)">D </label>
-                    <label for="" class="tooltip tooltip-primary" data-tip="Digitalización"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:click="disposicionFinalEvent(4)">S </label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Conservación total"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:model="DF_CT"> C</label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Eliminación"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:model="DF_E">E </label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Digitalización"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:model="DF_MD">D </label>
+                    <label for="" class="tooltip tooltip-primary" data-tip="Selección"><input type="checkbox" class="checkbox checkbox-sm checkbox-primary" name="disposicion" wire:model="DF_S">S </label>
                 </div>
 
                 <div class="col-span-1">
@@ -87,19 +91,20 @@
                     <label for="" class="tooltip tooltip-primary" data-tip="Público"><input type="radio" class="radio radio-sm radio-primary" name="acceso" wire:click="accesoEvent(1)" checked>P </label>
                     <label for="" class="tooltip tooltip-primary" data-tip="Privado"><input type="radio" class="radio radio-sm radio-primary" name="acceso" wire:click="accesoEvent(2)">Pr </label>
                 </div>
-                <div class="col-span-2">
-                    <button class="btn btn-xs btn-primary mt-4 text-xs w-full" @if ($boolEditSubserie)  wire:click="updateSubserie()" @else wire:click="guardar()" @endif>@if ($boolEditSubserie) Actualizar @else Crear Subserie  @endif </button>
-                </div>
                 <div class="col-span-6">
                     <label class="w-full block font-bold" for="">Procedimiento</label>
                     <textarea name="" id="" class="w-full textarea textarea-primary" rows="4" wire:model.defer="procedimiento"></textarea>
                 </div>
+                <div class="col-span-2">
+                    <button class="btn btn-xs btn-primary mt-4 text-xs w-full" @if ($boolEditSubserie)  wire:click="updateSubserie()" @else wire:click="guardar()" @endif>@if ($boolEditSubserie) Actualizar @else Crear Subserie  @endif </button>
+                </div>
+                @endif
             </div>
         </div>
 
-        <div>
-            <div>
-                <h1 class="font-bold" >Subseries</h1>
+        <div >
+            <div class="px-2 py-2 mt-2 border-2 rounded-md">
+                <h1 class="font-bold">Subseries</h1>
                 <label for="modal-secciones" class="btn btn-sm modal-button" wire:click="administrar(3)">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -113,9 +118,10 @@
                         <option value=""></option>
                     @endforelse
                 </select>
-            </div>
+        </div>
+        <div class="px-2 py-2 mt-2 border-2 rounded-md">
             <h1 class="font-bold">Tipología</h1>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 ">
                 <div class="">
                     <label class="w-full block font-bold" for="">Soporte</label>
                     <label for=""><input type="checkbox" class="tooltip tooltip-primary checkbox checkbox-primary" data-tip="Papel"  id="Pa" wire:model="So_Pa" checked>P </label>
@@ -178,9 +184,52 @@
                 </table>
             </div>
         </div>
+        </div>
     </div>
 
+        <div class="gap-3 px-2 py-2 mt-2 border-2 rounded-md w-full">
+            @forelse ($secciones as $seccion1)
+                <div class="w-full grid grid-cols-6">
+                    <div>
+                        <p>{{$seccion1->codigo.' - '.$seccion1->nombre}}</p>
+                    </div>
+                    <div class="col-span-5">
 
+                        @forelse (consultarSeries($seccion1->id) as $serie1)
+                            <div class="w-full grid grid-cols-4">
+                                <div class="col-span-1">
+                                    <p>{{$serie1->codigo.' - '.$serie1->nombre}}</p>
+                                </div>
+                                <div class="col-span-3">
+                                    @forelse (consultarSubseries($serie1->id, $seccion1->id) as $subserie1)
+                                    <div class="w-full grid grid-cols-2">
+                                        <div >
+                                            <p>{{$subserie1->codigo.' - '.$subserie1->nombre}}</p>
+                                        </div>
+                                        <div>
+                                            @forelse (consultarTipologia($subserie1->id) as $tipo1)
+                                            <div>
+                                                <p>{{$tipo1->nombre}}</p>
+                                            </div>
+                                            @empty
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                    <div class="divider"></div>
+                                    @empty
+                                    @endforelse
+                                </div>
+                            </div>
+                            <div class="divider"></div>
+                        @empty
+                        @endforelse
+                    </div>
+                </div>
+                <div class="divider"></div>
+            @empty
+
+            @endforelse
+        </div>
 
     <!-- Secciones de la empersa o entidad -->
     <input type="checkbox" id="modal-secciones" class="modal-toggle" />
@@ -306,4 +355,6 @@
 
         </div>
     </label>
-    </div>
+
+
+</div>

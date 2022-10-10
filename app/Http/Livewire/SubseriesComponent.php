@@ -291,6 +291,10 @@ class SubseriesComponent extends Component
         $this->codigo = null;
         $this->nombre = null;
         $this->procedimiento = null;
+        $this->DF_CT = false;
+        $this->DF_E = false;
+        $this->DF_MD = false;
+        $this->DF_S = false;
     }
 
     public function cambiarEmpresa()

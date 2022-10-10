@@ -1,6 +1,6 @@
 <div class="px-3 py-3 my-3 text-xs mx-2">
 
-    <div class="border-morado border-2 px-3 py-3 shadow-md rounded-xl bg-white">
+    <div class="border-morado border-2 px-3 py-3 shadow-md rounded-xl">
         <h3 class="block w-full text-lg font-bold">Parámetros de búsqueda</h3>
         <div class="grid grid-cols-2 md:grid-cols-6 mr-5 gap-4 font-semibold ">
             <div class="">

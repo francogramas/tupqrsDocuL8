@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
+use App\Models\EmpresaUser;
 
 class LiderComponent extends Component
 {
@@ -29,7 +30,7 @@ class LiderComponent extends Component
 
     public function mount()
     {
-        $this->empresa_id = Auth::user()->seccion->first()->seccionempresa->empresa_id;
+        $this->empresa_id = Auth::user()->empresaUser->empresa_id;
         $this->acciones=AccionOrdene::where('id','>',2)->orderBy('id','desc')->get();
         $this->accion_id = $this->acciones->first()->id;
 

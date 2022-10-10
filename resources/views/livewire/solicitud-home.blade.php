@@ -28,7 +28,7 @@
 
                     <div class="px-2">
                         <label for="nacimiento" class="block text-gray-700 text-sm font-bold">Fecha de nacimiento</label>
-                        <div class="bg-white rounded-lg shadow-xl w-full border border-black h-9">
+                        <div class="rounded-lg shadow-xl w-full border border-black h-9">
                             <div class="flex">
                                 <select wire:model="ano" wire:change="crearFecha()" class="bg-transparent border-transparent" style="background-image: none">
                                 @foreach ($anos as $anoi)

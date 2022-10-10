@@ -2,7 +2,7 @@
     <h3 class="text-2xl">Administrar Empresa</h3>
     @if ($countempresa==0)
     <section class="grid grid-cols-1 md:grid-cols-3 md:gap-2">
-        <div class="grid grid-cols-1 md:grid-cols-2 md:gap-1 text-sm border-morado border-2 px-3 py-3 shadow-md rounded-xl bg-white">
+        <div class="grid grid-cols-1 md:grid-cols-2 md:gap-1 text-sm border-morado border-2 px-3 py-3 shadow-md rounded-x">
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Nit</label>
                 @error('nit') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
@@ -56,7 +56,7 @@
     </section>
     @else
 
-    <section class="text-sm border-morado border-2 px-3 py-3 shadow-md rounded-xl bg-white">
+    <section class="text-sm border-morado border-2 px-3 py-3 shadow-md rounded-xl">
         <section class="flex flex-wrap">
             <div class="flex-initial px-2 py-1">
                 <label for="" class="font-bold block">Nit:</label>
@@ -147,10 +147,10 @@
                     @endif
 
             </div>
-            <div class="px-2">
+            <div class="px-2 overflow-x-auto">
                 <div class="shadow overflow-hidden border border-morado rounded-lg">
-                <table class="text-xs w-full">
-                    <thead class="font-bold bg-contenido uppercase">
+                <table class="w-full table table-compact">
+                    <thead class="font-bold uppercase">
                         <tr class="my-2 text-left border h-8">
                             <th class="pl-2">Dependencia</th>
                             <th class="pl-2">Líder</th>
