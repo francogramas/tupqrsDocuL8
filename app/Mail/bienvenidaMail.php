@@ -26,7 +26,7 @@ class bienvenidaMail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        return $this->subject('Bienvenido a tupqrs.com')
+        return $this->subject('Bienvenido a ingenius360.com')
                     ->markdown('emails.bievenidaMail');
     }
 }

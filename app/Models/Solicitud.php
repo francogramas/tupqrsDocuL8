@@ -29,6 +29,9 @@ class Solicitud extends Model
         'respuesta_email',
         'tipologia_id',
         'entrada',
+        'revision',
+        'aprobada',
+        'cancelada'
     ];
 
     public function copia()

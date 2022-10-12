@@ -20,6 +20,8 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use App\Models\EmpresaUser;
+use App\Mail\ColaSolicitudMail;
+use App\Models\ColaSolucitud;
 
 class LiderComponent extends Component
 {
@@ -113,10 +115,10 @@ class LiderComponent extends Component
 
     public function solicitudes($serie_id)
     {
-
         $this->solicitud = Solicitud::select('solicituds.*')
         ->join('subseries', 'solicituds.subserie_id', 'subseries.id')
         ->where('estado_id','<>', 4)
+        ->where('revision', 0)
         ->where('solicituds.seccion_id', $this->secciones_u_id)
         ->where('subseries.serie_id', $serie_id)
         ->orderBy('estado_id', 'desc')
@@ -152,7 +154,7 @@ class LiderComponent extends Component
         }
 
         if ($this->accion_id >= 6 and $this->accion_id <=8) {
-            $this->solicitudi->estado_id = 4;
+            $this->solicitudi->revision = true;
 
             // Se debe definir la forma de radiciaciones internas
             $solicitudBD = Solicitud::create([
@@ -198,7 +200,9 @@ class LiderComponent extends Component
             'adjunto' => $dataValid['adjunto'],
         ]);
 
-        Mail::to($this->solicitudi->solicitante->email)->send(new respuestaSolicitudMail($this->solicitudi));
+
+        //Mail::to($this->solicitudi->solicitante->email)->send(new respuestaSolicitudMail($this->solicitudi));
+        Mail::to($this->solicitudi->seccionempresa->emailjefe)->send(new ColaSolicitudMail($this->solicitudi));
         try {
             $this->consultarSeries();
             $this->solicitudes($this->serie_id);

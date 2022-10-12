@@ -9,14 +9,18 @@
     <style type="text/css">
         #pdf_container { background: #ccc; text-align: center; display: none; padding: 5px; overflow: auto }
     </style>
-
-
     </head>
 
     <body>
+        <button type="button" onclick="printJS('{!!$url!!}')">
+            Imprimir
+         </button>
         <div id="pdf_container" >
         </div>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.15.349/pdf.min.js"></script>
+        <script type="text/javascript" src=" https://printjs-4de6.kxcdn.com/print.min.js"></script>
+        <link href=" https://printjs-4de6.kxcdn.com/print.min.css" rel="stylesheet" type="text/css" />
+
         <link href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.15.349/pdf_viewer.min.css" rel="stylesheet" type="text/css" />
         <script type="text/javascript">
             var pdfjsLib = window['pdfjs-dist/build/pdf'];

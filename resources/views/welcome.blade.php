@@ -46,7 +46,7 @@
                             <div class="items-center">
                                 <div class="text-3xl lg:text-5xl leading-7 font-semibold">
                                     <h3 class="text-gray-900 dark:text-white">Bienvenido a<a href=""></a></h3>
-                                    <h3 class="text-gray-900 dark:text-white font-bold pt-3">tupqrs.com</h3>
+                                    <h3 class="text-gray-900 dark:text-white font-bold pt-3">ingenius360.com</h3>
                                 </div>
                                 <div class="pb-5 pt-5 text-contenido text-sm lg:text-lg">
                                     <div class="mt-2 text-gray-600 dark:text-gray-400">

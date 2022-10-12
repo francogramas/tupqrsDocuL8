@@ -1,7 +1,7 @@
 @component('mail::message')
-# Bienvenido a tupqrs.com
+# Bienvenido a ingenius360.com
 
-Hola {{$user->name}}, recibe esta correo por que ha sido registrado en tupqrs.com como líder de depedencia.
+Hola {{$user->name}}, recibe esta correo por que ha sido registrado en www.ingenius360.com como líder de depedencia.
 al ingregar por primera vez, debe confirmar su cuenta, además debe asignar una nueva contraseña.
 
 

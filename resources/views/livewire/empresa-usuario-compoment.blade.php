@@ -221,7 +221,7 @@
         </x-slot>
 
         <x-slot name="content">
-            @if (is_null($seccionUser))
+
                 <div class="pt-2">
                     <x-jet-label for="" value="Email" autocomplete="off" />
                     @error('userEmail') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
@@ -241,25 +241,34 @@
                     <x-jet-label for="" value="Confirmar contraseña" />
                     <x-jet-input wire:model="password_confirmation" class="block mt-1 w-full" type="password" />
                 </div>
-            @else
-                <div class="flex">
-                    <div class="mr-2">
-                        <button wire:click="confirmarBorrarUsuario({{$seccionUser->id}})" class="rounded-md text-error  font-bold" title="Eliminar">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+
+                @if (is_null($seccionUser))
+                @else
+                <div class="mt-4 pt-2 border-2 rounded-lg">
+                    <h1 class="w-full text-center bold uppercase mb-2">Listado de usuarios</h1>
+                    @forelse ($seccionUsers as $seccionU)
+                    <div class="flex">
+                        <div class="mr-2">
+                            <button wire:click="confirmarBorrarUsuario({{$seccionU->id}})" class="rounded-md text-error  font-bold" title="Eliminar">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div>
+                            {{$seccionU->user->name}}
+                        </div>
                     </div>
-                    <div>
-                        {{$seccionUser->user->name}}
-                    </div>
+                    @empty
+
+                    @endforelse
                 </div>
             @endif
         </x-slot>
 
         <x-slot name="footer">
             <x-jet-secondary-button wire:click="$toggle('modalFormVisible1')" wire:loading.attr="disabled">
-                Cancelar
+                Cerrar
             </x-jet-secondary-button>
 
             <x-jet-button class="ml-2" wire:click="saveUser()" wire:loading.attr="disabled" class="btn btn-primary ml-2">

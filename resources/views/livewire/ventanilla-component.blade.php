@@ -24,6 +24,7 @@
                             @elseif($totali->estado_id==2)bg-warning
                             @elseif($totali->estado_id==3)bg-error
                             @elseif($totali->estado_id==4)bg-primary
+                            @elseif($totali->estado_id==5)bg-primary
                             @endif "></div>{{$totali->estado. ': '.$totali->total}}
                     </x-jet-nav-link>
                 </div>
@@ -51,6 +52,7 @@
                     <tbody>
                         @foreach ($solicitudes as $solicitud)
                         @php
+
                         if($solicitud->estado_id==1){
                                 $clase = 'btn-success';
                             }
@@ -61,6 +63,9 @@
                                 $clase = 'btn-error';
                             }
                             elseif ($solicitud->estado_id==4) {
+                                $clase = 'btn-error';
+                            }
+                            elseif ($solicitud->estado_id==5) {
                                 $clase = 'btn-error';
                             }
                         @endphp

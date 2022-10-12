@@ -50,13 +50,12 @@ class actualizarSolicitudes extends Command
         $idPendientes = [];
 
         foreach ($solicitudes as $solicitud) {
-
             $fi = Carbon::parse( $solicitud->created_at)->format('Y-m-d');
             $fi = Carbon::createFromFormat('Y-m-d', $fi);
             $fv = $fi->addDays($solicitud->diasTermino);
             $d = now()->diffInDays($fv, false);
 
-            if($d>=0 and $d<=($solicitud->diasTermino/2)){
+            if($d>=0 and $d<=($solicitud->diasTermino/2) and $solicitud->estado_id!=2){
                 $seguimientoPendiente = array(
                     'solicitud_id' => $solicitud->id,
                     'estado_id' => '2',
@@ -68,7 +67,7 @@ class actualizarSolicitudes extends Command
                 );
                 $idPendientes[]=$solicitud->id;
             }
-            elseif ($d<0) {
+            elseif ($d<0 and $solicitud->estado_id!=2) {
                 $seguimientoVencida = array(
                     'solicitud_id' => $solicitud->id,
                     'user_id' => 0,

@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="text-center pt-16">
-        <div class="visible-print text-center"> 
+        <div class="visible-print text-center">
             <div class="text-center font-bold text-3xl" >
                 Para radicar  Peticiones, Quejas, Reclamos, Sugerencias o Felicitaciones, escanea el código
             </div>
@@ -19,11 +19,11 @@
             <div class="pt-5">Tu opinión es importante para nosotros. Ayúdanos a prestarte un mejor servicio</div>
 
             <div class="text-right pr-10 pt-2">
-                www.tupqrs.com
+                www.ingenius360.com
             </div>
         </div>
         <div>
-            
+
         </div>
     </div>
 </body>
