@@ -48,7 +48,7 @@ class VentanillaComponent extends Component
     $asunto, $anos, $ano, $meses, $mes, $dias, $dia, $estados, $estado_id, $ciudades, $ciudad_id, $direccion, $seccion_empresa,
     $tipo_usuarios, $tipo_usuario_id, $medio_recepcion, $medio_id, $fecha, $copia_radicado, $seccionCopia, $seccionCopia_id,
     $tipos_id, $confidencial, $respuesta_email, $diasTermino, $solicitudi, $descripcion, $series, $serie_id, $subserie, $subserie_id, $tipologia,
-    $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1;
+    $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1, $copias, $seguimiento;
 
     public function mount()
     {
@@ -304,13 +304,37 @@ class VentanillaComponent extends Component
 
     public function radicar()
     {
+        $cc=[];
 
+        if($this->copia_radicado){
+            foreach ($this->copias as $co => $value) {
+                if($value){
+                    $s = SeccionEmpresa::find($co);
+                    $se = SeccionUser::where('seccion_id', $co)->get();
+
+                    if (!is_null($s->emailjefe)) {
+                        $cc[]=$s->emailjefe;
+                    }
+                    foreach ($se as $sei) {
+                        if (!is_null($sei->user->email)) {
+                            $cc[]=$sei->user->email;
+                        }
+                    }
+                }
+            }
+
+            $cc = array_unique($cc);
+
+        }
         $this->validate([
             'fecha'=>'required|date',
             'asunto'=>'required|min:5',
             'diasTermino'=>'required|numeric',
             'adjunto' => 'required|max:24576', // Pdf máximo 24MB
         ]);
+
+
+
 
         $solicitudBD = Solicitud::create([
             'solicitante_id'=>$this->solicitante_id,
@@ -343,7 +367,7 @@ class VentanillaComponent extends Component
             $dataValid['adjunto']='';
         }
 
-        SeguimientoOrden::create([
+        $seg  = SeguimientoOrden::create([
             'solicitud_id' => $solicitudBD->id,
             'user_id'=>Auth::user()->id,
             'estado_id' => 1,
@@ -352,6 +376,8 @@ class VentanillaComponent extends Component
             'mensaje' => $this->descripcion,
             'adjunto' => $dataValid['adjunto'],
         ]);
+
+        $this->seguimiento = $seg->id;
 
         if($this->copia_radicado){
             solicitudCopia::create([
@@ -362,8 +388,9 @@ class VentanillaComponent extends Component
 
         $s = SeccionEmpresa::find($this->seccion_id);
 
+
         Mail::to($this->solicitante->email)
-        ->cc($s->emailjefe)
+        ->cc($s->emailjefe, $cc)
         ->send(new solicitudMail($solicitudBD));
         $this->solicitudi = $solicitudBD->id;
         $this->etapa = 3;
@@ -454,5 +481,20 @@ class VentanillaComponent extends Component
 
         Storage::disk('local')->delete($output_file);
         return $fpdi->Output($outputFile, 'F');
+    }
+
+    public function consultarListaEmails($seccion_id)
+    {
+        $s = SeccionEmpresa::find($seccion_id);
+        $se = SeccionUser::where('seccion_id', $seccion_id)->get();
+        $em = [];
+
+        $em[]=["email"=>$s->emailjefe];
+
+        foreach ($se as $sei) {
+            $em[]=["email"=>$sei->user->email];
+        }
+
+        return $em;
     }
 }

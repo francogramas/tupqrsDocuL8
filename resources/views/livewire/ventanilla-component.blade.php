@@ -84,11 +84,6 @@
                             <td class="px-2">{{$solicitud->destinatario}}</td>
                             <td class="px-2">{{Str::limit($solicitud->asunto, 50, '...') }}</td>
                             <td class="flex flex-row">
-                                <a href="#" class="text-gray-500" onclick="window.open('{{route('impdocumento',Crypt::encryptString(seguimientoRadicado($solicitud->id)))}}','Imprimir Radicado','width=700,height=600')" title="Imprimir Ficha">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
-                                    </svg>
-                                </a>
                                 <a href="#" class="text-gray-500" onclick="window.open('{{route('impdocumento',Crypt::encryptString(seguimientoRadicado($solicitud->id)))}}','Imprimir Radicado','width=600,height=400')" title="Imprimir Radicado">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
@@ -261,7 +256,7 @@
 
             @foreach ($seccionCopia as $seccion)
                 <div class="block">
-                    <input type="checkbox" name="ccopia[]" id="" value="{{$seccion->id}}">{{$seccion->nombre}}
+                    <input type="checkbox" wire:model='copias.{{$seccion->id}}' name="copias[]" id="" value="{{$seccion->id}}">{{$seccion->nombre}}
                 </div>
             @endforeach
             @endif
@@ -286,7 +281,7 @@
         <div class="px-2 py-1">
         </div>
         <div class="px-2 py-1">
-            <a href="#" class="w-full flex flex-row px-2 py-3 btn btn-primary shadow-lg" onclick="window.open('{{route('impradicado',Crypt::encryptString($solicitudi))}}','Imprimir Radicado','width=600,height=400')">
+            <a href="#" class="w-full flex flex-row px-2 py-3 btn btn-primary shadow-lg" onclick="window.open('{{route('impdocumento',Crypt::encryptString($seguimiento))}}','Imprimir Radicado','width=600,height=400')">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
                         </svg>
@@ -294,7 +289,7 @@
             </a>
         </div>
         <div class="px-2 py-1">
-            <a wire:click="finalizarRadicado()" class="w-full flex flex-row px-2 py-3 shadow-lg btn btn-primary" onclick="window.open('{{route('impradicado',Crypt::encryptString($solicitudi))}}','Imprimir Radicado','width=600,height=400')">
+            <a wire:click="finalizarRadicado()" class="w-full flex flex-row px-2 py-3 shadow-lg btn btn-primary" onclick="window.open('{{route('impdocumento',Crypt::encryptString($seguimiento))}}','Imprimir Radicado','width=600,height=400')">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
                     <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd" />
