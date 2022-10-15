@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Crypt;
 
 use App\Models\empresa;
 use App\Models\SeguimientoOrden;
+use App\Models\Solicitud;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -70,6 +71,13 @@ class impDocumentoController extends Controller
         $urlLogo = Storage::url('public/'.$s->solicitud->empresa->logo);
 
         return view('oficio_respuesta', ['s'=>$s, 'urlFirma'=>$urlFirma, 'urlLogo'=>$urlLogo]);
+    }
+
+    public function seguimientoLider($solicitud)
+    {
+        $id = Crypt::decryptString($solicitud);
+        $solicitud = Solicitud::find($id);
+        return view('seguimientoLider', ['solicitud'=>$solicitud]);
     }
 
 }

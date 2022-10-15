@@ -29,10 +29,10 @@ Atentamente: {{$solicitud->seccionempresa->userSeccion->user->name}}
 Líder de {{$solicitud->seccionempresa->nombre}}
 
 ## Para dar seguimiento a la respuesta y aprobarla haga click en el siguiente enlace
-
+@component('mail::button', ['url' => url('respsolicitud', Crypt::encryptString($solicitud->id))])
+Ver Solicitud
+@endcomponent
 ### Este mensaje se ha generado de forma atutomática, no lo responda.
-
-
 
 
 ### {{ config('app.name') }}

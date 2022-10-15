@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 
 class solicitudMail extends Mailable implements ShouldQueue
-{    
+{
     use Queueable, SerializesModels;
     public $solicitud, $seguimiento;
     /**
@@ -34,12 +34,12 @@ class solicitudMail extends Mailable implements ShouldQueue
     {
         if(Str::length($this->seguimiento->adjunto)>0){
             return $this->subject('Radicación de solicitud')->markdown('emails.solicitudMail')
-            ->attachFromStorage('public/'.$this->seguimiento->adjunto, 
-                                'adjunto.pdf', [
+            ->attachFromStorage('public/'.$this->seguimiento->adjunto,
+                                'solicitud_'.$this->solicitud->radicado.'.pdf', [
                                 'mime' => 'application/pdf']);
         }
         else{
             return $this->subject('Radicación de solicitud')->markdown('emails.solicitudMail');
-        }        
+        }
     }
 }

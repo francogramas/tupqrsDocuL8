@@ -30,13 +30,14 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 
+
 /**
- *
  * // TODO: EL PREFIJO DE LOS RADICADOS DEBEN SER INTERNOs(I)
  * // TODO: CREAR UNA HERRAMIENTA DE RADICADO MASIVO PARA SOLICITUDES DE LA VENTANILLA VIRTUAL
  * // TODO: GENERAR UNA PLANTILLA DE RESPUESTA INSTITUCIONAL(EMAILS)
  * //
 **/
+
 
 class VentanillaComponent extends Component
 {
@@ -56,11 +57,11 @@ class VentanillaComponent extends Component
 
         $this->tipodocumento = Tipodocumento::all();
         $this->tipo_documento = Tipodocumento::first()->id;
-        $this->anos = range(now()->year-100, now()->year);
-        $this->ano = now()->year-30;
-        $this->dias = range(1,31);
-        $this->dia = 1;
-        $this->mes = 1;
+        // $this->anos = range(now()->year-100, now()->year);
+        //$this->ano = now()->year-30;
+        //$this->dias = range(1,31);
+        //$this->dia = 1;
+        //$this->mes = 1;
         $this->tipoProceso = 1;
 
         $this->estados=Estado::all()->sortBy('estado');
@@ -70,7 +71,9 @@ class VentanillaComponent extends Component
         $this->ciudad_id = $ciudad1->id;
 
         $this->seccion_empresa = Subserie::seccionE($this->empresa_id);
+
         $this->seccion_id = $this->seccion_empresa->first()->id;
+
         $this->seccion_empresa = $this->seccion_empresa->pluck('nombre', 'id');
 
         $this->seccionCopia = SeccionEmpresa::where('empresa_id', $this->empresa_id)->get();
@@ -95,6 +98,7 @@ class VentanillaComponent extends Component
         $this->anexos = 0;
         $this->filtro = 0;
         $this->etapa = 0;
+
     }
     public function render()
     {
@@ -252,6 +256,7 @@ class VentanillaComponent extends Component
         $this->series = Subserie::serieSeccion($this->seccion_id);
         $this->serie_id = $this->series->first()->id;
         $this->series = $this->series->pluck('nombre', 'id');
+
         $seccion_empresa = SeccionEmpresa::find($this->seccion_id);
         $this->destinatario = $seccion_empresa->lider;
         $this->buscarSubSerie();
@@ -259,9 +264,12 @@ class VentanillaComponent extends Component
 
     public function buscarSubSerie()
     {
+
         $this->subserie = Subserie::where('serie_id', $this->serie_id)->where('seccion_id', $this->seccion_id)->orderBy('nombre')->get();
+
         $this->subserie_id = $this->subserie->first()->id;
         $this->buscarTipologia();
+
     }
 
     public function buscarTipologia()
@@ -269,12 +277,23 @@ class VentanillaComponent extends Component
         try {
             $this->tipologia = TipologiaDocumento::where('subserie_id', $this->subserie_id)->orderBy('nombre')->get();
             $this->tipologia_id = $this->tipologia->first()->id;
-            $this->obtenerDiasTermino();
         } catch (\Throwable $th) {
-            $this->tipologia = null;
-            $this->tipologia_id = null;
-            $this->diasTermino = 0;
+
+            $this->tipologia = TipologiaDocumento::create([
+                'subserie_id'=>$this->subserie_id,
+                'nombre'=>'No Aplica',
+                'So_Pa'=>false,
+                'So_El'=>false,
+                'So_Di'=>false,
+                'diasTermino'=>0,
+                'radicadoSalida'=>false,
+                'radicadoEntrada'=>false,
+                'pqrs_id'=>1,
+            ]);
+
+            $this->tipologia_id = $this->tipologia->first()->id;
         }
+        $this->obtenerDiasTermino();
     }
 
 
@@ -290,7 +309,7 @@ class VentanillaComponent extends Component
             'fecha'=>'required|date',
             'asunto'=>'required|min:5',
             'diasTermino'=>'required|numeric',
-            'adjunto' => 'max:24576', // Pdf máximo 24MB
+            'adjunto' => 'required|max:24576', // Pdf máximo 24MB
         ]);
 
         $solicitudBD = Solicitud::create([
@@ -341,7 +360,11 @@ class VentanillaComponent extends Component
             ]);
         }
 
-        Mail::to($this->solicitante->email)->send(new solicitudMail($solicitudBD));
+        $s = SeccionEmpresa::find($this->seccion_id);
+
+        Mail::to($this->solicitante->email)
+        ->cc($s->emailjefe)
+        ->send(new solicitudMail($solicitudBD));
         $this->solicitudi = $solicitudBD->id;
         $this->etapa = 3;
     }
@@ -428,10 +451,8 @@ class VentanillaComponent extends Component
             $text = null;
             $text1 = null;
         }
-        Storage::disk('local')->delete($output_file);
 
+        Storage::disk('local')->delete($output_file);
         return $fpdi->Output($outputFile, 'F');
     }
-
-
 }

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ config('app.name', 'tupqrs.co') }}</title>
+        <title>{{ config('app.name', 'ingenius360.com') }}</title>
 
     <style type="text/css">
         #pdf_container { background: #ccc; text-align: center; display: none; padding: 5px; overflow: auto }

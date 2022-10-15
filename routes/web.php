@@ -28,6 +28,10 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/impoficio/{seguimiento_id}', [App\Http\Controllers\impDocumentoController::class, 'oficio'])->name('impoficio');
 });
 
+
+Route::get('/respsolicitud/{solicitud}', [App\Http\Controllers\impDocumentoController::class, 'seguimientoLider'])->name('respsolicitud');
+
+
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 
     if(Auth::user()->hasRole('Gerente')){

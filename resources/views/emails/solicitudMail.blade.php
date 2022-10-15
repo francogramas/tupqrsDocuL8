@@ -12,9 +12,7 @@ Usted ha realizado una {{$solicitud->tipologia->nombre}} con las siguientes cara
 ## Estado de solictud:
 {{$solicitud->estado->nombre}}
 ## Asunto:
-{{$seguimiento->asunto}}
-## Contenido:
-{{$seguimiento->mensaje}}
+{{$solicitud->asunto}}
 
 
 ### Este mensaje se ha generado de forma atutomática, no responda a el.

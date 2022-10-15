@@ -180,6 +180,7 @@ class LiderComponent extends Component
                 'entrada'=>false
             ]);
 
+            Mail::to($this->solicitudi->seccionempresa->emailjefe)->send(new ColaSolicitudMail($solicitudBD));
             $this->solicitudi->save();
         }
         elseif($this->accion_id == 3) {
@@ -202,7 +203,7 @@ class LiderComponent extends Component
 
 
         //Mail::to($this->solicitudi->solicitante->email)->send(new respuestaSolicitudMail($this->solicitudi));
-        Mail::to($this->solicitudi->seccionempresa->emailjefe)->send(new ColaSolicitudMail($this->solicitudi));
+
         try {
             $this->consultarSeries();
             $this->solicitudes($this->serie_id);

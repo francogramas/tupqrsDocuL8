@@ -199,7 +199,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="hidden">
+        <div class="">
             <label for="subserie_id" class="block text-gray-700 text-sm font-bold">Subserie</label>
             <select id="subserie_id" name="" wire:model="subserie_id" wire:change = "buscarTipologia()" class="w-full px-2 py-1 rounded-md shadow-lg">
                 @foreach ($subserie as $subseri)
@@ -207,7 +207,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="hidden">
+        <div class="">
             <label for="tipologia_id" class="block text-gray-700 text-sm font-bold">Tipología</label>
             <select id="tipologia_id" name="" wire:model="tipologia_id" class="w-full px-2 py-1 rounded-md shadow-lg" wire:change="obtenerDiasTermino();">
                 @foreach ($tipologia as $tipologi)
@@ -258,6 +258,12 @@
                     <option value="{{$seccion->id}}">{{$seccion->nombre}}</option>
                 @endforeach
             </select>
+
+            @foreach ($seccionCopia as $seccion)
+                <div class="block">
+                    <input type="checkbox" name="ccopia[]" id="" value="{{$seccion->id}}">{{$seccion->nombre}}
+                </div>
+            @endforeach
             @endif
         </div>
         <div class="md:col-span-5">
@@ -266,7 +272,7 @@
         </div>
         <div class="md:col-span-5">
             <label for="" class="block text-gray-700 text-sm font-bold">Adjuntar archivo</label>
-            <input class="bg-green-200" type="file" wire:model="adjunto" accept="application/pdf">
+            <input class="btn btn-primary" type="file" wire:model="adjunto" accept="application/pdf">
         </div>
         <div class="flex gap-2">
             <button class="w-full btn btn-primary" wire:click="radicar()">Radicar solicitud</button>
