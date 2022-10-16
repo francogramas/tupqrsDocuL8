@@ -304,9 +304,14 @@ class VentanillaComponent extends Component
 
     public function radicar()
     {
+        $s = SeccionEmpresa::find($this->seccion_id);
         $cc=[];
 
-        if($this->copia_radicado){
+        if (!is_null($s->emailjefe)) {
+            $cc[]=$s->emailjefe;
+        }
+
+        if($this->copia_radicado and $this->copias){
             foreach ($this->copias as $co => $value) {
                 if($value){
                     $s = SeccionEmpresa::find($co);
@@ -324,6 +329,7 @@ class VentanillaComponent extends Component
             }
 
             $cc = array_unique($cc);
+            //dd($ccM);
 
         }
         $this->validate([
@@ -332,9 +338,6 @@ class VentanillaComponent extends Component
             'diasTermino'=>'required|numeric',
             'adjunto' => 'required|max:24576', // Pdf máximo 24MB
         ]);
-
-
-
 
         $solicitudBD = Solicitud::create([
             'solicitante_id'=>$this->solicitante_id,
@@ -379,21 +382,32 @@ class VentanillaComponent extends Component
 
         $this->seguimiento = $seg->id;
 
-        if($this->copia_radicado){
-            solicitudCopia::create([
-                'solicitud_id' => $solicitudBD->id,
-                'seccion_id' => $this->seccionCopia_id
-            ]);
+
+        if($this->copia_radicado and $this->copias){
+
+            foreach ($this->copias as $co => $value) {
+                if($value){
+                    $ccM[]=[
+                        'solicitud_id' => $solicitudBD->id,
+                        'seccion_id' => $co
+                    ];
+                }
+            }
+            solicitudCopia::upsert($ccM,['solicitud_id', 'seccion_id']);
         }
+
+
 
         $s = SeccionEmpresa::find($this->seccion_id);
 
 
         Mail::to($this->solicitante->email)
-        ->cc($s->emailjefe, $cc)
+        ->cc($cc)
         ->send(new solicitudMail($solicitudBD));
         $this->solicitudi = $solicitudBD->id;
         $this->etapa = 3;
+        $this->copias = null;
+        $this->copia_radicado = false;
     }
 
     public function calcularRadicado($trd=false)

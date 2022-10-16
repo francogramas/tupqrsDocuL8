@@ -248,17 +248,13 @@
             <p><input type="checkbox" wire:model.defer ="respuesta_email" class="px-2 py-1 rounded-md shadow-lg"> ¿Usted autoriza recibir respuesta por medio de correo electrónico?</p>
             <input type="checkbox" wire:model="copia_radicado" class="px-2 py-1 rounded-md shadow-lg"> Copia de radicado a:
             @if ($copia_radicado)
-            <select name="" id="seccionCopia_id" wire:model.defer="seccionCopia_id" class="w-full px-2 my-2 rounded-md shadow-lg">
+            <div class="py-2 px-2 mt-2 w-full border-2 rounded-lg">
                 @foreach ($seccionCopia as $seccion)
-                    <option value="{{$seccion->id}}">{{$seccion->nombre}}</option>
+                    <div class="block">
+                        <input type="checkbox" wire:model='copias.{{$seccion->id}}' name="copias[]" id="" value="{{$seccion->id}}">{{$seccion->nombre}}
+                    </div>
                 @endforeach
-            </select>
-
-            @foreach ($seccionCopia as $seccion)
-                <div class="block">
-                    <input type="checkbox" wire:model='copias.{{$seccion->id}}' name="copias[]" id="" value="{{$seccion->id}}">{{$seccion->nombre}}
-                </div>
-            @endforeach
+            </div>
             @endif
         </div>
         <div class="md:col-span-5">
