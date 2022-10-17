@@ -1,4 +1,4 @@
-<section class="px-5 pt-5">
+<section class="px-5 pt-5" x-data="{ ver: true, ver1: true }">
     <h3 class="text-2xl">Administrar Empresa</h3>
     @if ($countempresa==0)
     <section class="grid grid-cols-1 md:grid-cols-3 md:gap-2">
@@ -6,26 +6,26 @@
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Nit</label>
                 @error('nit') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
-                <input type="text" wire:model="nit" class="w-full px-2 py-1 rounded-md border-morado" required>
+                <input type="text" wire:model.defer="nit" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Razón Social</label>
                 @error('razonsocial') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
-                <input type="text" wire:model="razonsocial" class="w-full px-2 py-1 rounded-md border-morado" required>
+                <input type="text" wire:model.defer="razonsocial" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Teléfono</label>
                 @error('telefono') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
-                <input type="text" wire:model="telefono" class="w-full px-2 py-1 rounded-md border-morado" required>
+                <input type="text" wire:model.defer="telefono" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Email</label>
                 @error('email') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
-                <input type="email" wire:model="email" class="w-full px-2 py-1 rounded-md border-morado" required>
+                <input type="email" wire:model.defer="email" class="w-full px-2 py-1 rounded-md border-morado" required>
             </div>
             <div class="py-1 px-2">
                 <label class="font-bold" for="">Departamento</label>
-                <select name="estado_id" wire:model="estado_id" wire:change="cargarciudades()" id="" class="w-full px-2 py-1 rounded-md">
+                <select name="estado_id" wire:model.defer="estado_id" wire:change="cargarciudades()" id="" class="w-full px-2 py-1 rounded-md">
                     @foreach ($estados as $estado)
                         <option value="{{$estado->id}}">{{$estado->estado}}</option>
                     @endforeach
@@ -102,19 +102,19 @@
                 <label for="" class="font-bold block">Crear dependencia:</label>
                 <div class="flex">
                     <div class="w-5/12 mr-3 py-1">
-                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model="dependencia" required placeholder="Nombre de Sección/Dependencia">
+                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model.defer="dependencia" required placeholder="Nombre de Sección/Dependencia">
                         @error('dependencia') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
                     </div>
                     <div class="w-1/12 mr-3 py-1">
-                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model="codigo" required placeholder="Código">
+                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model.defer="codigo" required placeholder="Código">
                         @error('codigo') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
                     </div>
                     <div class="w-3/12 mr-3 py-1">
-                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model="lider" required placeholder="Jefe de la oificia">
+                        <input class=" rounded-md border-morado shadow-md w-full" type="text" wire:model.defer="lider" required placeholder="Jefe de la oificia">
                         @error('lider') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
                     </div>
                     <div class="w-3/12 mr-3 py-1">
-                        <input class=" rounded-md border-morado shadow-md w-full" type="email" wire:model="emailjefe" required placeholder="Email de Jefe">
+                        <input class=" rounded-md border-morado shadow-md w-full" type="email" wire:model.defer="emailjefe" required placeholder="Email de Jefe">
                         @error('emailjefe') <span class="text-error  block text-xs">{{ '*'.$message }}</span> @enderror
                     </div>
 
@@ -193,6 +193,10 @@
         </section>
     </section>
     @endif
+
+
+
+
 <!-- ------------------------------ Modal 1: Borrar dependencia ---------------------------------------- -->
     <x-jet-confirmation-modal wire:model="modalFormVisible" >
         <x-slot name="title">
@@ -221,25 +225,66 @@
         </x-slot>
 
         <x-slot name="content">
-
                 <div class="pt-2">
                     <x-jet-label for="" value="Email" autocomplete="off" />
                     @error('userEmail') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
-                    <x-jet-input wire:model="userEmail"  wire:change="revisarEmail()" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model.defer="userEmail"  wire:change="revisarEmail()" class="block mt-1 w-full" type="text" />
                 </div>
                 <div class="pt-2">
                     <x-jet-label for=""  value="Nombre completo" autocomplete="off"/>
                     @error('userName') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
-                    <x-jet-input wire:model="userName" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model.defer="userName" class="block mt-1 w-full" type="text" />
                 </div>
-                <div class="pt-2">
+                <div class="pt-2 relative">
                     <x-jet-label for="" value="Contraseña" />
                     @error('password') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
-                    <x-jet-input wire:model="password" class="block mt-1 w-full" type="password" />
+                    <input id="password" wire:model.defer="password" required autocomplete="current-password" placeholder="" :type="ver ? 'password' : 'text'" class="text-md block px-3 py-2 rounded-lg w-full
+                    bg-white border-2 border-gray-300 placeholder-gray-600 shadow-md
+                    focus:placeholder-gray-500
+                    focus:bg-white
+                    focus:border-gray-600
+                    focus:outline-none">
+                    <div class="absolute top-10 right-3 flex items-center text-sm leading-5 z-10">
+                        <svg class="h-6 text-gray-700" fill="none" @click="ver = !ver"
+                          :class="{'hidden': !ver, 'block':ver }" xmlns="http://www.w3.org/2000/svg"
+                          viewbox="0 0 576 512">
+                          <path fill="currentColor"
+                            d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z">
+                          </path>
+                        </svg>
+
+                        <svg class="h-6 text-gray-700" fill="none" @click="ver = !ver"
+                          :class="{'block': !ver, 'hidden':ver }" xmlns="http://www.w3.org/2000/svg"
+                          viewbox="0 0 640 512">
+                          <path fill="currentColor"
+                            d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z">
+                          </path>
+                        </svg>
                 </div>
-                <div class="pt-2">
+                <div class="pt-2 relative">
                     <x-jet-label for="" value="Confirmar contraseña" />
-                    <x-jet-input wire:model="password_confirmation" class="block mt-1 w-full" type="password" />
+                    <input id="password_confirmation" wire:model.defer="password_confirmation" required autocomplete="current-password" placeholder="" :type="ver1 ? 'password' : 'text'" class="text-md block px-3 py-2 rounded-lg w-full
+                    bg-white border-2 border-gray-300 placeholder-gray-600 shadow-md
+                    focus:placeholder-gray-500
+                    focus:bg-white
+                    focus:border-gray-600
+                    focus:outline-none">
+                    <div class="absolute top-10 right-3 flex items-center text-sm leading-5 z-10">
+                        <svg class="h-6 text-gray-700" fill="none" @click="ver1 = !ver1"
+                          :class="{'hidden': !ver1, 'block':ver1 }" xmlns="http://www.w3.org/2000/svg"
+                          viewbox="0 0 576 512">
+                          <path fill="currentColor"
+                            d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z">
+                          </path>
+                        </svg>
+
+                        <svg class="h-6 text-gray-700" fill="none" @click="ver1 = !ver1"
+                          :class="{'block': !ver1, 'hidden':ver1 }" xmlns="http://www.w3.org/2000/svg"
+                          viewbox="0 0 640 512">
+                          <path fill="currentColor"
+                            d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z">
+                          </path>
+                        </svg>
                 </div>
 
                 @if (is_null($seccionUser))
@@ -307,4 +352,6 @@
             alert('Enlace copiado');
         };
     </script>
+
+
 </div>
