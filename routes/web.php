@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\impDocumentoController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,13 +23,17 @@ Route::get('/', function () {
 Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/impradicado/{radicado}', [App\Http\Controllers\impRadicadoController::class, 'radicado'])->name('impradicado');
     Route::get('/impficha/{radicado}', [App\Http\Controllers\impRadicadoController::class, 'ficha'])->name('impficha');
-    Route::get('/impdocumento/{documento}', [App\Http\Controllers\impDocumentoController::class, 'seguimiento'])->name('impdocumento');
-    Route::get('/imparchivo/{archivo}', [App\Http\Controllers\impDocumentoController::class, 'archivo'])->name('imparchivo');
-    Route::get('/impoficio/{seguimiento_id}', [App\Http\Controllers\impDocumentoController::class, 'oficio'])->name('impoficio');
+    Route::get('/impdocumento/{documento}', [impDocumentoController::class, 'seguimiento'])->name('impdocumento');
+    Route::get('/imparchivo/{archivo}', [impDocumentoController::class, 'archivo'])->name('imparchivo');
+    Route::get('/impoficio/{seguimiento_id}', [impDocumentoController::class, 'oficio'])->name('impoficio');
 });
 
 
-Route::get('/respsolicitud/{solicitud}', [App\Http\Controllers\impDocumentoController::class, 'seguimientoLider'])->name('respsolicitud');
+Route::controller(impDocumentoController::class)->group(function () {
+    Route::get('/respsolicitud/{solicitud_id}', 'seguimientoLider');
+    Route::post('/respsolicitud/{seguimiento_id}','responderSolicitud');
+});
+
 
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {

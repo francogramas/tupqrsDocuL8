@@ -11,7 +11,8 @@ class SeccionUser extends Model
     protected $fillable =[
         'user_id',
         'seccion_id',
-        'empresa_id'
+        'empresa_id',
+        'jefe'
     ];
     public function user()
     {

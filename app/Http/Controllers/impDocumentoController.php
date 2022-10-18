@@ -9,7 +9,13 @@ use Illuminate\Support\Facades\Crypt;
 use App\Models\empresa;
 use App\Models\SeguimientoOrden;
 use App\Models\Solicitud;
+use App\Models\ColaSolicitud;
+
+use Illuminate\Support\Facades\Mail;
+use App\Mail\respuestaSolicitudMail;
+
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Request;
 
 
 class impDocumentoController extends Controller
@@ -73,11 +79,31 @@ class impDocumentoController extends Controller
         return view('oficio_respuesta', ['s'=>$s, 'urlFirma'=>$urlFirma, 'urlLogo'=>$urlLogo]);
     }
 
-    public function seguimientoLider($solicitud)
+    public function seguimientoLider($solicitud_id)
     {
-        $id = Crypt::decryptString($solicitud);
+        // La $solcititud es el radicado de salida
+        $id = Crypt::decryptString($solicitud_id);
+        $cola = ColaSolicitud::where('solicitudSalida', $id)->first();
         $solicitud = Solicitud::find($id);
-        return view('seguimientoLider', ['solicitud'=>$solicitud]);
+
+        return view('seguimientoLider', ['solicitud'=>$solicitud, 'cola'=>$cola, 'solicitud_id'=> $solicitud_id]);
+    }
+
+    /*responderSolicitud($solicitud)
+    * Da respuesta desde la herramienta del jefe de oficina a la solicitud
+    */
+    public function responderSolicitud(Request $request, $seguimiento_id)
+    {
+        $id = Crypt::decryptString($seguimiento_id);
+        $s = SeguimientoOrden::find($id);
+        $solicitudi = Solicitud::find($s->solicitud_id);
+        $s->mensaje = $request->mensaje;
+        $solicitudi->estado_id = 4;
+        $solicitudi->save();
+        $s->save();
+
+        Mail::to($solicitudi->solicitante->email)->send(new respuestaSolicitudMail($solicitudi));
+        return('Su respuesta se ha radicado correctamente');
     }
 
 }

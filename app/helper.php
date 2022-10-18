@@ -5,11 +5,22 @@ use App\Models\Subserie;
 use App\Models\TipologiaDocumento;
 
 
-function totalSolicitudes($serie, $seccion)
+function totalSolicitudes($serie, $seccion, $revisada = false)
 {
     return Solicitud::where('estado_id','<>', 4)
             ->where('serie_id', $serie)
             ->where('seccion_id', $seccion)
+            ->where('entrada', true)
+            ->where('revision', $revisada)
+            ->count();
+}
+
+function totalSolicitudesSeccion($seccion, $revisada = false)
+{
+    return Solicitud::where('estado_id','<>', 4)
+            ->where('seccion_id', $seccion)
+            ->where('entrada', true)
+            ->where('revision', $revisada)
             ->count();
 }
 

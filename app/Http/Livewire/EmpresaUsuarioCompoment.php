@@ -22,7 +22,7 @@ use App\Models\Subserie;
 use App\Models\TipologiaDocumento;
 use Illuminate\Support\Facades\Storage;
 use App\Models\EmpresaUser;
-
+use Database\Seeders\themeSeeder;
 
 class EmpresaUsuarioCompoment extends Component
 {
@@ -31,7 +31,7 @@ class EmpresaUsuarioCompoment extends Component
     public $empresa, $empresa_id, $countempresa, $dependencia, $dependencia_id, $secciones, $estados, $estado_id, $ciudades,
     $nit, $razonsocial, $telefono, $email, $ciudad_id, $direccion, $id_eps, $boolguardar, $boolguardarDep, $modalFormVisible,
     $modalFormVisible1, $modalFormVisible2, $userName, $userEmail, $password, $password_confirmation, $seccionUser, $seccionUsers, $boolUsuario,
-    $mensaje, $codigo, $publica, $lider, $firma, $emailjefe, $urlFirma;
+    $mensaje, $codigo, $publica, $lider, $firma, $emailjefe, $urlFirma, $jefe, $jefeNoExiste;
 
     public function rules()
     {
@@ -287,6 +287,8 @@ class EmpresaUsuarioCompoment extends Component
         $this->modalFormVisible1 = true;
         $this->seccionUser = SeccionUser::where('seccion_id', $id)->first();
         $this->seccionUsers = SeccionUser::where('seccion_id', $id)->get();
+        $this->jefeNoExiste = is_null(SeccionUser::where('seccion_id', $id)->where('jefe',true)->first());
+
         $this->userEmail = null;
         $this->userName = null;
         $this->password_confirmation = null;
@@ -304,20 +306,30 @@ class EmpresaUsuarioCompoment extends Component
             ['email'=>$this->userEmail],
             ['name'=>$this->userName, 'password'=>Hash::make($this->password),]
         );
-        $user->assignRole('Lider');
+
+        if ($this->jefe) {
+            $user->assignRole('Jefe');
+        } else {
+            $user->assignRole('Lider');
+        }
+
         EmpresaUser::firstOrCreate([
             'user_id'=>$user->id,
             'empresa_id'=>$this->empresa_id
         ]);
+
         SeccionUser::firstOrCreate([
             'user_id' => $user->id,
             'seccion_id' => $this->dependencia_id,
-            'empresa_id'=>$this->empresa_id
+            'empresa_id'=>$this->empresa_id,
+            'jefe' => $this->jefe,
         ]);
+
         Mail::to($user->email)->send(new bienvenidaMail($user));
         $this->seccionUser = SeccionUser::where('seccion_id', $this->dependencia_id)->first();
         $this->seccionUsers = SeccionUser::where('seccion_id', $this->dependencia_id)->get();
         //$this->modalFormVisible1 = false;
+        $this->jefe=false;
     }
 
     public function confirmarBorrarUsuario($id)

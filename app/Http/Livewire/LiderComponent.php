@@ -21,14 +21,15 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use App\Models\EmpresaUser;
 use App\Mail\ColaSolicitudMail;
-use App\Models\ColaSolucitud;
+
+use App\Models\ColaSolicitud;
 
 class LiderComponent extends Component
 {
     use WithFileUploads;
     public $tiposolicitud, $solicitud, $solicitudi, $respuesta, $adjunto, $acciones, $accion_id, $empresa_id,
     $observaciones, $seccion_empresa, $seccion_id, $secciones_u, $secciones_u_id, $series, $serie_id, $subseries, $subserie_id,
-    $tipologias, $tipologia_id, $max_consecutivo;
+    $tipologias, $tipologia_id, $max_consecutivo, $pendientes;
 
     public function mount()
     {
@@ -121,9 +122,22 @@ class LiderComponent extends Component
         ->where('revision', 0)
         ->where('solicituds.seccion_id', $this->secciones_u_id)
         ->where('subseries.serie_id', $serie_id)
+        ->where('entrada', true)
         ->orderBy('estado_id', 'desc')
         ->orderBy('created_at', 'asc')
         ->get();
+
+        $this->pendientes= Solicitud::select('solicituds.*')
+        ->join('subseries', 'solicituds.subserie_id', 'subseries.id')
+        ->where('estado_id','<>', 4)
+        ->where('revision', true)
+        ->where('solicituds.seccion_id', $this->secciones_u_id)
+        ->where('subseries.serie_id', $serie_id)
+        ->where('entrada', true)
+        ->orderBy('estado_id', 'desc')
+        ->orderBy('created_at', 'asc')
+        ->take(5)
+        ->get(5);
 
         $this->solicitudi = $this->solicitud->first();
         $this->respuesta=null;
@@ -180,29 +194,49 @@ class LiderComponent extends Component
                 'entrada'=>false
             ]);
 
+            SeguimientoOrden::create([
+                'radicado' => null, // El seguimiento se hace por cada solicitud, debido a esto no es necesrio que tenga radicado
+                'solicitud_id' => $solicitudBD->id,
+                'user_id'=>Auth::user()->id,
+                'estado_id' => $solicitudBD->estado_id,
+                'seccion_id' => $solicitudBD->seccion_id,
+                'accion_id' => $this->accion_id,
+                'mensaje' => $this->respuesta,
+                'observaciones' => $this->observaciones,
+                'adjunto' => $dataValid['adjunto'],
+            ]);
+
+
+            ColaSolicitud::firstOrCreate([
+                'user_id'=>Auth::user()->id,
+                'solicitudEntrada'=>$this->solicitudi->id,
+                'solicitudSalida'=>$solicitudBD->id,
+                'seccion_id'=>$this->solicitudi->seccion_id,
+                'finalizada'=>false,
+                ]
+            );
+
+
             Mail::to($this->solicitudi->seccionempresa->emailjefe)->send(new ColaSolicitudMail($solicitudBD));
             $this->solicitudi->save();
         }
         elseif($this->accion_id == 3) {
             $this->solicitudi->seccion_id = $this->seccion_id;
             $this->solicitudi->save();
+
+            SeguimientoOrden::create([
+                'radicado' => null, // El seguimiento se hace por cada solicitud, debido a esto no es necesrio que tenga radicado
+                'solicitud_id' => $this->solicitudi->id,
+                'user_id'=>Auth::user()->id,
+                'estado_id' => $this->solicitudi->estado_id,
+                'seccion_id' => $this->solicitudi->seccion_id,
+                'accion_id' => $this->accion_id,
+                'mensaje' => $this->respuesta,
+                'observaciones' => $this->observaciones,
+                'adjunto' => $dataValid['adjunto'],
+            ]);
+
         }
-
-
-        SeguimientoOrden::create([
-            'radicado' => null, // El seguimiento se hace por cada solicitud, debido a esto no es necesrio que tenga radicado
-            'solicitud_id' => $this->solicitudi->id,
-            'user_id'=>Auth::user()->id,
-            'estado_id' => $this->solicitudi->estado_id,
-            'seccion_id' => $this->solicitudi->seccion_id,
-            'accion_id' => $this->accion_id,
-            'mensaje' => $this->respuesta,
-            'observaciones' => $this->observaciones,
-            'adjunto' => $dataValid['adjunto'],
-        ]);
-
-
-        //Mail::to($this->solicitudi->solicitante->email)->send(new respuestaSolicitudMail($this->solicitudi));
 
         try {
             $this->consultarSeries();

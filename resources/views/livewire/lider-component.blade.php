@@ -77,6 +77,7 @@
                     <div class="mr-2"><div class="font-bold">Subserie:</div> {{$solicitudi->subserie->nombre}} </div>
                     <div class="mr-2"><div class="font-bold">Tipología:</div> {{$solicitudi->tipologia->nombre}} </div>
                 </div>
+
                 <p class="text-gray-700 mt-2">
                     <span class="font-bold mt-2">Asunto:</span> {{$solicitudi->asunto}}
                 </p>
@@ -112,40 +113,43 @@
                 @empty
                 @endforelse
 
-                <div class="mt-2">
-                    @error('respuesta') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
-                    <textarea wire:model="respuesta" class="mt-2 rounded-md resize-none w-full h-full border shadow-lg px-2 py-2" rows="4" placeholder="Diligencie la respuesta a la solicitud"></textarea>
-                </div>
-                <div class="mt-2">
-                    @error('observaciones') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
-                    <textarea wire:model="observaciones" class="mt-2 rounded-md resize-none w-full h-full border shadow-lg px-2 py-2" rows="2" placeholder="Observaciones"></textarea>
-                </div>
-                <div>
-                    <label for="" class="block text-gray-700 text-sm font-bold">Adjuntar archivo</label>
-                    <input class="bg-green-200" type="file" accept="application/pdf" wire:model="adjunto">
-                    @error('adjunto') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
-                </div>
-                <div class="mt-2">
-                    <label for="" class="block text-gray-700 text-sm font-bold">Acciones</label>
-                    <select class="w-full" wire:model="accion_id" id="accion_id">
-                        @foreach ($acciones as $accion)
-                            <option value="{{$accion->id}}">{{$accion->nombre}}</option>
-                        @endforeach
-                    </select>
-                </div>
-                @if ($accion_id == 3 and !is_null($seccion_id))
+                @if (!$solicitudi->revision)
+
                     <div class="mt-2">
-                        <label for="" class="block text-gray-700 text-sm font-bold">Dependencia/Sección</label>
-                        <select class="w-full" wire:model="seccion_id" id="seccion_id">
-                            @foreach ($seccion_empresa as $seccion)
-                                <option value="{{$seccion->id}}">{{$seccion->nombre}}</option>
+                        @error('respuesta') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
+                        <textarea wire:model.defer="respuesta" class="mt-2 rounded-md resize-none w-full h-full border shadow-lg px-2 py-2" rows="4" placeholder="Diligencie la respuesta a la solicitud"></textarea>
+                    </div>
+                    <div class="mt-2">
+                        @error('observaciones') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
+                        <textarea wire:model.defer="observaciones" class="mt-2 rounded-md resize-none w-full h-full border shadow-lg px-2 py-2" rows="2" placeholder="Observaciones"></textarea>
+                    </div>
+                    <div>
+                        <label for="" class="block text-gray-700 text-sm font-bold">Adjuntar archivo</label>
+                        <input class="bg-green-200" type="file" accept="application/pdf" wire:model.defer="adjunto">
+                        @error('adjunto') <span class="error text-error ">{{ '*'.$message }}</span> @enderror
+                    </div>
+                    <div class="mt-2">
+                        <label for="" class="block text-gray-700 text-sm font-bold">Acciones</label>
+                        <select class="w-full" wire:model="accion_id" id="accion_id">
+                            @foreach ($acciones as $accion)
+                                <option value="{{$accion->id}}">{{$accion->nombre}}</option>
                             @endforeach
                         </select>
                     </div>
+                    @if ($accion_id == 3 and !is_null($seccion_id))
+                        <div class="mt-2">
+                            <label for="" class="block text-gray-700 text-sm font-bold">Dependencia/Sección</label>
+                            <select class="w-full" wire:model="seccion_id" id="seccion_id">
+                                @foreach ($seccion_empresa as $seccion)
+                                    <option value="{{$seccion->id}}">{{$seccion->nombre}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+                    <div class="my-3 ">
+                        <button wire:click="responder()" class="w-full btn btn-primary shadow-lg rounded-md">ENVIAR RESPUESTA</button>
+                    </div>
                 @endif
-                <div class="my-3 ">
-                    <button wire:click="responder()" class="w-full btn btn-primary shadow-lg rounded-md">ENVIAR RESPUESTA</button>
-                </div>
             </div>
         </div>
         <div class="container mx-auto w-full h-full">
@@ -178,7 +182,36 @@
 
               @endforelse
               <div>
-                <h3 class="mb-2 font-bold text-gray-800 text-base">Solicitudes Pendientes</h3>
+                <h3 class="mb-2 font-bold text-gray-800 text-base">Solicitudes Pendientes({{totalSolicitudesSeccion($secciones_u_id, true)}})</h3>
+                @forelse($pendientes as $pendiente)
+                <button wire:click="verSolicitud({{$pendiente->id}})" class="w-full text-left py-1 px-1 cursor-pointer border shadow-md hover:bg-contenido">
+                    <a href="#respuesta">
+                        <p class="text-gray-700 text-sm font-semibold">{{Str::limit($pendiente->solicitante->nombrecompleto,20)}}</p>
+                        <p class="text-gray-700 text-xs">{{Str::limit($pendiente->asunto, 25, '...') }}</p>
+                        <p class="text-gray-500 text-xs text-right flex">
+
+                            @if($pendiente->estado_id==1)
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                            @elseif($pendiente->estado_id==2)
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-warning" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            @elseif($pendiente->estado_id==3)
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            @endif
+                            {{$pendiente->created_at->format('d/m/Y')}}
+
+                        </p>
+                    </a>
+                </button>
+                @empty
+                    <p class="px-2 py-2">No tienes solicitudes pendientes</p>
+                @endforelse
+                <div></div>
               </div>
               <div>
                 <h3 class="mb-2 font-bold text-gray-800 text-base">Solicitudes Resueltas</h3>
