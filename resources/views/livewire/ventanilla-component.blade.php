@@ -242,6 +242,9 @@
         </div>
         <div class="md:col-span-5">
             <label for="asunto" class="block text-gray-700 text-sm font-bold">Asunto</label>
+            <div wire:loading>
+                Subiendo el archivo, porfavor espere....
+            </div>
             @error('asunto') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <textarea id="asunto" wire:model.defer="asunto" rows="2" class="w-full px-2 py-1 rounded-md shadow-lg"></textarea>
         </div>
@@ -265,8 +268,9 @@
         </div>
         <div class="md:col-span-5 flex gap-2">
             <div>
+                @error('adjunto') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                 <button id="upload-dialog" class="btn btn-primary">Seleccionar archivo</button>
-                <input type="file" id="pdf-file" wire:model.defer="adjunto" accept="application/pdf" style="display:none" />
+                <input type="file" id="pdf-file" wire:model="adjunto" accept="application/pdf" style="display:none" />
                 <div wire:ignore>
                     <div id="pdf-loader" style="display:none">Cargando previsualización ..</div>
                     <canvas id="pdf-preview" width="350" style="display:none" class="border-2 mt-3"></canvas>
