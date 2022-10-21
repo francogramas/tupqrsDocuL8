@@ -29,6 +29,7 @@ use setasign\Fpdi\Fpdi;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
+use App\Models\User;
 
 
 /**
@@ -48,7 +49,7 @@ class VentanillaComponent extends Component
     $asunto, $anos, $ano, $meses, $mes, $dias, $dia, $estados, $estado_id, $ciudades, $ciudad_id, $direccion, $seccion_empresa,
     $tipo_usuarios, $tipo_usuario_id, $medio_recepcion, $medio_id, $fecha, $copia_radicado, $seccionCopia, $seccionCopia_id,
     $tipos_id, $confidencial, $respuesta_email, $diasTermino, $solicitudi, $descripcion, $series, $serie_id, $subserie, $subserie_id, $tipologia,
-    $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1, $copias, $seguimiento;
+    $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1, $copias, $seguimiento, $usercopias;
 
     public function mount()
     {
@@ -74,7 +75,7 @@ class VentanillaComponent extends Component
 
         $this->seccion_id = $this->seccion_empresa->first()->id;
 
-        $this->seccion_empresa = $this->seccion_empresa->pluck('nombre', 'id');
+        $this->seccion_empresa = $this->seccion_empresa;
 
         $this->seccionCopia = SeccionEmpresa::where('empresa_id', $this->empresa_id)->get();
         $this->seccionCopia_id = SeccionEmpresa::where('empresa_id', $this->empresa_id)->first()->id;
@@ -311,27 +312,19 @@ class VentanillaComponent extends Component
             $cc[]=$s->emailjefe;
         }
 
-        if($this->copia_radicado and $this->copias){
-            foreach ($this->copias as $co => $value) {
+        if($this->copia_radicado and $this->usercopias){
+            foreach ($this->usercopias as $co => $value) {
                 if($value){
-                    $s = SeccionEmpresa::find($co);
-                    $se = SeccionUser::where('seccion_id', $co)->get();
-
-                    if (!is_null($s->emailjefe)) {
-                        $cc[]=$s->emailjefe;
-                    }
-                    foreach ($se as $sei) {
-                        if (!is_null($sei->user->email)) {
-                            $cc[]=$sei->user->email;
-                        }
+                    $s = User::find($co);
+                        $cc[]=$s->email;
                     }
                 }
             }
 
-            $cc = array_unique($cc);
-            //dd($ccM);
+        $cc = array_unique($cc);
+        //dd($cc);
 
-        }
+
         $this->validate([
             'fecha'=>'required|date',
             'asunto'=>'required|min:5',

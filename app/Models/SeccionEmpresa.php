@@ -24,6 +24,12 @@ class SeccionEmpresa extends Model
         return $this->hasOne(SeccionUser::class, 'seccion_id');
     }
 
+
+    public function usuarios()
+    {
+        return $this->hasMany(SeccionUser::class, 'seccion_id');
+    }
+
     public function empresa()
     {
         return $this->belongsTo(empresa::class, 'empresa_id');
