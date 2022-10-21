@@ -75,7 +75,7 @@ class VentanillaComponent extends Component
 
         $this->seccion_id = $this->seccion_empresa->first()->id;
 
-        $this->seccion_empresa = $this->seccion_empresa;
+        $this->seccion_empresa = $this->seccion_empresa->pluck('nombre','id');
 
         $this->seccionCopia = SeccionEmpresa::where('empresa_id', $this->empresa_id)->get();
         $this->seccionCopia_id = SeccionEmpresa::where('empresa_id', $this->empresa_id)->first()->id;
