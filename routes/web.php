@@ -17,7 +17,6 @@ use App\Http\Controllers\impDocumentoController;
 */
 
 Route::get('/', function () {
-    dd(phpinfo());
     return view('welcome');
 });
 
