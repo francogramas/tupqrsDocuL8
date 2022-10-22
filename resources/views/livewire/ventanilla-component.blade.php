@@ -242,9 +242,7 @@
         </div>
         <div class="md:col-span-5">
             <label for="asunto" class="block text-gray-700 text-sm font-bold">Asunto</label>
-            <div wire:loading>
-                Subiendo el archivo, porfavor espere....
-            </div>
+
             @error('asunto') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
             <textarea id="asunto" wire:model.defer="asunto" rows="2" class="w-full px-2 py-1 rounded-md shadow-lg"></textarea>
         </div>
@@ -272,11 +270,36 @@
             <label for="" class="block text-gray-700 text-sm font-bold">Descripción de adjunto</label>
             <input type="text" wire:model.defer="descripcion" class="w-full px-2 py-1 rounded-md shadow-lg">
 
-            <div class="flex gap-2 py-2">
-                <div>
+            <div class="gap-2 py-2">
+                <div class="flex gap-2 py-2">
                     @error('adjunto') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                     <button id="upload-dialog" class="btn btn-primary">Seleccionar archivo</button>
-                    <input type="file" id="pdf-file" wire:model="adjunto" accept="application/pdf" style="display:none" />
+
+                    <div x-data="{ isUploading: false, progress: 0 }"
+                        x-on:livewire-upload-start="isUploading = true"
+                        x-on:livewire-upload-finish="isUploading = false"
+                        x-on:livewire-upload-error="isUploading = false"
+                        x-on:livewire-upload-progress="progress = $event.detail.progress">
+                        <!-- File Input -->
+                        <input type="file" id="pdf-file" wire:model="adjunto" accept="application/pdf" style="display:none" />
+
+
+                        <!-- Progress Bar -->
+                        <div x-show="isUploading">
+                            <p>Cargando Archivo...</p>
+                            <progress class="progress progress-success w-56" x-bind:value="progress" max="100"></progress>
+                        </div>
+                        <div x-show="!isUploading">
+                            <button class="btn btn-primary w-44" wire:click="radicar()">Radicar solicitud</button>
+                            <button class="btn btn-warning w-44" wire:click="finalizarRadicado()">Canclear</button>
+                        </div>
+                    <div>
+
+                    </div>
+
+                </div>
+            </div>
+
                     <div wire:ignore>
                         <div id="pdf-loader" style="display:none">Cargando previsualización ..</div>
                         <canvas id="pdf-preview" width="350" style="display:none" class="border-2 mt-3"></canvas>
@@ -372,10 +395,8 @@
                             });
                         </script>
                     </div>
-                </div>
-                <button class="btn btn-primary w-44" wire:click="radicar()">Radicar solicitud</button>
-                <button class="btn btn-warning w-44" wire:click="finalizarRadicado()">Canclear</button>
             </div>
+
         </div>
 
     </div>

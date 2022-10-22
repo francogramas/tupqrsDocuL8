@@ -172,41 +172,24 @@ class AdminEmpresasComponent extends Component
 
 
 // Admin
-        $admin = User::firstOrCreate([ 'name' => 'Administrador del Sistema', 'email' => 'admin@'.$this->dominio, 'email_verified_at' => now(), 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',]);
+        $admin = User::firstOrCreate([ 'name' => 'Administrador del Sistema', 'email' => 'admin@'.$this->dominio, 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',]);
         $admin->assignRole('Gerente');
         $admin->assignRole('Ventanilla');
 
-        EmpresaUser::firstOrCreate(
-            [
-                'user_id' => $admin->id,
-                'empresa_id' => $this->empresa_id
-            ]
-        );
-
 // Lider de vetanilla unica central
-        $usuario = User::firstOrCreate(['name' => 'Ventanilla Unica', 'email' => 'ventanilla@'.$this->dominio, 'email_verified_at' => now(), 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',]);
+        $usuario = User::firstOrCreate(['name' => 'Ventanilla Unica', 'email' => 'ventanilla@'.$this->dominio, 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',]);
         $usuario->assignRole('Ventanilla');
 
-        EmpresaUser::firstOrCreate(
-            [
-                'user_id' => $usuario->id,
-                'empresa_id' => $this->empresa_id
-            ]
-        );
-
 // Auxiliar de dependencia
-        $auxiliar = User::firstOrCreate(['name' => 'Auxiliar 1', 'email' => 'auxiliar@'.$this->dominio, 'email_verified_at' => now(), 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',]); // password
+        $auxiliar = User::firstOrCreate(['name' => 'Auxiliar 1', 'email' => 'auxiliar@'.$this->dominio, 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',]); // password
         $auxiliar->assignRole('Lider');
+        $empresa = empresa::firstOrCreate( ['nit'=> $this->nit, 'razonsocial'=> $this->razonsocial, 'direccion'=> $this->direccion, 'telefono'=> $this->telefono, 'email'=> $this->email, 'logo'=> $dataValid['logo'], 'ciudad_id'=> $this->ciudad_id, 'user_id'=> $admin->id, 'url'=> $url, 'estado_id'=> 1, 'dominio'=> $this->dominio]);
 
-        EmpresaUser::firstOrCreate(
-            [
-                'user_id' => $auxiliar->id,
-                'empresa_id' => $this->empresa_id
-            ]
-        );
 
-        $empresa = empresa::firstOrCreate( [ 'nit'=> $this->nit, 'razonsocial'=> $this->razonsocial, 'direccion'=> $this->direccion, 'telefono'=> $this->telefono, 'email'=> $this->email, 'logo'=> $dataValid['logo'], 'ciudad_id'=> $this->ciudad_id, 'user_id'=> $admin->id, 'url'=> $url, 'estado_id'=> 1, 'dominio'=> $this->dominio,] );
         $seccion = SeccionEmpresa::firstOrCreate(['nombre'=>'Oficina General', 'codigo'=>'000', 'empresa_id'=>$empresa->id, 'estado_id'=>1, 'publica' => true, ]);
+        EmpresaUser::firstOrCreate(['user_id' => $admin->id, 'empresa_id' => $empresa->id,]);
+        EmpresaUser::firstOrCreate(['user_id' => $usuario->id, 'empresa_id' => $empresa->id]);
+        EmpresaUser::firstOrCreate(['user_id' => $auxiliar->id, 'empresa_id' => $empresa->id,]);
 
         SeccionUser::create(['user_id' => $auxiliar->id, 'seccion_id' => $seccion->id, 'empresa_id'=>$empresa->id,]);
         SeccionUser::create(['user_id' => $admin->id, 'seccion_id' => $seccion->id, 'empresa_id'=>$empresa->id,]);
