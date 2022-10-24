@@ -31,14 +31,12 @@ use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use App\Models\User;
 
-
 /**
- * // TODO: EL PREFIJO DE LOS RADICADOS DEBEN SER INTERNOs(I)
- * // TODO: CREAR UNA HERRAMIENTA DE RADICADO MASIVO PARA SOLICITUDES DE LA VENTANILLA VIRTUAL
- * // TODO: GENERAR UNA PLANTILLA DE RESPUESTA INSTITUCIONAL(EMAILS)
- * //
+ *  TODO: EL PREFIJO DE LOS RADICADOS DEBEN SER INTERNOs(I)
+ *  TODO: CREAR UNA HERRAMIENTA DE RADICADO MASIVO PARA SOLICITUDES DE LA VENTANILLA VIRTUAL
+ *  TODO: GENERAR UNA PLANTILLA DE RESPUESTA INSTITUCIONAL(EMAILS)
+ *
 **/
-
 
 class VentanillaComponent extends Component
 {
@@ -141,7 +139,6 @@ class VentanillaComponent extends Component
         $total = $totales->sum('total');
         return view('livewire.ventanilla-component',['solicitudes' => $solicitudes, 'total'=>$total, 'totales'=>$totales]);
     }
-
     public function calcularDias()
     {
         $m31 = collect(["1","3","5","7","8","10","12"]);
@@ -166,14 +163,12 @@ class VentanillaComponent extends Component
 
         $this->dia = 1;
     }
-
     public function cargarciudades()
     {
         $this->ciudades = Ciudade::where('estado_id',$this->estado_id)->get();
         $ciudades1 = Ciudade::where('estado_id',$this->estado_id)->first();
         $this->ciudad_id = $ciudades1->id;
     }
-
     public function siguienteSolictud($t)
     {
         $this->etapa = $this->etapa+1;
@@ -181,7 +176,6 @@ class VentanillaComponent extends Component
         $this->consultarTipoSerie();
 
     }
-
     public function crearFecha()
     {
         $this->calcularDias();
@@ -251,7 +245,6 @@ class VentanillaComponent extends Component
             $this->ciudad_id = $s->ciudad_id;
         }
     }
-
     public function buscarSerie()
     {
         $this->series = Subserie::serieSeccion($this->seccion_id);
@@ -262,7 +255,6 @@ class VentanillaComponent extends Component
         $this->destinatario = $seccion_empresa->lider;
         $this->buscarSubSerie();
     }
-
     public function buscarSubSerie()
     {
 
@@ -272,7 +264,6 @@ class VentanillaComponent extends Component
         $this->buscarTipologia();
 
     }
-
     public function buscarTipologia()
     {
         try {
@@ -296,13 +287,10 @@ class VentanillaComponent extends Component
         }
         $this->obtenerDiasTermino();
     }
-
-
     public function obtenerDiasTermino()
     {
         $this->diasTermino = TipologiaDocumento::find($this->tipologia_id)->pqrs->diastermino;
     }
-
     public function radicar()
     {
         $s = SeccionEmpresa::find($this->seccion_id);
@@ -402,7 +390,6 @@ class VentanillaComponent extends Component
         $this->copias = null;
         $this->copia_radicado = false;
     }
-
     public function calcularRadicado($trd=false)
     {
         $date = Carbon::createFromDate(now()->format('Y-m-d'));
@@ -428,7 +415,6 @@ class VentanillaComponent extends Component
 
         return($radicado);
     }
-
     public function finalizarRadicado()
     {
         $this->nombrecompleto = null;
@@ -449,13 +435,11 @@ class VentanillaComponent extends Component
         $this->filtro = $id;
         $this->resetPage();
     }
-
     public function consultarTipoSerie()
     {
         $this->etapa = 1;
         $this->buscarSubSerie();
     }
-
     public function fillPDF($file, $outputFile, $empresa,$radicado)
     {
         $fpdi = new FPDI;
@@ -489,7 +473,6 @@ class VentanillaComponent extends Component
         Storage::disk('local')->delete($output_file);
         return $fpdi->Output($outputFile, 'F');
     }
-
     public function consultarListaEmails($seccion_id)
     {
         $s = SeccionEmpresa::find($seccion_id);

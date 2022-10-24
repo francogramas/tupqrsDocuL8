@@ -56,7 +56,9 @@ Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
-
+Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Jefe']], function () {
+    Route::get('jefe', App\Http\Livewire\JefeComponent::class)->name('jefe');
+});
 
 /** --------------------------------- Roles de gerente ----------------------------------------------------- **/
 Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Gerente']], function () {

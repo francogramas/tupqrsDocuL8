@@ -25,16 +25,16 @@ No de Radicado: {{$solicitud->radicado}}
 @endif
 @endforeach
 
-Atentamente: {{$solicitud->seccionempresa->userSeccion->user->name}}
-Líder de {{$solicitud->seccionempresa->nombre}}
+Gestiona la solicitud: {{$solicitud->user->name}}
 
 ## Para dar seguimiento a la respuesta y aprobarla haga click en el siguiente enlace
-@component('mail::button', ['url' => url('respsolicitud', Crypt::encryptString($solicitud->id))])
+@component('mail::button', ['url' => url('jefe').'?sol='.Crypt::encryptString($solicitud->id)])
 Ver Solicitud
 @endcomponent
-### Este mensaje se ha generado de forma atutomática, no lo responda.
+
+Este mensaje se ha generado de forma atutomática, no lo responda.
 
 
-### {{ config('app.name') }}
+###{{ config('app.name') }}
 @endcomponent
 

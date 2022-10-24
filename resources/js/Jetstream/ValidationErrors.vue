@@ -9,7 +9,7 @@ const hasErrors = computed(() => Object.keys(errors.value).length > 0);
 <template>
     <div v-if="hasErrors">
         <div class="font-medium text-error ">
-            Whoops! Something went wrong.
+             ¡Al parecer algo salió mal!
         </div>
 
         <ul class="mt-3 list-disc list-inside text-sm text-error ">

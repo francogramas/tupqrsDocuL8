@@ -311,6 +311,7 @@ class EmpresaUsuarioCompoment extends Component
             $user->assignRole('Jefe');
         } else {
             $user->assignRole('Lider');
+            $this->jefe=false;
         }
 
         EmpresaUser::firstOrCreate([
