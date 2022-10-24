@@ -331,6 +331,10 @@ class EmpresaUsuarioCompoment extends Component
         $this->seccionUsers = SeccionUser::where('seccion_id', $this->dependencia_id)->get();
         //$this->modalFormVisible1 = false;
         $this->jefe=false;
+        $this->userEmail = null;
+        $this->userName = null;
+        $this->password = null;
+        $this->password_confirmation=null;
     }
 
     public function confirmarBorrarUsuario($id)
