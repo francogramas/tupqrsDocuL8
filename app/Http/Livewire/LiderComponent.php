@@ -28,8 +28,9 @@ class LiderComponent extends Component
 {
     use WithFileUploads;
     public $tiposolicitud, $solicitud, $solicitudi, $respuesta, $adjunto, $acciones, $accion_id, $empresa_id,
-    $observaciones, $seccion_empresa, $seccion_id, $secciones_u, $secciones_u_id, $series, $serie_id, $subseries, $subserie_id,
-    $tipologias, $tipologia_id, $max_consecutivo, $pendientes;
+    $observaciones, $seccion_empresa, $seccion_empresaTodos, $seccion_id, $secciones_u, $secciones_u_id, $series, $serie_id, $subseries, $subserie_id,
+    $tipologias, $tipologia_id, $max_consecutivo, $pendientes, $resuletas;
+
 
     public function mount()
     {
@@ -37,15 +38,17 @@ class LiderComponent extends Component
         $this->acciones=AccionOrdene::where('id','>',2)->orderBy('id','desc')->get();
         $this->accion_id = $this->acciones->first()->id;
 
-        $secciones_id = SeccionUser::select('seccion_id')->where('user_id', Auth::user()->id)->get();
+        $secciones_id = SeccionUser::select('seccion_id')->where('empresa_id',$this->empresa_id)->where('user_id', Auth::user()->id)->groupBy('seccion_id')->get();
         $seccion_id = Solicitud::select('seccion_id')->where('estado_id','<>',4)->whereIn('seccion_id', $secciones_id)->groupBy('seccion_id')->get();
 
         //Verificación de que existe solicitudes en las secciones, de lo contrario se muestra un mensaje diciendo que no hay solicitudes por responder
+
         if($seccion_id->count()>0){
-            $this->seccion_empresa = SeccionEmpresa::whereIn('id', $seccion_id)->get();
-            $this->secciones_u_id = $this->seccion_empresa->first()->id;
+            $this->seccion_empresaTodos = SeccionEmpresa::whereIn('id', $seccion_id)->get();
+
+            $this->secciones_u_id = $this->seccion_empresaTodos->first()->id;
             try {
-                $this->seccion_id = $this->seccion_empresa->first()->id;
+                $this->seccion_id = $this->seccion_empresaTodos->first()->id;
             } catch (\Throwable $th) {
                 $this->seccion_id = null;
             }
@@ -60,8 +63,8 @@ class LiderComponent extends Component
                 $this->tipologia_id = $this->tipologias->first()->id;
             }
             $this->solicitudes($this->serie_id);
+            $this->finalizadas();
         }
-
     }
 
     public function render()
@@ -127,17 +130,13 @@ class LiderComponent extends Component
         ->orderBy('created_at', 'asc')
         ->get();
 
-        $this->pendientes= Solicitud::select('solicituds.*')
-        ->join('subseries', 'solicituds.subserie_id', 'subseries.id')
-        ->where('estado_id','<>', 4)
-        ->where('revision', true)
-        ->where('solicituds.seccion_id', $this->secciones_u_id)
-        ->where('subseries.serie_id', $serie_id)
-        ->where('entrada', true)
-        ->orderBy('estado_id', 'desc')
-        ->orderBy('created_at', 'asc')
-        ->take(5)
-        ->get(5);
+        $secc = SeccionUser::select('seccion_id')->where('user_id', Auth::user()->id)->groupBy('seccion_id')->get();
+        $this->pendientes = ColaSolicitud::where('finalizada',false)
+                            ->whereIn('seccion_id', $secc)
+                            ->take(5)
+                            ->get();
+
+        //dd($this->pendientes);
 
         $this->solicitudi = $this->solicitud->first();
         $this->respuesta=null;
@@ -282,6 +281,7 @@ class LiderComponent extends Component
 
     public function finalizadas()
     {
-
+        $secc = SeccionUser::select('seccion_id')->where('user_id', Auth::user()->id)->groupBy('seccion_id')->get();
+        $this->resueltas = ColaSolicitud::where('finalizada',true)->whereIn('seccion_id', $secc)->orderBy('updated_at', 'desc')->take(20)->get();
     }
 }

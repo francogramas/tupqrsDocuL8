@@ -1,6 +1,5 @@
 
 <nav x-data="{ open: false }" class="border-b border-gray-100 text-titulo">
-
     <!-- Primary Navigation Menu -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -11,7 +10,6 @@
                             <x-jet-application-mark class="block h-9 w-auto" />
                         </a>
                     </div>
-
                     <!-- Navigation Links -->
                     <div class="hidden space-x-8 md:-my-px md:ml-10 md:flex">
                         @role('Gerente')
@@ -56,10 +54,11 @@
                                 </x-jet-dropdown-link>
                             </x-slot>
                         </x-jet-dropdown>
+
                         @endrole
                         @role('Lider')
                         <x-jet-nav-link href="{{ route('lider') }}" :active="request()->routeIs('lider')">
-                            {{ __('Solicitudes') }}
+                            {{ __('Respuestas') }}
                         </x-jet-nav-link>
                         @endrole
                         @role('Admin')
@@ -74,6 +73,9 @@
                         <x-jet-nav-link href="{{ route('ventanilla') }}" :active="request()->routeIs('ventanilla')">
                             {{ __('Ventanilla') }}
                         </x-jet-nav-link>
+                        <!--x-jet-nav-link href="#" :active="request()->routeIs('ventanilla')">
+                            {{ __('Expediente') }}
+                        </x-jet-nav-link -->
                         @endrole
                     </div>
                 </div>
@@ -107,7 +109,7 @@
                                         @endrole
                                         @role('Lider')
                                             <x-jet-dropdown-link href="{{ route('lider') }}">
-                                                {{ __('Solicitudes') }}
+                                                {{ __('Respuestas') }}
                                             </x-jet-dropdown-link>
                                         @endrole
                                         @role('Admin')
@@ -243,7 +245,7 @@
 
                 @role('Lider')
                     <x-jet-responsive-nav-link href="{{ route('lider') }}" :active="request()->routeIs('lider')">
-                        {{ __('Solicitudes') }}
+                        {{ __('Respuestas') }}
                     </x-jet-responsive-nav-link>
                 @endrole
                 @hasanyrole('Gerente|Ventanilla')

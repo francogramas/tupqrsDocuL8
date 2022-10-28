@@ -293,7 +293,7 @@ class AdminEmpresasComponent extends Component
         $this->empresa->direccion = $this->direccion;
         $this->empresa->telefono = $this->telefono;
         $this->empresa->email = $this->email;
-        $this->empresa->logo = $this->logo;
+        $this->empresa->logo = $dataValid['logo'];
         $this->empresa->ciudad_id = $this->ciudad_id;
         $this->empresa->user_id = $this->user_id;
         $this->empresa->url = $this->url;

@@ -1,11 +1,11 @@
 <div class="px-5 pt-5 text-sm">
-    @if (!is_null($seccion_empresa))
+    @if (!is_null($seccion_empresaTodos))
     <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
         <div class="grid grid-cols-1 border px-2 py-2">
             <div class="mb-2">
                 <label for="" class="block text-gray-700 text-sm font-bold">Dependencias</label>
                 <select wire:model="secciones_u_id" id="secciones_u_id" class="w-full mb-2" wire:change="consultarSeries();">
-                    @foreach ($seccion_empresa as $seccion)
+                    @foreach ($seccion_empresaTodos as $seccion)
                         <option value="{{$seccion->id}}">{{$seccion->nombre}}</option>
                     @endforeach
                 </select>
@@ -54,8 +54,9 @@
                 <div></div>
             </div>
         </div>
-        @isset($solicitudi)
+
         <div class="col-span1 md:col-span-3" id="respuesta">
+            @isset($solicitudi)
             <div class="rounded-lg shadow-ld border px-2 py-2">
                 <h3 class="font-bold text-gray-700 text-lg">Descripción de la solicitud:</h3>
                 <div class="text-sm text-gray-500 grid grid-cols-1 md:grid-cols-3">
@@ -151,75 +152,102 @@
                     </div>
                 @endif
             </div>
+            @endisset
         </div>
+
         <div class="container mx-auto w-full h-full">
-
             <div class="relative wrap overflow-hidden pt-7 pl-7 h-full w-full">
-              <h3 class="mb-2 font-bold text-gray-800 text-base">Historial de la solicitud</h3>
-              <div class="border-2-2 absolute border-dashed border-blue-500 h-full border" style="left: 5.8%"></div>
-
-              @forelse ($solicitudi->seguimiento as $seguimiento)
-                   <!-- First timeline -->
-                <button class="w-full text-right">
-                  <div class="mb-1 flex justify-between items-center w-full">
-                    <div class="order-2"></div>
-                    <div class="z-20">
-                      <div class="my-4 rounded-full h-8 w-8 flex items-center bg-indigo-300 ring-4 ring-indigo-400 ring-opacity-30">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div class="order-1 @if ($seguimiento->estado_id==1) bg-green-300 @elseif($seguimiento->estado_id==2) bg-yellow-300 @elseif ($seguimiento->estado_id==3) bg-red-300 @endif opacity-70 rounded-lg shadow-xl w-full px-3 py-1">
-                      <div class="flex flex-row">
-                        <h3 class="mb-1 font-bold text-gray-800 text-sm">{{$seguimiento->accion->nombre}}</h3>
-                      </div>
-                      <p class="leading-snug tracking-wide text-gray-900 text-opacity-100 text-xs">{{$seguimiento->created_at->format('M d/Y')}} - {{$seguimiento->user->name}}</p>
-                    </div>
-                  </div>
-                </button>
-              @empty
-
-              @endforelse
               <div>
                 <h3 class="mb-2 font-bold text-gray-800 text-base">Solicitudes Pendientes({{totalSolicitudesSeccion($secciones_u_id, true)}})</h3>
-                @forelse($pendientes as $pendiente)
-                <button wire:click="verSolicitud({{$pendiente->id}})" class="w-full text-left py-1 px-1 cursor-pointer border shadow-md hover:bg-contenido">
-                    <a href="#respuesta">
-                        <p class="text-gray-700 text-sm font-semibold">{{Str::limit($pendiente->solicitante->nombrecompleto,20)}}</p>
-                        <p class="text-gray-700 text-xs">{{Str::limit($pendiente->asunto, 25, '...') }}</p>
+                @forelse($pendientes as $sol1)
+
+                    <button wire:click="verSolicitud({{$sol1->salida->id}})" class="w-full text-left py-1 px-1 cursor-pointer border shadow-md hover:bg-contenido  ">
+                        <a href="#respuesta">
+                            <p class="text-gray-700 text-sm font-semibold">{{Str::limit($sol1->salida->solicitante->nombrecompleto,20)}}</p>
+                            <p class="text-gray-700 text-xs">{{Str::limit($sol1->salida->asunto, 25, '...') }}</p>
+                            <p class="text-gray-500 text-xs text-right flex">
+
+                                @if($sol1->salida->estado_id==1)
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                @elseif($sol1->salida->estado_id==2)
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-warning" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                @elseif($sol1->salida->estado_id==3)
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                @endif
+                                {{$sol1->salida->created_at->format('d/m/Y')}}
+
+                            </p>
+                        </a>
+                    </button>
+                @empty
+                    <p class="px-2 py-2">No tienes compromisos por responder</p>
+                @endforelse
+              </div>
+              <div wire:poll.30s='finalizadas()'>
+                <h3 class="mb-2 font-bold text-gray-800 text-base">Solicitudes Resueltas</h3>
+                @forelse($resueltas as $resu)
+
+                    <a href="{{url('impoficio', Crypt::encryptString($resu->salida->seguimiento->last()->id)) }}" class="block border shadow-md hover:bg-contenido  ">
+                        <p class="text-gray-700 text-sm font-semibold">{{Str::limit($resu->salida->solicitante->nombrecompleto,20)}}</p>
+                        <p class="text-gray-700 text-xs">{{Str::limit($resu->salida->asunto, 25, '...') }}</p>
                         <p class="text-gray-500 text-xs text-right flex">
 
-                            @if($pendiente->estado_id==1)
+                            @if($resu->salida->estado_id==1)
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                            @elseif($pendiente->estado_id==2)
+                                </svg>
+                            @elseif($resu->salida->estado_id==2)
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-warning" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                                 </svg>
-                            @elseif($pendiente->estado_id==3)
+                            @elseif($resu->salida->estado_id==3)
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             @endif
-                            {{$pendiente->created_at->format('d/m/Y')}}
+                            {{$resu->salida->created_at->format('d/m/Y')}}
 
                         </p>
                     </a>
-                </button>
                 @empty
-                    <p class="px-2 py-2">No tienes solicitudes pendientes</p>
+                    <p class="px-2 py-2">No tienes compromisos por responder</p>
                 @endforelse
-                <div></div>
               </div>
-              <div>
-                <h3 class="mb-2 font-bold text-gray-800 text-base">Solicitudes Resueltas</h3>
-              </div>
+                @isset($solicitudi)
+                    <h3 class="mb-2 font-bold text-gray-800 text-base">Historial de la solicitud</h3>
+                    <div class="border-2-2 absolute border-dashed border-blue-500 h-full border" style="left: 5.8%"></div>
+                    @forelse ($solicitudi->seguimiento as $seguimiento)
+                        <!-- First timeline -->
+                        <button class="w-full text-right">
+                        <div class="mb-1 flex justify-between items-center w-full">
+                            <div class="order-2"></div>
+                            <div class="z-20">
+                            <div class="my-4 rounded-full h-8 w-8 flex items-center bg-indigo-300 ring-4 ring-indigo-400 ring-opacity-30">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            </div>
+                            <div class="order-1 @if ($seguimiento->estado_id==1) bg-green-300 @elseif($seguimiento->estado_id==2) bg-yellow-300 @elseif ($seguimiento->estado_id==3) bg-red-300 @endif opacity-70 rounded-lg shadow-xl w-full px-3 py-1">
+                            <div class="flex flex-row">
+                                <h3 class="mb-1 font-bold text-gray-800 text-sm">{{$seguimiento->accion->nombre}}</h3>
+                            </div>
+                            <p class="leading-snug tracking-wide text-gray-900 text-opacity-100 text-xs">{{$seguimiento->created_at->format('M d/Y')}} - {{$seguimiento->user->name}}</p>
+                            </div>
+                        </div>
+                        </button>
+                    @empty
+                @endforelse
+                @endisset
+
             </div>
           </div>
-
-        @endisset
     </div>
     @else
         <p class="px-2 py-2">No tienes compromisos por responder</p>

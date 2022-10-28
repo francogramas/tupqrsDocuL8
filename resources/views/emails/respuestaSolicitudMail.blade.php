@@ -27,6 +27,9 @@ No de Radicado: {{$solicitud->radicado}}
 Atentamente: {{$solicitud->seccionempresa->userSeccion->user->name}}
 Líder de {{$solicitud->seccionempresa->nombre}}
 
+@component('mail::button', ['url' => url('impoficio', Crypt::encryptString($seguimiento->id))])
+Ver Respuesta
+@endcomponent
 
 ### Este mensaje se ha generado de forma atutomática, no lo responda.
 

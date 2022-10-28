@@ -90,8 +90,9 @@ class impDocumentoController extends Controller
     }
 
     /*responderSolicitud($solicitud)
-    * Da respuesta desde la herramienta del jefe de oficina a la solicitud
+    *da respuesta desde la herramienta del jefe de oficina a la solicitud
     */
+
     public function responderSolicitud(Request $request, $seguimiento_id)
     {
         $id = Crypt::decryptString($seguimiento_id);

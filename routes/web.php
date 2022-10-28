@@ -28,16 +28,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/impoficio/{seguimiento_id}', [impDocumentoController::class, 'oficio'])->name('impoficio');
 });
 
-
 Route::controller(impDocumentoController::class)->group(function () {
     Route::get('/respsolicitud/{solicitud_id}', 'seguimientoLider');
     Route::post('/respsolicitud/{seguimiento_id}','responderSolicitud');
 });
 
-
-
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-
     if(Auth::user()->hasRole('Gerente')){
         return redirect('empresauser');
     }
@@ -51,6 +47,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
         return redirect('ventanilla');
     }
 })->name('dashboard');
+
 
 Route::get('/email/verify', function () {
     return view('auth.verify-email');

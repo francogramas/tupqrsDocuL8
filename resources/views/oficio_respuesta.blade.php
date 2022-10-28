@@ -20,7 +20,7 @@
     <body class="px-5 py-5" style="width: 8.5in">
         <header>
             <img src="{{$urlLogo}}" alt="" width="240px">
-            <p class="font-bold text-lg text-center">{{$s->solicitud->empresa->razonsocial}}</p>
+            <p class="font-bold text-lg text-center uppercase pt-5">{{$s->solicitud->empresa->razonsocial}}</p>
             <p class="pt-7">{{$s->solicitud->empresa->ciudad->ciudad}} - {{$s->solicitud->empresa->ciudad->estado->estado}}, {{ \Carbon\Carbon::parse($s->created_at)->locale('es_CO')->isoFormat('LL')}}</p>
             <br>
             <p>Señor(a):</p>
@@ -36,12 +36,14 @@
             </p>
 
         </header>
+        <main>
+
+
         <section class="py-5">
             {{$s->mensaje}}
         </section>
-    </body>
-    <footer>
-        <p>Atentamente:</p>
+        <section>
+            <p>Atentamente:</p>
         <br>
         <br>
         <br>
@@ -52,6 +54,14 @@
         <p><span class="text-xs">(firma autorizada)</span></p>
         <p class="font-bold">{{$s->seccionempresa->lider}}</p>
         {{$s->seccionempresa->nombre}}
+        </section>
+    </main>
+    <footer class="pt-10">
+        <p class="text-lg text-center gap-5">
+            <span class="font-bold">Direccion:</span> {{$s->solicitud->empresa->direccion}}
+            <span class="font-bold">Teléfono:</span> {{$s->solicitud->empresa->telefono}}
+            <span class="font-bold">Email:</span> {{$s->solicitud->empresa->email}}
+        </p>
     </footer>
-
+    </body>
 </html>

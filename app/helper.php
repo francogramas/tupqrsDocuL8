@@ -3,6 +3,7 @@ use App\Models\Solicitud;
 use App\Models\Serie;
 use App\Models\Subserie;
 use App\Models\TipologiaDocumento;
+use App\Models\ColaSolicitud;
 
 
 function totalSolicitudes($serie, $seccion, $revisada = false)
@@ -17,11 +18,12 @@ function totalSolicitudes($serie, $seccion, $revisada = false)
 
 function totalSolicitudesSeccion($seccion, $revisada = false)
 {
-    return Solicitud::where('estado_id','<>', 4)
+    return ColaSolicitud::where('finalizada', $revisada)->where('seccion_id', $seccion)->count();
+    /*return Solicitud::where('estado_id','<>', 4)
             ->where('seccion_id', $seccion)
             ->where('entrada', true)
             ->where('revision', $revisada)
-            ->count();
+            ->count();*/
 }
 
 function totalesSeccionSolicitud($seccion_id, $serie_id, $fechai, $fechaf)
