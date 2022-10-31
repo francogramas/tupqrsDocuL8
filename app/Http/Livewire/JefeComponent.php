@@ -113,9 +113,15 @@ class JefeComponent extends Component
             $this->cola = null;
         }
         else {
-            $this->cola = ColaSolicitud::where('seccion_id', $this->seccion_id)->where('finalizada',false)->first();
-            $this->solicitud = $this->cola->first()->salida;
-            $this->respuesta = $this->cola->salida->seguimiento->last()->mensaje;
+            try {
+                $this->cola = ColaSolicitud::where('seccion_id', $this->seccion_id)->where('finalizada',false)->first();
+                $this->solicitud = $this->cola->first()->salida;
+                $this->respuesta = $this->cola->salida->seguimiento->last()->mensaje;
+            } catch (\Throwable $th) {
+                $this->solicitud=null;
+                $this->cola = null;
+            }
+
         }
     }
 }
