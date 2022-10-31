@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Livewire;
-
 use Livewire\Component;
 use App\Models\Tipodocumento;
 use App\Models\Solicitante;
@@ -9,7 +8,6 @@ use App\Models\SeccionUser;
 use App\Models\Estado;
 use App\Models\Ciudade;
 use App\Models\SeccionEmpresa;
-
 use App\Models\TipoUsuario;
 use App\Models\MedioRecepcion;
 use App\Models\Solicitud;
@@ -31,12 +29,14 @@ use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use App\Models\User;
 
+
 /**
  *  TODO: EL PREFIJO DE LOS RADICADOS DEBEN SER INTERNOs(I)
  *  TODO: CREAR UNA HERRAMIENTA DE RADICADO MASIVO PARA SOLICITUDES DE LA VENTANILLA VIRTUAL
  *  TODO: GENERAR UNA PLANTILLA DE RESPUESTA INSTITUCIONAL(EMAILS)
  *
 **/
+
 
 class VentanillaComponent extends Component
 {
@@ -389,6 +389,8 @@ class VentanillaComponent extends Component
         $this->etapa = 3;
         $this->copias = null;
         $this->copia_radicado = false;
+        $this->finalizarRadicado();
+
     }
     public function calcularRadicado($trd=false)
     {
@@ -429,6 +431,7 @@ class VentanillaComponent extends Component
         $this->destinatario = null;
         $this->etapa = 0;
         $this->filtrar(0);
+        session()->flash('message', 'El documento ha sido radicado exitosamente!!');
     }
     public function filtrar($id)
     {

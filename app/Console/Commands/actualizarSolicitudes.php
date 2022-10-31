@@ -41,7 +41,7 @@ class actualizarSolicitudes extends Command
     public function handle()
     {
 
-        $solicitudes = Solicitud::whereNotIn('estado_id', [3, 4])->get();
+        $solicitudes = Solicitud::whereNotIn('estado_id', [3, 4])->where('entrada',1)->get();
         $vectorVencida = array();
         $seguimientoVencida = array();
         $idVencidas = [];

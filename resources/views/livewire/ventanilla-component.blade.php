@@ -1,6 +1,59 @@
-<div>
+<div
+x-data="alertComponent()"
+x-init="$watch('openAlertBox', value => {
+  if(value){
+    setTimeout(function () {
+      openAlertBox = false
+    }, 3000)
+  }
+})">
     <script src="/js/pdfjs/build/pdf.js"></script>
     <script src="/js/pdfjs/build/pdf.worker.js"></script>
+    <script>
+        window.alertComponent = function () {
+            return {
+                openAlertBox: false,
+                alertBackgroundColor: '',
+                alertMessage: '',
+                showAlert(type) {
+                this.openAlertBox = true
+                switch (type) {
+                    case 'success':
+                    this.alertBackgroundColor = 'bg-success'
+                    this.alertMessage = `${this.successIcon} ${this.defaultSuccessMessage}`
+                    break
+
+                }
+                this.openAlertBox = true
+                },
+                successIcon: `<svg fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 mr-2 text-white"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                defaultSuccessMessage: `El documento ha sido radicado exitosamente`,
+            }
+        }
+    </script>
+
+    @if (session()->has('message'))
+          <template x-if="openAlertBox">
+            <div
+              class="fixed bottom-0 right-0"
+              x-transition:enter="transition ease-out duration-300"
+              x-transition:enter-start="opacity-0"
+              x-transition:enter-end="opacity-100"
+              x-transition:leave="transition ease-in duration-300"
+              x-transition:leave-start="opacity-100"
+              x-transition:leave-end="opacity-0"
+            >
+              <div class="p-10">
+                <div class="flex items-center text-white text-sm font-bold px-4 py-3 rounded shadow-md" :class="alertBackgroundColor" role="alert">
+                  <span x-html="alertMessage" class="flex"></span>
+                  <button type="button" class="flex" @click="openAlertBox = false">
+                    <svg fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24" stroke="currentColor" class="w-4 h-4 ml-4"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+    @endif
 
     @if ($etapa==0)
         <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
@@ -289,7 +342,7 @@
                         </div>
                         <div x-show="!isUploading">
                             <button id="upload-dialog" class="btn btn-primary">Seleccionar archivo</button>
-                            <button class="btn btn-primary w-44" wire:click="radicar()">Radicar solicitud</button>
+                            <button class="btn btn-success w-44" @click="showAlert('success')" wire:click="radicar()">Radicar solicitud</button>
                             <button class="btn btn-warning w-44" wire:click="finalizarRadicado()">Canclear</button>
                         </div>
                         <div>
