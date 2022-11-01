@@ -16,7 +16,7 @@
             <label for="" class="block text-gray-700 text-sm font-bold">Solicitudes por responder</label>
             @forelse($pendientes as $sol)
                 @isset($sol->salida)
-                    <button wire:click="verSolicitud({{$sol->salida->id}})" class="w-full text-left py-1 px-1 cursor-pointer border shadow-md hover:bg-contenido  @if($sol->salida->id == $solicitud->id) bg-contenido @endif">
+                    <button wire:click="verSolicitud({{$sol->salida->id}})" class="w-full text-left py-1 px-1 cursor-pointer border shadow-md hover:bg-contenido  @isset($solicitud)@if($sol->salida->id == $solicitud->id) bg-contenido @endif @endisset">
                         <a href="#respuesta">
                             <p class="text-gray-700 text-sm font-semibold">{{Str::limit($sol->salida->solicitante->nombrecompleto,20)}}</p>
                             <p class="text-gray-700 text-xs">{{Str::limit($sol->salida->asunto, 25, '...') }}</p>

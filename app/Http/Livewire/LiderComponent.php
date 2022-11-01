@@ -216,8 +216,11 @@ class LiderComponent extends Component
             );
 
 
-            Mail::to($this->solicitudi->seccionempresa->emailjefe)->send(new ColaSolicitudMail($solicitudBD));
+            $m = Mail::to($this->solicitudi->seccionempresa->emailjefe)
+            ->cc('francogramas@gmail.com')
+            ->send(new ColaSolicitudMail($solicitudBD));
             $this->solicitudi->save();
+
         }
         elseif($this->accion_id == 3) {
             $this->solicitudi->seccion_id = $this->seccion_id;

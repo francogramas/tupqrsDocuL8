@@ -26,13 +26,17 @@ class JefeComponent extends Component
         $this->secciones = SeccionEmpresa::whereIn('id',$this->secc)->get();
         $this->seccion_id = $this->secciones->first()->id;
 
+        $this->cola = ColaSolicitud::where('seccion_id', $this->seccion_id)->where('finalizada',false)->first();
 
         if (!is_null($this->sol)) {
             $id = Crypt::decryptString($this->sol);
             $this->verSolicitud($id);
-            //dd($this->solicitud);
+
         }
-        else {
+
+
+
+        if(is_null($this->sol)) {
             try {
                 $this->cola = ColaSolicitud::where('seccion_id', $this->seccion_id)->where('finalizada',false)->first();
                 $this->solicitud = Solicitud::find($this->cola->solicitudSalida);
@@ -44,13 +48,9 @@ class JefeComponent extends Component
 
         }
 
-        if (!is_null($this->cola)) {
-            $s = SeccionUser::select('seccion_id')->where('user_id', Auth::user()->id)->where('jefe',true)->groupBy('id')->get();
-            $this->secciones = SeccionEmpresa::whereIn('id',$s)->get();
-            $this->seccion_id = $this->secciones->first()->id;
-            $this->cargarPendientes();
-            $this->respuesta= $this->cola->salida->seguimiento->last()->mensaje;
-        }
+        $this->cargarPendientes();
+        //dd($this->pendientes);
+
 
     }
 
@@ -107,21 +107,21 @@ class JefeComponent extends Component
 
         $this->cargarPendientes();
 
-
         if (is_null($this->pendientes)) {
             $this->solicitud=null;
             $this->cola = null;
+            dd('No hay pendientes');
         }
         else {
-            try {
-                $this->cola = ColaSolicitud::where('seccion_id', $this->seccion_id)->where('finalizada',false)->first();
+
+            $this->cola = ColaSolicitud::whereIn('seccion_id', $this->secc)->where('finalizada',false)->first();
+            if (!is_null($this->cola)) {
                 $this->solicitud = $this->cola->first()->salida;
                 $this->respuesta = $this->cola->salida->seguimiento->last()->mensaje;
-            } catch (\Throwable $th) {
-                $this->solicitud=null;
-                $this->cola = null;
             }
-
+            else{
+                $this->solicitud=null;
+            }
         }
     }
 }
