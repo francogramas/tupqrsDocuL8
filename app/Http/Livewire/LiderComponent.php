@@ -142,9 +142,9 @@ class LiderComponent extends Component
         $this->respuesta=null;
         $this->adjunto = null;
         $this->serie_id = $serie_id;
-        $secciones_id = SeccionUser::select('id')->where('user_id', Auth::user()->id)->get();
-        $seccion_id = Solicitud::select('seccion_id')->where('estado_id','<>',4)->whereIn('seccion_id', $secciones_id)->groupBy('seccion_id')->get();
-        $this->seccion_empresa = SeccionEmpresa::whereIn('id', $seccion_id)->get();
+
+        $this->seccion_empresa = SeccionEmpresa::where('empresa_id', $this->empresa_id)->where('id','!=', $this->seccion_id)->get();
+
 
     }
 
@@ -216,8 +216,7 @@ class LiderComponent extends Component
             );
 
 
-            $m = Mail::to($this->solicitudi->seccionempresa->emailjefe)
-            ->cc('francogramas@gmail.com')
+            Mail::to($this->solicitudi->seccionempresa->emailjefe)
             ->send(new ColaSolicitudMail($solicitudBD));
             $this->solicitudi->save();
 
@@ -244,6 +243,7 @@ class LiderComponent extends Component
             $this->consultarSeries();
             $this->solicitudes($this->serie_id);
         } catch (\Throwable $th) {
+            dd('error');
             $this->seccion_empresa = null;
         }
 
