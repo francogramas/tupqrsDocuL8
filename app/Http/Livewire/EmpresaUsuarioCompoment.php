@@ -305,6 +305,9 @@ class EmpresaUsuarioCompoment extends Component
             'password' => ['required','confirmed', Password::min(8)]
         ]);
 
+        $this->userEmail = trim($this->userEmail);
+        $this->userName = trim($this->userName);
+
         $user = User::where('email', $this->userEmail)->first();
         if(is_null($user)){
             $user = User::create(
@@ -359,6 +362,7 @@ class EmpresaUsuarioCompoment extends Component
 
     public function revisarEmail()
     {
+        $this->userEmail = trim($this->userEmail);
         $u = User::where('email', $this->userEmail)->first();
 
         if(!is_null($u)){
