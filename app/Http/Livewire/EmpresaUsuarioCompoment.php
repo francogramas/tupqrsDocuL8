@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\EmpresaUser;
 use Database\Seeders\themeSeeder;
 
+use function PHPUnit\Framework\isNull;
+
 class EmpresaUsuarioCompoment extends Component
 {
     use WithFileUploads;
@@ -302,10 +304,18 @@ class EmpresaUsuarioCompoment extends Component
             'userEmail' => 'required|email',
             'password' => ['required','confirmed', Password::min(8)]
         ]);
-        $user = User::firstOrCreate(
-            ['email'=>$this->userEmail],
-            ['name'=>$this->userName, 'password'=>Hash::make($this->password),]
-        );
+
+        $user = User::where('email', $this->userEmail)->first();
+        if(is_null($user)){
+            $user = User::create(
+                [
+                    'email'=>$this->userEmail,
+                    'name'=>$this->userName,
+                    'password'=>Hash::make($this->password),
+                ]
+            );
+        };
+
 
         if ($this->jefe) {
             $user->assignRole('Jefe');

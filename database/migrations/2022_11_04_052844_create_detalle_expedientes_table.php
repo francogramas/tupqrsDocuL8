@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSolicitudsTable extends Migration
+class CreateDetalleExpedientesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,25 +13,20 @@ class CreateSolicitudsTable extends Migration
      */
     public function up()
     {
-        Schema::create('solicituds', function (Blueprint $table) {
+        Schema::create('detalle_expedientes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('solicitante_id')->constrained('solicitantes');
-            $table->foreignId('estado_id')->constrained('estado_solicituds');
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('expediente_id')->constrained('expedientes');
             $table->foreignId('seccion_id')->constrained('seccion_empresas');
             $table->foreignId('empresa_id')->constrained('empresas');
             $table->foreignId('serie_id')->constrained('series');
             $table->foreignId('subserie_id')->constrained('subseries');
             $table->foreignId('medio_id')->constrained('medio_recepcions');
-            $table->foreignId('user_id')->constrained('users');
-            $table->string('radicado',30)->nullable();
-            $table->integer('consecutivo');
-            $table->integer('diasTermino');
             $table->integer('folios')->default(1);
             $table->integer('anexos')->default(0);
-            $table->string('destinatario',100)->nullable();
             $table->string('asunto',100)->nullable();
-            $table->boolean('confidencial')->default(false);
-            $table->foreignId('tipologia_id')->constrained('tipologia_documentos');
+            $table->text('observaciones')->nullable();
+
             $table->timestamps();
         });
     }
@@ -43,6 +38,6 @@ class CreateSolicitudsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('solicituds');
+        Schema::dropIfExists('detalle_expedientes');
     }
 }
