@@ -102,7 +102,7 @@
             </div>
             <div class="mt-3">
                 <h1 class="font-bold">Respuesta</h1>
-                <textarea name="respuesta" wire:model='respuesta' id="" class="w-full" rows="10">{{$cola->salida->seguimiento->last()->mensaje}}</textarea>
+                <textarea name="respuesta" wire:model.defer='respuesta' id="" class="w-full" rows="10">{{$cola->salida->seguimiento->last()->mensaje}}</textarea>
             </div>
             <div class="mt-3">
                 <button class="btn btn-primary" wire:click='responderSolicitud();'>Responder</button>

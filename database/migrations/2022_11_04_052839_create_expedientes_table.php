@@ -15,10 +15,12 @@ class CreateExpedientesTable extends Migration
     {
         Schema::create('expedientes', function (Blueprint $table) {
             $table->id();
+            $table->integer('numero')->nullable();
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('empresa_id')->constrained('empresas');
+            $table->foreignId('seccion_id')->constrained('seccion_empresas');
             $table->foreignId('solicitudEntrada')->constrained('solicituds');
             $table->foreignId('solicitudSalida')->constrained('solicituds');
-            $table->foreignId('seccion_id')->constrained('seccion_empresas');
             $table->boolean('finalizada')->default(false);
             $table->timestamps();
         });

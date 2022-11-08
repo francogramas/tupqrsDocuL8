@@ -25,8 +25,10 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/impficha/{radicado}', [App\Http\Controllers\impRadicadoController::class, 'ficha'])->name('impficha');
     Route::get('/impdocumento/{documento}', [impDocumentoController::class, 'seguimiento'])->name('impdocumento');
     Route::get('/imparchivo/{archivo}', [impDocumentoController::class, 'archivo'])->name('imparchivo');
-    Route::get('/impoficio/{seguimiento_id}', [impDocumentoController::class, 'oficio'])->name('impoficio');
+
 });
+
+Route::get('/impoficio/{seguimiento_id}', [impDocumentoController::class, 'oficio'])->name('impoficio');
 
 Route::controller(impDocumentoController::class)->group(function () {
     Route::get('/respsolicitud/{solicitud_id}', 'seguimientoLider');
@@ -71,6 +73,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Gerente']], fun
 /** --------------------------------- Roles de Lider ----------------------------------------------------- **/
 Route::group(['middleware' => ['auth:sanctum', 'verified', 'role:Lider']], function () {
     Route::get('lider', App\Http\Livewire\LiderComponent::class)->name('lider');
+    Route::get('expediente', App\Http\Livewire\ExpedienteComponent::class)->name('expediente');
 });
 
 /** --------------------------------- Roles de Ventanilla/Gerente ----------------------------------------------------- **/

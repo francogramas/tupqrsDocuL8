@@ -49,6 +49,8 @@ class VentanillaComponent extends Component
     $tipos_id, $confidencial, $respuesta_email, $diasTermino, $solicitudi, $descripcion, $series, $serie_id, $subserie, $subserie_id, $tipologia,
     $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1, $copias, $seguimiento, $usercopias;
 
+
+
     public function mount()
     {
         $this->empresa_id = Auth::user()->empresaUser->empresa_id;
@@ -70,7 +72,6 @@ class VentanillaComponent extends Component
         $this->ciudad_id = $ciudad1->id;
 
         $this->seccion_empresa = Subserie::seccionE($this->empresa_id);
-
         $this->seccion_id = $this->seccion_empresa->first()->id;
 
         $this->seccion_empresa = $this->seccion_empresa->pluck('nombre','id');

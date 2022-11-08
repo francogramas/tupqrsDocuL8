@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Livewire;
+
 use App\Models\Solicitud;
 use App\Models\AccionOrdene;
 use App\Models\SeccionEmpresa;
@@ -9,36 +10,35 @@ use App\Models\Subserie;
 use App\Models\TipologiaDocumento;
 use App\Models\SeguimientoOrden;
 use App\Models\SeccionUser;
+use App\Models\Expediente;
+use App\Models\ColaSolicitud;
+use App\Models\DetalleExpediente;
 
-use App\Mail\respuestaSolicitudMail;
+use App\Mail\ColaSolicitudMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
-
 use Livewire\Component;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
-use App\Models\EmpresaUser;
-use App\Mail\ColaSolicitudMail;
-
-use App\Models\ColaSolicitud;
 
 class LiderComponent extends Component
 {
     use WithFileUploads;
     public $tiposolicitud, $solicitud, $solicitudi, $respuesta, $adjunto, $acciones, $accion_id, $empresa_id,
     $observaciones, $seccion_empresa, $seccion_empresaTodos, $seccion_id, $secciones_u, $secciones_u_id, $series, $serie_id, $subseries, $subserie_id,
-    $tipologias, $tipologia_id, $max_consecutivo, $pendientes, $resuletas;
+    $tipologias, $tipologia_id, $max_consecutivo, $pendientes, $resuletas, $u_id;
 
 
     public function mount()
     {
+        $this->u_id = Auth::user()->id;
         $this->empresa_id = Auth::user()->empresaUser->empresa_id;
         $this->acciones=AccionOrdene::where('id','>',2)->orderBy('id','desc')->get();
         $this->accion_id = $this->acciones->first()->id;
 
-        $secciones_id = SeccionUser::select('seccion_id')->where('empresa_id',$this->empresa_id)->where('user_id', Auth::user()->id)->groupBy('seccion_id')->get();
+        $secciones_id = SeccionUser::select('seccion_id')->where('empresa_id',$this->empresa_id)->where('user_id', $this->u_id)->groupBy('seccion_id')->get();
         $seccion_id = Solicitud::select('seccion_id')->where('estado_id','<>',4)->whereIn('seccion_id', $secciones_id)->groupBy('seccion_id')->get();
 
         //Verificación de que existe solicitudes en las secciones, de lo contrario se muestra un mensaje diciendo que no hay solicitudes por responder
@@ -130,7 +130,7 @@ class LiderComponent extends Component
         ->orderBy('created_at', 'asc')
         ->get();
 
-        $secc = SeccionUser::select('seccion_id')->where('user_id', Auth::user()->id)->groupBy('seccion_id')->get();
+        $secc = SeccionUser::select('seccion_id')->where('user_id', $this->u_id)->groupBy('seccion_id')->get();
         $this->pendientes = ColaSolicitud::where('finalizada',false)
                             ->whereIn('seccion_id', $secc)
                             ->take(5)
@@ -178,7 +178,7 @@ class LiderComponent extends Component
                 'serie_id'=>$this->solicitudi->serie_id,
                 'subserie_id'=>$this->solicitudi->subserie_id,
                 'medio_id'=>$this->solicitudi->medio_id,
-                'user_id' => Auth::user()->id,
+                'user_id' => $this->u_id,
                 'radicado'=> $this->calcularRadicado(),
                 'consecutivo'=> $this->max_consecutivo,
                 'diasTermino'=> $this->solicitudi->diasTermino,
@@ -196,7 +196,7 @@ class LiderComponent extends Component
             SeguimientoOrden::create([
                 'radicado' => null, // El seguimiento se hace por cada solicitud, debido a esto no es necesrio que tenga radicado
                 'solicitud_id' => $solicitudBD->id,
-                'user_id'=>Auth::user()->id,
+                'user_id'=>$this->u_id,
                 'estado_id' => $solicitudBD->estado_id,
                 'seccion_id' => $solicitudBD->seccion_id,
                 'accion_id' => $this->accion_id,
@@ -206,8 +206,8 @@ class LiderComponent extends Component
             ]);
 
 
-            ColaSolicitud::firstOrCreate([
-                'user_id'=>Auth::user()->id,
+            ColaSolicitud::create([
+                'user_id'=>$this->u_id,
                 'solicitudEntrada'=>$this->solicitudi->id,
                 'solicitudSalida'=>$solicitudBD->id,
                 'seccion_id'=>$this->solicitudi->seccion_id,
@@ -215,6 +215,20 @@ class LiderComponent extends Component
                 ]
             );
 
+            if ($this->accion_id==7) {
+                $n=Expediente::where('empresa_id', $this->empresa_id)->max('numero')+1;
+
+                Expediente::create(
+                    [
+                        'numero'=>$n,
+                        'user_id'=>$this->u_id,
+                        'empresa_id'=>$this->empresa_id,
+                        'seccion_id'=>$this->seccion_id,
+                        'solicitudEntrada'=>$this->solicitudi->id,
+                        'solicitudSalida'=>$solicitudBD->id,
+                    ]
+                );
+            }
 
             Mail::to($this->solicitudi->seccionempresa->emailjefe)
             ->send(new ColaSolicitudMail($solicitudBD));
@@ -228,7 +242,7 @@ class LiderComponent extends Component
             SeguimientoOrden::create([
                 'radicado' => null, // El seguimiento se hace por cada solicitud, debido a esto no es necesrio que tenga radicado
                 'solicitud_id' => $this->solicitudi->id,
-                'user_id'=>Auth::user()->id,
+                'user_id'=>$this->u_id,
                 'estado_id' => $this->solicitudi->estado_id,
                 'seccion_id' => $this->solicitudi->seccion_id,
                 'accion_id' => $this->accion_id,
@@ -284,7 +298,7 @@ class LiderComponent extends Component
 
     public function finalizadas()
     {
-        $secc = SeccionUser::select('seccion_id')->where('user_id', Auth::user()->id)->groupBy('seccion_id')->get();
+        $secc = SeccionUser::select('seccion_id')->where('user_id', $this->u_id)->groupBy('seccion_id')->get();
         $this->resueltas = ColaSolicitud::where('finalizada',true)->whereIn('seccion_id', $secc)->orderBy('updated_at', 'desc')->take(20)->get();
     }
 }

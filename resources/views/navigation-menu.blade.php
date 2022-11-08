@@ -60,6 +60,9 @@
                         <x-jet-nav-link href="{{ route('lider') }}" :active="request()->routeIs('lider')">
                             {{ __('Respuestas') }}
                         </x-jet-nav-link>
+                        <!--x-jet-nav-link href="{{ route('expediente') }}" :active="request()->routeIs('expediente')">
+                            {{ __('Expediente') }}
+                        </!--x-jet-nav-link-->
                         @endrole
                         @role('Admin')
                         <x-jet-nav-link href="{{ route('empresas') }}" :active="request()->routeIs('empresas')">
@@ -109,8 +112,11 @@
                                         @endrole
                                         @role('Lider')
                                             <x-jet-dropdown-link href="{{ route('lider') }}">
-                                                {{ __('Respuestas') }}
+                                                {{ __('Respuesta') }}
                                             </x-jet-dropdown-link>
+                                            <!--x-jet-dropdown-link href="{{ route('expediente') }}">
+                                                {{ __('Expediente') }}
+                                            </!--x-jet-dropdown-link-->
                                         @endrole
                                         @role('Admin')
                                             <x-jet-dropdown-link href="{{ route('empresas') }}">
@@ -247,6 +253,9 @@
                     <x-jet-responsive-nav-link href="{{ route('lider') }}" :active="request()->routeIs('lider')">
                         {{ __('Respuestas') }}
                     </x-jet-responsive-nav-link>
+                    <!--x-jet-responsive-nav-link href="{{ route('expediente') }}" :active="request()->routeIs('expediente')">
+                        {{ __('Expediente') }}
+                    </!--x-jet-responsive-nav-link-->
                 @endrole
                 @hasanyrole('Gerente|Ventanilla')
                     <x-jet-responsive-nav-link href="{{ route('ventanilla') }}" :active="request()->routeIs('ventanilla')">

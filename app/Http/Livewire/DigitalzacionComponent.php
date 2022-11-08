@@ -69,7 +69,7 @@ class DigitalzacionComponent extends Component
             $inventarioDigital = InventarioDigital::select('inventario_digitals.*', 'remitente_digitals.nombrecompleto')
             ->where('empresa_id', $this->empresa->id)
             ->join('remitente_digitals','inventario_digitals.remitente_id','remitente_digitals.id')
-            ->paginate(20   );
+            ->paginate(20);
         }
 
         return view('livewire.digitalzacion-component', ['inventarioDigital' =>  $inventarioDigital]);
@@ -128,7 +128,7 @@ class DigitalzacionComponent extends Component
             $this->anexos = $solicitud->anexos;
             $this->descripcion = $solicitud->asunto;
             $this->confidencial = $solicitud->confidencial;
-            
+
         }
         $radicado = InventarioDigital::where('radicado', $this->radicado)->first();
         if($radicado){

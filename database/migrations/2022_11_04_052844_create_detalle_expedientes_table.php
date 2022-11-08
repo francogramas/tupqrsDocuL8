@@ -24,9 +24,9 @@ class CreateDetalleExpedientesTable extends Migration
             $table->foreignId('medio_id')->constrained('medio_recepcions');
             $table->integer('folios')->default(1);
             $table->integer('anexos')->default(0);
-            $table->string('asunto',100)->nullable();
+            $table->string('asunto',128)->nullable();
+            $table->string('adjunto',128)->nullable();
             $table->text('observaciones')->nullable();
-
             $table->timestamps();
         });
     }

@@ -19,6 +19,7 @@ class accionOrdenesSeeder extends Seeder
             array('id' => 2, 'nombre'=> 'Cambio de estado por sistema'),
             array('id' => 3, 'nombre'=> 'Cambio de dependencia'),
             array('id' => 8, 'nombre'=> 'Finalizar solicitud'),
+            array('id' => 9, 'nombre'=> 'Abrir expediente'),
 
         );
         DB::table('accion_ordenes')->insert($acciones);
