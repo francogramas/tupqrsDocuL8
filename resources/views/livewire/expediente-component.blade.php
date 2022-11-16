@@ -1,9 +1,68 @@
-<div class="px-5 py-5">
+<div class="px-5 py-5"
+x-data="alertComponent()"
+x-init="$watch('openAlertBox', value => {
+  if(value){
+    setTimeout(function () {
+      openAlertBox = false
+    }, 3000)
+  }
+})">
+
+    <script src="/js/pdfjs/build/pdf.js"></script>
+    <script src="/js/pdfjs/build/pdf.worker.js"></script>
+
+    <script>
+        window.alertComponent = function () {
+            return {
+                openAlertBox: false,
+                alertBackgroundColor: '',
+                alertMessage: '',
+                showAlert(type) {
+                this.openAlertBox = true
+                switch (type) {
+                    case 'success':
+                    this.alertBackgroundColor = 'bg-success'
+                    this.alertMessage = `${this.successIcon} ${this.defaultSuccessMessage}`
+                    break
+
+                }
+                this.openAlertBox = true
+                },
+                successIcon: `<svg fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 mr-2 text-white"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                defaultSuccessMessage: `El documento ha sido radicado exitosamente`,
+            }
+        }
+    </script>
+
+@if (session()->has('message'))
+<template x-if="openAlertBox">
+  <div
+    class="fixed bottom-0 right-0"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-300"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+  >
+    <div class="p-10">
+      <div class="flex items-center text-white text-sm font-bold px-4 py-3 rounded shadow-md" :class="alertBackgroundColor" role="alert">
+        <span x-html="alertMessage" class="flex"></span>
+        <button type="button" class="flex" @click="openAlertBox = false">
+          <svg fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewBox="0 0 24 24" stroke="currentColor" class="w-4 h-4 ml-4"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+@endif
     <h1 class="font-bold text-lg">Expediente</h1>
     <div class="grid grid-cols-6 gap-3">
-
         <div class="col-span-2">
-            <table class="table table-compact text-xs">
+            <div class="py-2">
+                <input type="search" class="w-full input input-primary" placeholder="Parámetro de busqueda:">
+            </div>
+            <table class="table table-compact text-xs w-full border-1">
                 <caption class="font-bold">Listado de Expedientes</caption>
                 <thead>
                     <tr>
@@ -14,12 +73,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($expedientes as $expediente)
-                    <tr>
-                        <td>{{$expediente->numero}}</td>
-                        <td>{{$expediente->entrada->fecha}}</td>
-                        <td>{{ Str::limit($expediente->entrada->solicitante->nombrecompleto, 15, '...')}}</td>
-                        <td>{{Str::limit($expediente->entrada->asunto,20,'...')}}</td>
+                    @forelse ($expedientes as $expedientei)
+                    <tr wire:click="seleccionar({{$expedientei->id}})" class="hover:border-2 hover:border-primarprimaryy cursor-pointer @if ($expediente_id ==$expedientei->id) border-2 @endif" >
+                        <td>{{$expedientei->numero}}</td>
+                        <td>{{$expedientei->entrada->fecha}}</td>
+                        <td>{{ Str::limit($expedientei->entrada->solicitante->nombrecompleto, 15, '...')}}</td>
+                        <td>{{Str::limit($expedientei->entrada->asunto,20,'...')}}</td>
                     </tr>
 
                     @empty
@@ -34,13 +93,77 @@
                 {{$expedientes->links()}}
         </div>
 
-        <div class="col-span-4">
-            <h3 class="font-bold">Detalle de expediente</h3>
-            <h3 class="font-bold">Documentos de expediente</h3>
-            <div>
-                <button class="btn btn-primary">Agregar archivo</button>
+        @if ($expediente)
+        <div class="col-span-4 overflow-hidden bg-white shadow sm:rounded-lg text-sm">
+            <div class="gap-3 px-4 py-5 sm:px-6">
+                <h3 class="text-lg font-medium leading-6 text-primary">Detalle de expediente</h3>
+                <div class="flex gap-3">
+                    @if (!$boolAgregar and !$expediente->finalizada)
+                    <div class="tooltip tooltip-right" data-tip="Agregar Archivo">
+                        <button class="btn btn-sm btn-primary rounded-md shadow-lg" wire:click="Agregar(true);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+
+                        </button>
+                    </div>
+                    @endif
+                    <h3> <span class="font-bold">Numero: </span>{{$expediente->numero}}</h3>
+                    <h3> <span class="font-bold">Remitente: </span>{{$expediente->entrada->solicitante->nombrecompleto}}</h3>
+                    <h3> <span class="font-bold">Estado:</span>  @if ($expediente->finalizada) Finalizada @else Activa @endif</h3>
+                </div>
             </div>
-            <div>
+
+
+            <div class="w-full border-t border-contenido">
+                <dl>
+                    <div class="px-4 py-1 sm:grid sm:grid-cols-5 sm:gap-4 sm:px-6">
+                        <dt class="font-medium text-secondary"><h3 class="font-bold"></h3> </dt>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0 font-bold">Entrada</dd>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0 font-bold">Salida</dd>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-1 sm:grid sm:grid-cols-5 sm:gap-4 sm:px-6">
+                        <dt class="font-medium text-secondary"><h3 class="font-bold">Fecha:</h3> </dt>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0">{{$expediente->entrada->created_at}}</dd>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0">{{$expediente->salida->created_at}}</dd>
+                    </div>
+                    <div class="px-4 py-1 sm:grid sm:grid-cols-5 sm:gap-4 sm:px-6">
+                        <dt class="font-medium text-secondary"><h3 class="font-bold">Radicado:</h3> </dt>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0">{{$expediente->entrada->radicado}}</dd>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0">{{$expediente->salida->radicado}}</dd>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-1 sm:grid sm:grid-cols-5 sm:gap-4 sm:px-6">
+                        <dt class="font-medium text-secondary"><h3 class="font-bold">Asunto:</h3> </dt>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0">{{$expediente->entrada->asunto}}</dd>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0">{{$expediente->salida->asunto}}</dd>
+                    </div>
+                    <div class="px-4 py-1 sm:grid sm:grid-cols-5 sm:gap-4 sm:px-6">
+                        <dt class="font-medium text-secondary"><h3 class="font-bold">Adjunto:</h3> </dt>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0">
+                            @foreach ($expediente->entrada->seguimiento as $seguimientoi)
+                            @if ($seguimientoi->adjunto)
+                                <div>
+                                    <a href="{{route('impdocumento',Crypt::encryptString($seguimientoi->id))}}" target="_blank" class="link">Ver Documento</a>
+                                </div>
+                            @endif
+                            @endforeach
+                        </dd>
+                        <dd class="mt-1 text-primary sm:col-span-2 sm:mt-0">
+                            @foreach ($expediente->salida->seguimiento as $seguimientoi)
+                            @if ($seguimientoi->adjunto)
+                                <div>
+                                    <a href="{{route('impdocumento',Crypt::encryptString($seguimientoi->id))}}" target="_blank" class="link">Ver Documento</a>
+                                </div>
+                            @endif
+                            @endforeach
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+
+
+            @if ($boolAgregar)
+            <div class="py-2 my-2 border border-gray-300">
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-3 px-3 py-2">
                     <div>
                         <label for="seccion_id" class="block text-gray-700 text-sm font-bold">Oficinas</label>
@@ -87,10 +210,6 @@
                         <input type="number" wire:model="diasTermino" id="diasTermino" class="w-full px-2 py-1 rounded-md shadow-lg">
                     </div>
                     <div>
-                        <label for="fecha" class="block text-gray-700 text-sm font-bold">Fecha</label>
-                        <input type="date" wire:model.defer="fecha" id="fecha" class="w-full px-2 py-1 rounded-md shadow-lg">
-                    </div>
-                    <div>
                         <label for="destinatario" class="block text-gray-700 text-sm font-bold">Destinatario</label>
                         <input type="text" wire:model.defer="destinatario" id="destinatario" class="w-full px-2 py-1 rounded-md shadow-lg">
                     </div>
@@ -108,7 +227,7 @@
                         @error('asunto') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
                         <textarea id="asunto" wire:model.defer="asunto" rows="2" class="w-full px-2 py-1 rounded-md shadow-lg"></textarea>
                     </div>
-                    <div class="md:col-span-2">
+                    <!--div class="md:col-span-2">
                         <p><input type="checkbox" wire:model.defer="confidencial" class="px-2 py-1 rounded-md shadow-lg"> Marcar como confindencial.</p>
                         <input type="checkbox" wire:model="copia_radicado" class="px-2 py-1 rounded-md shadow-lg"> Copia de radicado a:
                         @if ($copia_radicado)
@@ -126,11 +245,8 @@
                             @endforeach
                         </div>
                         @endif
-                    </div>
+                    </!--div-->
                     <div class="md:col-span-3">
-                        <label for="" class="block text-gray-700 text-sm font-bold">Descripción de adjunto</label>
-                        <input type="text" wire:model.defer="descripcion" class="w-full px-2 py-1 rounded-md shadow-lg">
-
                         <div class="gap-2 py-2">
                             <div class="flex gap-2 py-2">
                                 @error('adjunto') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
@@ -150,8 +266,8 @@
                                     </div>
                                     <div x-show="!isUploading">
                                         <button id="upload-dialog" class="btn btn-primary">Seleccionar archivo</button>
-                                        <button class="btn btn-success w-44" @click="showAlert('success')" wire:click="radicar()">Radicar solicitud</button>
-                                        <button class="btn btn-warning w-44" wire:click="finalizarRadicado()">Canclear</button>
+                                        <button class="btn btn-success" @click="showAlert('success')" wire:click="radicar()">Actualizar Expediente</button>
+                                        <button class="btn btn-warning" wire:click="Agregar(false)">Cancelar</button>
                                     </div>
                                     <div>
                                         <div x-show="!isUploading">
@@ -252,13 +368,77 @@
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            @endif
+
+
+            <div class="pt-3 px-3">
+                <h3 class="font-bold py-1 uppercase">Documentos de expediente</h3>
+                <table class="table table-compact table-zebra w-full text-sm">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Oficina</th>
+                            <th>Clasificación</th>
+                            <th>Recepción</th>
+                            <th>Folios</th>
+                            <th>Asunto</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($expediente->detalles as $detalle)
+                        <tr>
+                            <td>{{$detalle->created_at->format('Y/m/d')}}</td>
+                            <td>{{$detalle->seccionempresa->nombre}}</td>
+                            <td>
+                                <p>{{$detalle->serie->nombre}}</p>
+                                <p>{{$detalle->subserie->nombre}}</p>
+                                <p>{{$detalle->tipologia->nombre}}</p>
+                            </td>
+                            <td></td>
+                            <td>{{$detalle->folios}}</td>
+                            <td>{{$detalle->asunto}}</td>
+                            <td><a target="_blank" href="{{url(Storage::url('public/'.$detalle->adjunto))}}">Ver</a></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            </div>
+            <div class="md:col-span-3 pt-3 px-3 py-3">
+                <button class="btn btn-primary" wire:click="boolCerrar(true);">
+                    Cerrar Expediente
+                </button>
+            </div>
         </div>
+        @endif
     </div>
 
+    <x-jet-dialog-modal wire:model="modalFormVisible1" >
+        <x-slot name="title">
+            Cerrar Expediente
+        </x-slot>
+
+        <x-slot name="content">
+            <div class="pt-2">
+                ¿Desear cerrar el expediente?
+            </div>
+        </x-slot>
+
+        <x-slot name="footer">
+            <button wire:click="$toggle('modalFormVisible1')" wire:loading.attr="disabled" class="btn btn-warning">
+                Cancelar
+            </button>
+
+            <button class="ml-2 btn btn-primary" wire:click="enviarMensaje()" wire:loading.attr="disabled" >
+                Cerrar Expediente
+            </button>
+        </x-slot>
+    </x-jet-dialog-modal>
 </div>

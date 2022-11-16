@@ -21,6 +21,7 @@ class CreateDetalleExpedientesTable extends Migration
             $table->foreignId('empresa_id')->constrained('empresas');
             $table->foreignId('serie_id')->constrained('series');
             $table->foreignId('subserie_id')->constrained('subseries');
+            $table->foreignId('tipologia_id')->constrained('tipologia_documentos');
             $table->foreignId('medio_id')->constrained('medio_recepcions');
             $table->integer('folios')->default(1);
             $table->integer('anexos')->default(0);

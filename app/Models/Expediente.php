@@ -44,4 +44,8 @@ class Expediente extends Model
         return $this->belongsTo(SeccionEmpresa::class, 'seccion_id');
     }
 
+    public function detalles()
+    {
+        return $this->hasMany(DetalleExpediente::class, 'expediente_id', 'id');
+    }
 }

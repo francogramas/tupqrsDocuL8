@@ -343,7 +343,7 @@ x-init="$watch('openAlertBox', value => {
                         <div x-show="!isUploading">
                             <button id="upload-dialog" class="btn btn-primary">Seleccionar archivo</button>
                             <button class="btn btn-success w-44" @click="showAlert('success')" wire:click="radicar()">Radicar solicitud</button>
-                            <button class="btn btn-warning w-44" wire:click="finalizarRadicado()">Canclear</button>
+                            <button class="btn btn-warning w-44" wire:click="finalizarRadicado()">Cancelar</button>
                         </div>
                         <div>
                         <div x-show="!isUploading">

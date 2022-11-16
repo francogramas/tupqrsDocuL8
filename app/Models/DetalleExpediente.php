@@ -16,6 +16,7 @@ class DetalleExpediente extends Model
                             'empresa_id',
                             'serie_id',
                             'subserie_id',
+                            'tipologia_id',
                             'medio_id',
                             'folios',
                             'anexos',
@@ -23,4 +24,44 @@ class DetalleExpediente extends Model
                             'adjunto',
                             'observaciones',
                         ];
+
+
+    public function expediente()
+    {
+        return $this->belongsTo(Expediente::class);
+    }
+
+    public function seccionempresa()
+    {
+        return $this->belongsTo(SeccionEmpresa::class, 'seccion_id');
+    }
+
+    public function empresa()
+    {
+        return $this->belongsTo(empresa::class, 'empresa_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function medio()
+    {
+        return $this->belongsTo(MedioRecepcion::class, 'medio_id');
+    }
+
+    public function tipologia()
+    {
+        return $this->belongsTo(TipologiaDocumento::class, 'tipologia_id');
+    }
+
+    public function serie()
+    {
+        return $this->belongsTo(Serie::class, 'serie_id');
+    }
+
+    public function subserie()
+    {
+        return $this->belongsTo(Subserie::class, 'subserie_id');
+    }
 }

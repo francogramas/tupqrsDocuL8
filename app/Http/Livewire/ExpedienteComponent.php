@@ -10,12 +10,17 @@ use App\Models\Tipodocumento;
 use App\Models\SeccionEmpresa;
 use App\Models\MedioRecepcion;
 use App\Models\Expediente;
+use App\Models\DetalleExpediente;
+use App\Models\User;
 
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+
 
 
 class ExpedienteComponent extends Component
@@ -26,7 +31,8 @@ class ExpedienteComponent extends Component
     public $seccion_empresa, $series, $serie_id, $subserie, $subserie_id, $seccion_id, $empresa_id,
     $tipologia, $tipologia_id, $medio_recepcion, $medio_id, $diasTermino, $fecha, $destinatario, $folios,
     $anexos, $asunto, $confidencial, $respuesta_email, $copia_radicado, $seccionCopia, $seccionCopia_id,
-    $descripcion, $adjunto, $tipoProceso, $filtro, $etapa, $expediente_id;
+    $descripcion, $adjunto, $tipoProceso, $filtro, $etapa, $expediente, $expediente_id, $boolAgregar,
+    $observaciones, $modalFormVisible1;
 
     public function mount()
     {
@@ -44,7 +50,6 @@ class ExpedienteComponent extends Component
         $this->buscarSubSerie();
         $this->medio_recepcion = MedioRecepcion::all();
         $this->medio_id = MedioRecepcion::first()->id;
-        $this->fecha = now()->format('Y-m-d');
         $this->solicitudi = 0;
         $this->confidencial = false;
         $this->respuesta_email = false;
@@ -53,12 +58,17 @@ class ExpedienteComponent extends Component
         $this->anexos = 0;
         $this->filtro = 0;
         $this->etapa = 0;
-
+        try {
+            $this->expediente_id = Expediente::where('empresa_id',$this->empresa_id)->orderBy('updated_at','desc')->first()->id;
+            $this->seleccionar($this->expediente_id);
+        } catch (\Throwable $th) {
+            $this->expediente_id = 0;
+        }
     }
 
     public function render()
     {
-        $expedientes = Expediente::paginate(20);
+        $expedientes = Expediente::where('empresa_id',$this->empresa_id)->orderBy('updated_at','desc')->paginate(20);
 
         return view('livewire.expediente-component', ['expedientes'=> $expedientes]);
     }
@@ -129,4 +139,90 @@ class ExpedienteComponent extends Component
         $this->filtrar(0);
         session()->flash('message', 'El expdiente fue actualizado!!');
     }
+
+    public function seleccionar($id)
+    {
+        $this->expediente_id = $id;
+        $this->expediente = Expediente::find($this->expediente_id);
+        $this->Agregar(false);
+
+    }
+
+    public function Agregar($agregar)
+    {
+        $this->boolAgregar=$agregar;
+
+    }
+
+    public function radicar()
+    {
+        $s = SeccionEmpresa::find($this->seccion_id);
+        $cc=[];
+
+
+
+        if (!is_null($s->emailjefe)) {
+            $cc[]=$s->emailjefe;
+        }
+
+        if($this->copia_radicado and $this->usercopias){
+            foreach ($this->usercopias as $co => $value) {
+                if($value){
+                    $u = User::find($co);
+                        $cc[]=$u->email;
+                    }
+                }
+            }
+
+        $cc = array_unique($cc);
+        //dd($cc);
+
+
+        $this->validate([
+            'asunto'=>'required|min:5',
+            'diasTermino'=>'required|numeric',
+            'adjunto' => 'required|max:24576', // Pdf máximo 24MB
+        ]);
+
+        try {
+            $dataValid['adjunto'] = $this->adjunto->store('pdf','public');
+            Storage::disk('public')->path($dataValid['adjunto']);
+
+        } catch (\Throwable $th) {
+            $dataValid['adjunto']='';
+        }
+
+        DetalleExpediente::create([
+            'user_id'=>Auth::user()->id,
+            'expediente_id'=>$this->expediente_id,
+            'seccion_id'=>$this->seccion_id,
+            'empresa_id'=>$this->empresa_id,
+            'serie_id'=>$this->serie_id,
+            'subserie_id'=>$this->subserie_id,
+            'tipologia_id'=>$this->tipologia_id,
+            'medio_id'=>$this->medio_id,
+            'folios'=>$this->folios,
+            'anexos'=>$this->anexos,
+            'asunto'=>$this->asunto,
+            'adjunto'=>$dataValid['adjunto'],
+            'observaciones'=>$this->observaciones,
+        ]);
+
+        $this->asunto=null;
+        $this->adjunto=null;
+        $this->Agregar(false);
+        $this->expediente = Expediente::find($this->expediente_id);
+    }
+
+    public function boolCerrar($cerrar)
+    {
+        $this->modalFormVisible1 = $cerrar;
+    }
+
+    public function cerrarExpediente()
+    {
+        $this->expediente->finalizada = true;
+        $this->expediente->save();
+    }
+
 }

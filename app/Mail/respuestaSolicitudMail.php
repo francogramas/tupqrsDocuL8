@@ -13,7 +13,7 @@ class respuestaSolicitudMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $solicitud;
+    public $solicitud, $seguimiento;
     /**
      * Create a new message instance.
      *
