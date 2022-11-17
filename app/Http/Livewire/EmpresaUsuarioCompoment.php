@@ -185,11 +185,11 @@ class EmpresaUsuarioCompoment extends Component
         ]);
 
         //------------------------------------------------------------------ SERIES
-        $SP = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'PETICIONES')->first();
-        $SQ = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'QUEJAS')->first();
-        $SR = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'RECLAMOS')->first();
-        $SS = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'SUGERENCIAS')->first();
-        $SD = Serie::where('empresa_id', $this->empresa_id)->where('nombre', 'DENUNCIAS')->first();
+        $SP = Serie::firstOrCreate(['empresa_id' =>  $this->empresa_id], ['nombre' => 'PETICIONES']);
+        $SQ = Serie::firstOrCreate(['empresa_id' =>  $this->empresa_id], ['nombre' => 'QUEJAS']);
+        $SR = Serie::firstOrCreate(['empresa_id' =>  $this->empresa_id], ['nombre' => 'RECLAMOS']);
+        $SS = Serie::firstOrCreate(['empresa_id' =>  $this->empresa_id], ['nombre' => 'SUGERENCIAS']);
+        $SD = Serie::firstOrCreate(['empresa_id' =>  $this->empresa_id], ['nombre' => 'DENUNCIAS']);
 
         //------------------------------------------------------------------ SUBSERIES
         $SSP = Subserie::create([ 'serie_id'=>$SP->id, 'seccion_id'=>$seccion->id, 'codigo'=>'0001', 'nombre'=>'PETICIONES', 'Re_AG'=>10, 'Re_AC'=>0, 'DF_CT'=>true, 'DF_E'=>false, 'DF_MD'=>false, 'DF_S'=>false, 'ACC_P'=>true, 'ACC_Pr'=>false, 'procedimiento'=>'',]);
