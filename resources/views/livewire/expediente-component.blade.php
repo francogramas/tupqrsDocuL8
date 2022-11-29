@@ -60,7 +60,7 @@ x-init="$watch('openAlertBox', value => {
     <div class="grid grid-cols-6 gap-3">
         <div class="col-span-2">
             <div class="py-2">
-                <input type="search" class="w-full input input-primary" placeholder="Parámetro de busqueda:">
+                <input type="search" wire:model='param' class="w-full input input-primary" placeholder="Parámetro de busqueda:">
             </div>
             <table class="table table-compact text-xs w-full border-1">
                 <caption class="font-bold">Listado de Expedientes</caption>

@@ -112,8 +112,9 @@ class VentanillaComponent extends Component
             ->whereRaw("(replace(solicitantes.nombrecompleto,' ','') REGEXP ?)
             or (replace(concat_ws('', solicitantes.documento),' ','') REGEXP ?)
             or (replace(concat_ws('', solicituds.radicado),' ','') REGEXP ?)
-            or (replace(concat_ws('', solicituds.asunto),' ','') REGEXP ?)",
-            [$p, $p, $this->param, $p])->join('solicitantes','solicituds.solicitante_id','solicitantes.id')->paginate(10);
+            or (replace(concat_ws('', solicituds.asunto),' ','') REGEXP ?)
+            and (empresa_id like ?)",
+            [$p, $p, $this->param, $p, $this->empresa_id])->join('solicitantes','solicituds.solicitante_id','solicitantes.id')->paginate(10);
         }
         else{
             if ($this->filtro == 0) {
@@ -347,50 +348,52 @@ class VentanillaComponent extends Component
             $dataValid['adjunto'] = $this->adjunto->store('pdf','public');
             $outputFile = Storage::disk('public')->path($dataValid['adjunto']);
             $this->fillPDF(Storage::disk('public')->path($dataValid['adjunto']), $outputFile, $solicitudBD->empresa->razonsocial ,$solicitudBD->radicado);
+            $seg  = SeguimientoOrden::create([
+                'solicitud_id' => $solicitudBD->id,
+                'user_id'=>Auth::user()->id,
+                'estado_id' => 1,
+                'seccion_id' => $this->seccion_id,
+                'accion_id' => 1,
+                'mensaje' => $this->descripcion,
+                'adjunto' => $dataValid['adjunto'],
+            ]);
+
+            $this->seguimiento = $seg->id;
+
+
+            if($this->copia_radicado and $this->copias){
+
+                foreach ($this->copias as $co => $value) {
+                    if($value){
+                        $ccM[]=[
+                            'solicitud_id' => $solicitudBD->id,
+                            'seccion_id' => $co
+                        ];
+                    }
+                }
+                solicitudCopia::upsert($ccM,['solicitud_id', 'seccion_id']);
+            }
+
+
+
+            $s = SeccionEmpresa::find($this->seccion_id);
+
+
+            Mail::to($this->solicitante->email)
+            ->cc($cc)
+            ->send(new solicitudMail($solicitudBD));
+            $this->solicitudi = $solicitudBD->id;
+            $this->etapa = 3;
+            $this->copias = null;
+            $this->copia_radicado = false;
+            $this->finalizarRadicado();
 
         } catch (\Throwable $th) {
+            $this->error('adjunto', 'EL formato del pedf no es admitido');
             $dataValid['adjunto']='';
         }
 
-        $seg  = SeguimientoOrden::create([
-            'solicitud_id' => $solicitudBD->id,
-            'user_id'=>Auth::user()->id,
-            'estado_id' => 1,
-            'seccion_id' => $this->seccion_id,
-            'accion_id' => 1,
-            'mensaje' => $this->descripcion,
-            'adjunto' => $dataValid['adjunto'],
-        ]);
 
-        $this->seguimiento = $seg->id;
-
-
-        if($this->copia_radicado and $this->copias){
-
-            foreach ($this->copias as $co => $value) {
-                if($value){
-                    $ccM[]=[
-                        'solicitud_id' => $solicitudBD->id,
-                        'seccion_id' => $co
-                    ];
-                }
-            }
-            solicitudCopia::upsert($ccM,['solicitud_id', 'seccion_id']);
-        }
-
-
-
-        $s = SeccionEmpresa::find($this->seccion_id);
-
-
-        Mail::to($this->solicitante->email)
-        ->cc($cc)
-        ->send(new solicitudMail($solicitudBD));
-        $this->solicitudi = $solicitudBD->id;
-        $this->etapa = 3;
-        $this->copias = null;
-        $this->copia_radicado = false;
-        $this->finalizarRadicado();
 
     }
     public function calcularRadicado($trd=false)

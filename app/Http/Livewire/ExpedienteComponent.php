@@ -12,13 +12,12 @@ use App\Models\MedioRecepcion;
 use App\Models\Expediente;
 use App\Models\DetalleExpediente;
 use App\Models\User;
+use App\Models\Solicitud;
 
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -32,7 +31,7 @@ class ExpedienteComponent extends Component
     $tipologia, $tipologia_id, $medio_recepcion, $medio_id, $diasTermino, $fecha, $destinatario, $folios,
     $anexos, $asunto, $confidencial, $respuesta_email, $copia_radicado, $seccionCopia, $seccionCopia_id,
     $descripcion, $adjunto, $tipoProceso, $filtro, $etapa, $expediente, $expediente_id, $boolAgregar,
-    $observaciones, $modalFormVisible1;
+    $observaciones, $modalFormVisible1, $param;
 
     public function mount()
     {
@@ -68,7 +67,27 @@ class ExpedienteComponent extends Component
 
     public function render()
     {
-        $expedientes = Expediente::where('empresa_id',$this->empresa_id)->orderBy('updated_at','desc')->paginate(20);
+
+
+        if(Str::length($this->param)>2){
+            $char = [' ',',','.',';','"','?','¿','!','¡','&','$','@','#','%',')','(','/','=','+','-','*','/','_',':','>','<','{','}','[',']',"'"];
+            $p = str_replace($char,'',$this->param);
+
+            $expedientes = Expediente::select('expedientes.*')
+            ->whereRaw("(replace(solicitantes.nombrecompleto,' ','') REGEXP ?)
+            or (replace(concat_ws('', solicitantes.documento),' ','') REGEXP ?)
+            or (replace(concat_ws('', solicituds.radicado),' ','') REGEXP ?)
+            or (replace(concat_ws('', solicituds.asunto),' ','') REGEXP ?)
+            and (solicituds.empresa_id like ?)",
+            [$p, $p, $this->param, $p, $this->empresa_id])
+            ->join('solicituds', 'expedientes.solicitudEntrada', 'solicituds.id')
+            ->join('solicitantes','solicituds.solicitante_id','solicitantes.id')
+            ->orderBy('updated_at','desc')->paginate(20);
+
+        }
+        else{
+            $expedientes = Expediente::where('empresa_id',$this->empresa_id)->orderBy('updated_at','desc')->paginate(20);
+        };
 
         return view('livewire.expediente-component', ['expedientes'=> $expedientes]);
     }

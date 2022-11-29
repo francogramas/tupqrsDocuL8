@@ -82,20 +82,26 @@
                 <p class="text-gray-700 mt-2">
                     <span class="font-bold mt-2">Asunto:</span> {{$solicitudi->asunto}}
                 </p>
+
                 @forelse ($solicitudi->seguimiento as $seguimiento)
-                    @if ($seguimiento->mensaje)
+
+
                         <div class="block p-2 border border-gray-400 mt-2 text-sm">
                             <div class="text-base font-bold text-gray-700">
                                 {{$seguimiento->accion->nombre}}
                             </div>
-                            <p class="text-gray-700">
+                            <!--p class="text-gray-700">
                                 <span class="font-bold">Mensaje: </span>{{$seguimiento->mensaje}}
-                            </p>
+                            </p-->
                             @if ($seguimiento->observaciones)
                             <p class="text-gray-700">
                                 <span class="font-bold">Observaciones: </span>{{$seguimiento->observaciones}}
                             </p>
                             @endif
+
+                            <p class="text-gray-500">
+                                {{$seguimiento->created_at->format('M d/Y')}}
+                            </p>
                             @if (Str::length($seguimiento->adjunto)>0)
                                 <a class="font-bold mt-2  flex " href="{{route('impdocumento',Crypt::encryptString($seguimiento->id))}}" target="_blank">
                                     Documento adjunto: <button class="bg-blue-300 text-gray-800 font-bold mx-2 px-2 py-1 flex rounded">
@@ -106,11 +112,7 @@
                                     </button>
                                 </a>
                             @endif
-                            <p class="text-right text-gray-500">
-                                {{$seguimiento->created_at->format('M d/Y')}}
-                            </p>
                         </div>
-                    @endif
                 @empty
                 @endforelse
 
