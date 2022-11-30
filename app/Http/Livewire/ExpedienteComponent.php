@@ -74,12 +74,12 @@ class ExpedienteComponent extends Component
             $p = str_replace($char,'',$this->param);
 
             $expedientes = Expediente::select('expedientes.*')
+            ->where('empresa_id', $this->empresa_id)
             ->whereRaw("(replace(solicitantes.nombrecompleto,' ','') REGEXP ?)
             or (replace(concat_ws('', solicitantes.documento),' ','') REGEXP ?)
             or (replace(concat_ws('', solicituds.radicado),' ','') REGEXP ?)
-            or (replace(concat_ws('', solicituds.asunto),' ','') REGEXP ?)
-            and (solicituds.empresa_id like ?)",
-            [$p, $p, $this->param, $p, $this->empresa_id])
+            or (replace(concat_ws('', solicituds.asunto),' ','') REGEXP ?)",
+            [$p, $p, $this->param, $p])
             ->join('solicituds', 'expedientes.solicitudEntrada', 'solicituds.id')
             ->join('solicitantes','solicituds.solicitante_id','solicitantes.id')
             ->orderBy('updated_at','desc')->paginate(20);
