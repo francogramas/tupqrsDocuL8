@@ -105,7 +105,7 @@ x-init="$watch('openAlertBox', value => {
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($  as $solicitud)
+                        @foreach ($solicitudes  as $solicitud)
                         @php
 
                         if($solicitud->estado_id==1){
