@@ -13,12 +13,12 @@
             </select>
         </div>
         <div class="px-2 mx-1">
-            <button class="mt-9 ml-2 px-1 py-1 bg-blue-400 rounded-lg hover:bg-blue-600 text-gray-100 font-bold" title="Enviar mensaje masivo" wire:click="mostrarMensajeMasivo()">
+            <button class="ml-2 mt-9 px-1 py-1 rounded-lg font-bold tooltip tooltip-primary"  data-tip="Enviar mensaje masivo" wire:click="mostrarMensajeMasivo()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                   </svg>
             </button>
-            <button class="mt-9 ml-2 px-1 py-1 bg-blue-400 rounded-lg hover:bg-blue-600 text-gray-100 font-bold" title="Crear empresa nueva" wire:click="crearNueva()">
+            <button class="ml-2 mt-9 px-1 py-1 rounded-lg font-bold tooltip tooltip-primary"  data-tip="Crear empresa nueva" wire:click="crearNueva()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
