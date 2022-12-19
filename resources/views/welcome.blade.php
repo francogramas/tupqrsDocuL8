@@ -24,7 +24,7 @@
                 @if (Route::has('login'))
                     <div class="fixed top-0 left-0 px-6 py-2 sm:block w-full md:w-auto bg-white md:bg-transparent text-right">
                         <div class="flex items-center">
-                            <img src="/src/img/logo.svg" alt="" class="w-36 md:w-48">
+                            <img src="/src/img/logo.svg" alt="" class="w-72">
                         </div>
                     </div>
                     <div class="fixed top-0 right-0 px-6 py-6 sm:block w-full  md:w-auto md:bg-transparent text-right">

@@ -195,7 +195,7 @@ x-init="$watch('openAlertBox', value => {
         <div class="px-2">
             <label for="telefono" class="block text-gray-700 text-sm font-bold">Celular</label>
             @error('telefono') <span class="text-error  block text-xs">{{ $message }}</span> @enderror
-            <input id="telefono" wire:model.defer="telefono" type="tel" class="w-full px-2 py-1 rounded-md shadow-lg" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+            <input id="telefono" wire:model.defer="telefono" type="number" class="w-full px-2 py-1 rounded-md shadow-lg" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
         </div>
         <div class="px-2">
             <label for="email" class="block text-gray-700 text-sm font-bold">Correo electrónico</label>

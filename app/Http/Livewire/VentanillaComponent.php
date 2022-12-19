@@ -188,10 +188,10 @@ class VentanillaComponent extends Component
             'tipo_documento' => 'required',
             'documento' => 'required',
             //'nacimiento' => 'required|date',
-            'telefono' => 'required|numeric|min:10',
-            'email' => 'required|email',
+            'telefono' => 'numeric|min:10',
+            'email' => 'email',
             'nombrecompleto' => 'required|min:10',
-            'direccion' => 'required'
+            'direccion' => 'min:5'
         ]);
 
         $s = Solicitante::where('documento', $this->documento)->first();
