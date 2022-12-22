@@ -47,7 +47,7 @@ class VentanillaComponent extends Component
     $asunto, $anos, $ano, $meses, $mes, $dias, $dia, $estados, $estado_id, $ciudades, $ciudad_id, $direccion, $seccion_empresa,
     $tipo_usuarios, $tipo_usuario_id, $medio_recepcion, $medio_id, $fecha, $copia_radicado, $seccionCopia, $seccionCopia_id,
     $tipos_id, $confidencial, $respuesta_email, $diasTermino, $solicitudi, $descripcion, $series, $serie_id, $subserie, $subserie_id, $tipologia,
-    $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1, $copias, $seguimiento, $usercopias, $error;
+    $tipologia_id, $tipoProceso, $max_consecutivo, $destinatario, $folios, $anexos, $param, $filtro, $solicitud1, $copias, $seguimiento, $usercopias;
 
 
 
@@ -388,7 +388,7 @@ class VentanillaComponent extends Component
             $this->finalizarRadicado();
 
         } catch (\Throwable $th) {
-            $this->error('adjunto', 'EL formato del pedf no es admitido');
+            report($th);
             $dataValid['adjunto']='';
         }
 
