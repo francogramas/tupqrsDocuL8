@@ -346,7 +346,7 @@ class VentanillaComponent extends Component
         try {
             $dataValid['adjunto'] = $this->adjunto->store('pdf','public');
             $outputFile = Storage::disk('public')->path($dataValid['adjunto']);
-            $this->fillPDF(Storage::disk('public')->path($dataValid['adjunto']), $outputFile, $solicitudBD->empresa->razonsocial ,$solicitudBD->radicado);
+            //$this->fillPDF(Storage::disk('public')->path($dataValid['adjunto']), $outputFile, $solicitudBD->empresa->razonsocial ,$solicitudBD->radicado);
             $seg  = SeguimientoOrden::create([
                 'solicitud_id' => $solicitudBD->id,
                 'user_id'=>Auth::user()->id,
